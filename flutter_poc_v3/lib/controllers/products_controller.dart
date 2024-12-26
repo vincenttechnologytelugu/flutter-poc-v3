@@ -38,7 +38,7 @@ class ProductsController extends GetxController {
       log('Fetching data for page: $currentPage');
 
       final response = await http.get(
-        Uri.parse("http://192.168.96.1:8080/adposts?page=$currentPage&psize=$pageSize"),
+        Uri.parse("http://172.26.0.1:8080/adposts?page=$currentPage&psize=$pageSize"),
       );
 
       if (response.statusCode == 200) {

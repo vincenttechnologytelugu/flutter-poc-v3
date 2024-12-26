@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_poc_v3/main.dart';
+
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:flutter_poc_v3/services/api_services.dart';
@@ -19,7 +19,7 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-    final _formKey = GlobalKey<FormState>();
+  final _formKey = GlobalKey<FormState>();
   SizedBox textFieldDefaultGap = const SizedBox(height: 16);
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -39,7 +39,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     return emailValid && passwordValid;
   }
-    bool isLoading = false;
+
+  bool isLoading = false;
 // function to register to user
   Future<void> registerUser(
       String firstName, String lastName, String email, String password) async {
@@ -57,7 +58,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://192.168.96.1:8080/authentication/register"),
+        Uri.parse("http://172.26.0.1:8080/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -81,6 +82,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final responseData = jsonDecode(response.body);
+        
+  // Initialize prefs before using it
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  
+         // Save user data immediately after successful registration
+  await prefs.setString('first_name', firstNameController.text.trim());
+  await prefs.setString('last_name', lastNameController.text.trim());
+  await prefs.setString('email', emailController.text.trim());
+
+    // Debug log to verify data is saved
+  log('User data saved after registration:');
+  log('first_name: ${prefs.getString('first_name')}');
+  log('last_name: ${prefs.getString('last_name')}');
+  log('email: ${prefs.getString('email')}');
 
         // Changed from 'token' to 'session'
         final token = responseData['session'];
@@ -88,7 +103,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Save token and user data
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
+        // In registration
+log('Saved user data: ${firstNameController.text}, ${lastNameController.text}, ${emailController.text}');
 
+// In profile loading
+log('Loaded user data: $firstName, $lastName, $email');
+
+          // Save user data - Add these lines
+          await prefs.setString('first_name', firstName);
+          await prefs.setString('last_name', lastName);
+          await prefs.setString('email', email);
+
+// Debug log after saving
+          log('Verification - Saved data:');
+          log('first_name: ${prefs.getString('first_name')}');
+          log('last_name: ${prefs.getString('last_name')}');
+          log('email: ${prefs.getString('email')}');
           // Save user data from the 'data' object
           if (responseData['data'] != null) {
             await prefs.setString(
@@ -97,6 +127,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 'last_name', responseData['data']['last_name']);
             await prefs.setString('email', responseData['data']['email']);
           }
+          // Add after saving data
+          log('Saved user data - First Name: ${await prefs.getString('first_name')}');
+          log('Saved user data - Last Name: ${await prefs.getString('last_name')}');
+          log('Saved user data - Email: ${await prefs.getString('email')}');
 
           // Show success message
           Fluttertoast.showToast(
@@ -119,22 +153,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception(errorData['message'] ?? 'Registration failed');
-        
-        
       }
     } catch (e) {
-    // Hide loading indicator if it's still showing
-    if (context.mounted) {
-      Navigator.pop(context);
-    }
-      
- // Show error message
-    Fluttertoast.showToast(
-      msg: "Error during registration: $e",
-      toastLength: Toast.LENGTH_LONG,
-      gravity: ToastGravity.BOTTOM,
-      backgroundColor: Colors.red,
-    );
+      // Hide loading indicator if it's still showing
+      if (context.mounted) {
+        Navigator.pop(context);
+      }
+
+      // Show error message
+      Fluttertoast.showToast(
+        msg: "Error during registration: $e",
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        backgroundColor: Colors.red,
+      );
 
       log('Error during registration: $e');
     }
@@ -148,43 +180,59 @@ class _RegisterScreenState extends State<RegisterScreen> {
     passwordController.dispose();
     super.dispose();
   }
-  Future<void> _register() async {
-    if (!_formKey.currentState!.validate()) return;
 
-    setState(() => isLoading = true);
+  // Future<void> _register() async {
+  //   if (!_formKey.currentState!.validate()) return;
 
-    try {
-      await ApiService.register(
-         firstNameController.text,
-          lastNameController.text,
-        emailController.text,
-        passwordController.text
-      );
+  //   setState(() => isLoading = true);
 
-      if (mounted) {
-        Fluttertoast.showToast(
-          msg: "Registration successful!",
-          backgroundColor: Colors.green,
-        );
-        
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
-        );
-      }
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        backgroundColor: Colors.red,
-      );
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
-    }
-  }
+  //   try {
+  //     // Get the response from ApiService
+  //     final responseData = await ApiService.register(
+  //         firstNameController.text,
+  //         lastNameController.text,
+  //         emailController.text,
+  //         passwordController.text);
 
- 
+
+  //          final prefs = await SharedPreferences.getInstance();
+  //            // Add this after successful registration
+  //   await prefs.setString('first_name', firstNameController.text);
+  //   await prefs.setString('last_name', lastNameController.text);
+  //   await prefs.setString('email', emailController.text);
+
+  //     // Save user data to SharedPreferences
+  //     // final prefs = await SharedPreferences.getInstance();
+  //     if (responseData['data'] != null) {
+  //       await prefs.setString('first_name', responseData['data']['first_name']);
+  //       await prefs.setString('last_name', responseData['data']['last_name']);
+  //       await prefs.setString('email', responseData['data']['email']);
+  //     }
+
+  //     if (mounted) {
+  //       Fluttertoast.showToast(
+  //         msg: "Registration successful!",
+  //         backgroundColor: Colors.green,
+  //       );
+
+  //       Navigator.pushReplacement(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     Fluttertoast.showToast(
+  //       msg: e.toString(),
+  //       backgroundColor: Colors.red,
+  //     );
+  //   } finally {
+  //     if (mounted) {
+  //       setState(() => isLoading = false);
+  //     }
+  //   }
+  // }
+
+  
   @override
   void initState() {
     super.initState();
@@ -203,9 +251,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             padding: const EdgeInsets.all(2.0),
             child: Column(
               children: [
-                Image.asset("assets/images/Register.jpg",
-             
-                width: 250,
+                Image.asset(
+                  "assets/images/Register.jpg",
+                  width: 250,
                 ),
                 // CachedNetworkImage(
                 //   height: 150,
@@ -243,7 +291,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                   decoration: const InputDecoration(
-                      hintText: "Lirst_name",
+                      hintText: "First_name",
                       label: Text("First_name"),
                       prefixIcon: Icon(Icons.person_2_outlined),
                       counterText: "",

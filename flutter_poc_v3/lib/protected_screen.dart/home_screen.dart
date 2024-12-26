@@ -6,12 +6,14 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/dashhome_screen.d
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/my_adds.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/profile_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
+
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/products_screen..dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +30,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // Define screens list properly
   final List<Widget> _screens = [
     // const CategoriesModel(), // Your home content
-    const DashhomeScreen(),
+    // const DashhomeScreen(),
+    const ResponsiveProductsScreen(),
+
+    
+
+
 
     const ChatScreen(),
     const SellScreen(),

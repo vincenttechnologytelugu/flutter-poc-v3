@@ -5,7 +5,7 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 import 'dart:developer';
 
 class ResponsiveProductsScreen extends StatefulWidget {
-  const ResponsiveProductsScreen({Key? key}) : super(key: key);
+  const ResponsiveProductsScreen({super.key});
 
   @override
   State<ResponsiveProductsScreen> createState() =>
@@ -149,7 +149,7 @@ void _scrollListener() {
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
               onPressed: _loadMoreData,
-              child: const Text('Load More' ,style: TextStyle(fontSize: 40,color: Colors.red),),
+              child: const Text('Load More' ,style: TextStyle(fontSize: 15,color: Colors.red),),
             ),
           ),
       ],
@@ -162,9 +162,9 @@ class ProductCard extends StatefulWidget {
   final ProductModel product;
 
   const ProductCard({
-    Key? key,
+    super.key,
     required this.product,
-  }) : super(key: key);
+  });
 
   @override
   State<ProductCard> createState() => _ProductCardState();

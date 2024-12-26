@@ -1,9 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+
 
 class DashhomeScreen extends StatefulWidget {
   const DashhomeScreen({super.key});
@@ -14,9 +17,10 @@ class DashhomeScreen extends StatefulWidget {
 
 class _DashhomeScreenState extends State<DashhomeScreen> {
   final ProductsController productsController = Get.put(ProductsController());
+  final ResponsiveProductsScreen responsiveProductsScreen =Get.put(ResponsiveProductsScreen());
 
   final List<Map<String, String>> items = [
-    {"image": "assets/images/cars.jpg", "caption": "Cars"},
+    {"image": "assets/images/car s.jpg", "caption": "Cars"},
     {"image": "assets/images/property.png", "caption": "Property"},
     {"image": "assets/images/mobiles.png", "caption": "Mobiles"},
     {"image": "assets/images/jobs.png", "caption": "Jobs"},
@@ -59,9 +63,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title:Text("data")
-      ),
+      appBar: AppBar(title: Text("data")),
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,7 +218,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
 class ProductCard extends StatelessWidget {
   final ProductModel product;
 
-  const ProductCard({Key? key, required this.product}) : super(key: key);
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {

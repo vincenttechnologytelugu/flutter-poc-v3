@@ -2,33 +2,35 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 //import 'package:flutter_poc_v3/main.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
-import 'package:flutter_poc_v3/providers/user_provider.dart';
-import 'package:flutter_poc_v3/public_screen.dart/forgot_password_screen.dart';
+import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
+
+import 'package:flutter_poc_v3/public_screen.dart/reset_password_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/register_screen.dart';
 import 'package:flutter_poc_v3/services/api_services.dart';
 import 'package:flutter_poc_v3/services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:provider/provider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:developer';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _formKey = GlobalKey<FormState>();
+  final formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final SizedBox textFieldDefaultGap = const SizedBox(height: 16);
   bool visiblePassword = false;
   String? loginMessage;
   bool isLoading = false;
+ProfileResponseModel profileData = ProfileResponseModel();
 
   @override
   void initState() {
@@ -36,58 +38,122 @@ class _LoginScreenState extends State<LoginScreen> {
     checkLoginStatus();
   }
 
-  // lib/public_screen/login_screen.dart
-// In your login success handler:
-  Future<void> handleLogin(String email, String password) async {
-    try {
-      setState(() => isLoading = true);
+  // Future<void>handleLogin(String email, String password) async {
+  //   try {
+  //     setState(() => isLoading = true);
 
-      final response = await http.post(
-        Uri.parse('${ApiService.baseUrl}/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'password': password,
-        }),
+  //     // First login request
+  //     final response = await http.post(
+  //       Uri.parse('${ApiService.baseUrl}/login'),
+  //       headers: {'Content-Type': 'application/json'},
+  //       body: jsonEncode({
+  //         'email': email,
+  //         'password': password,
+  //       }),
+  //     );
+
+  //     if (response.statusCode == 200) {
+  //       final responseData = jsonDecode(response.body);
+  //       final token = responseData['session'];
+
+  //       // Save token first
+  //       final prefs = await SharedPreferences.getInstance();
+  //       await prefs.setString('token', token);
+
+  //       // Then immediately fetch user details with the token
+  //       final userResponse = await http.get(
+  //         Uri.parse('${ApiService.baseUrl}/authentication/auth_user'),
+  //         headers: {
+  //           'Authorization': 'Bearer $token',
+  //           'Content-Type': 'application/json',
+  //         },
+  //       );
+
+  //       if (userResponse.statusCode == 200) {
+  //         final userData = jsonDecode(userResponse.body);
+
+  //         // Save user data with proper field names
+  //         await prefs.setString('first_name', userData['firstName'] ?? '');
+  //         await prefs.setString('last_name', userData['lastName'] ?? '');
+  //         await prefs.setString('email', userData['email'] ?? '');
+
+  //         // Debug logs to verify data is saved
+  //         log('Saved user data:');
+  //         log('Token: $token');
+  //         log('First Name: ${prefs.getString('first_name')}');
+  //         log('Last Name: ${prefs.getString('last_name')}');
+  //         log('Email: ${prefs.getString('email')}');
+           
+
+  //          refreshUserDataFromApi();
+          
+  //       } else {
+  //         throw Exception('Failed to fetch user details');
+  //       }
+  //     } else {
+  //       throw Exception('Login failed');
+  //     }
+  //   } catch (e) {
+  //     log('Login error: $e');
+  //     setState(() => isLoading = false);
+  //     Fluttertoast.showToast(
+  //       msg: "An error occurred. Please try again.",
+  //       backgroundColor: Colors.red,
+  //     );
+  //   } finally {
+  //     setState(() => isLoading = false);
+  //   }
+  // }
+
+
+
+ Future<void> refreshUserDataFromApi() async {
+    setState(() => isLoading = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        log('No token found');
+        return;
+      }
+
+      // Make API call to get user details
+      final response = await http.get(
+        Uri.parse('http://172.26.0.1:8080/authentication/auth_user'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        final token = responseData['session'];
-
-        if (token != null) {
-          // Save token
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setString('token', token);
-
-          // Fetch user details
-          final user = await ApiService.getAuthenticatedUser(token);
-
-          // Update user provider
-          //Provider.of<UserProvider>(context, listen: false).setUser(user);
-
-          Fluttertoast.showToast(
-            msg: "Login successful!",
-            backgroundColor: Colors.green,
-          );
-
-          if (mounted) {
+        final userDetails = jsonDecode(response.body);
+        log('User details: $userDetails');
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        profileData = ProfileResponseModel.fromJson(responseData);
+        setState(() {
+          isLoading = false;
+        });
+        log('User details: $userDetails');
+        // Update SharedPreferences with latest data
+        await prefs.setString('first_name', profileData.firstName ?? '');
+        await prefs.setString('last_name', profileData.lastName ?? '');
+        await prefs.setString('email', profileData.email ?? '');
+        if (mounted) {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
             );
           }
-        }
       }
     } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        backgroundColor: Colors.red,
-      );
+      log('Error refreshing user data: $e');
     } finally {
       setState(() => isLoading = false);
     }
   }
+
 
   Future<void> checkLoginStatus() async {
     final prefs = await SharedPreferences.getInstance();
@@ -129,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.96.1:8080/authentication/login'),
+        Uri.parse('http://172.26.0.1:8080/authentication/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -153,15 +219,6 @@ class _LoginScreenState extends State<LoginScreen> {
           // Store the token
           await prefs.setString('token', token);
 
-          // Store user data if available in response
-          if (responseData['data'] != null) {
-            await prefs.setString('email', responseData['data']['email']);
-            await prefs.setString(
-                'first_name', responseData['data']['first_name']);
-            await prefs.setString(
-                'last_name', responseData['data']['last_name']);
-          }
-
           setState(() {
             loginMessage = 'Login successful! Redirecting to home...';
             isLoading = false;
@@ -174,15 +231,13 @@ class _LoginScreenState extends State<LoginScreen> {
             gravity: ToastGravity.BOTTOM,
             backgroundColor: Colors.green,
           );
-
-          // Navigate to home screen after 5 seconds
-          await Future.delayed(const Duration(seconds: 5));
-          if (mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
-            );
-          }
+refreshUserDataFromApi();
+          // if (mounted) {
+          //   Navigator.pushReplacement(
+          //     context,
+          //     MaterialPageRoute(builder: (context) => const HomeScreen()),
+          //   );
+          // }
         } else {
           throw Exception('Session token not received from server');
         }
@@ -203,57 +258,6 @@ class _LoginScreenState extends State<LoginScreen> {
         backgroundColor: Colors.red,
         textColor: Colors.white,
       );
-    }
-  }
-
-  // In your LoginScreen _login method:
-  Future<void> _login() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    setState(() => isLoading = true);
-
-    try {
-      final result = await ApiService.login(
-        _emailController.text,
-        _passwordController.text,
-      );
-
-      if (result['token'] != null) {
-        // Save token
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', result['token']);
-
-        // Save user data
-        if (result['user'] != null) {
-          await prefs.setString('user_data', jsonEncode(result['user']));
-        }
-
-        if (mounted) {
-          Fluttertoast.showToast(
-            msg: "Login successful!",
-            backgroundColor: Colors.green,
-          );
-
-          // Update user provider if you're using one
-          // Provider.of<UserProvider>(context, listen: false).setUser(result['user']);
-
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-          );
-        }
-      } else {
-        throw Exception('Login failed: No token received');
-      }
-    } catch (e) {
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        backgroundColor: Colors.red,
-      );
-    } finally {
-      if (mounted) {
-        setState(() => isLoading = false);
-      }
     }
   }
 
@@ -350,7 +354,7 @@ class _LoginScreenState extends State<LoginScreen> {
               //    Navigator.push(
               //         context,
               //         MaterialPageRoute(
-              //             builder: (ctx) =>  ForgotPasswordScreen()));
+              //             builder: (ctx) =>  ResetPasswordScreen()));
               // }, child: Text("Forgot Password",
               // style: TextStyle(fontSize: 20,color: Colors.blue),
               // )
@@ -417,11 +421,15 @@ class _LoginScreenState extends State<LoginScreen> {
 class User {
   final String id;
   final String email;
+   final String firstName;
+  final String lastName;
   // Add other relevant fields
 
   User({
     required this.id,
     required this.email,
+      required this.firstName,
+    required this.lastName,
     // Add other required fields
   });
 
@@ -429,6 +437,8 @@ class User {
     return User(
       id: json['id'],
       email: json['email'],
+       firstName: json['firstName'],
+      lastName: json['lastName'],
       // Map other fields
     );
   }

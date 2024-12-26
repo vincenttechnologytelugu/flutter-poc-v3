@@ -4,7 +4,7 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 class ProductDetails extends StatelessWidget {
   final ProductModel productModel;
 
-  const ProductDetails({Key? key, required this.productModel}) : super(key: key);
+  const ProductDetails({super.key, required this.productModel});
 
   @override
   Widget build(BuildContext context) {

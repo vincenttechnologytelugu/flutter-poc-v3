@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 //import 'package:flutter_poc_v3/main.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
 
 import 'package:flutter_poc_v3/public_screen.dart/reset_password_screen.dart';
@@ -271,148 +272,236 @@ refreshUserDataFromApi();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text("Login"),
-      ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              // CachedNetworkImage(
-              //   height: 150,
-              //   imageUrl:
-              //       "https://static.vecteezy.com/ti/vetor-gratis/p1/15271968-design-de-icone-plano-de-homem-de-negocios-conceito-de-icone-de-recurso-humano-e-empresario-icone-de-homem-em-estilo-plano-da-moda-simbolo-para-o-design-do-seu-site-logotipo-app-vetor.jpg",
-              //   placeholder: (context, url) =>
-              //       const CircularProgressIndicator(),
-              //   errorWidget: (context, url, error) => const Icon(Icons.error),
-              // ),
-              const SizedBox(height: 24),
-              Text(
-                "Welcome Back\nPlease Login to Your Account",
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
+      // appBar: AppBar(
+      //   centerTitle: true,
+      //   title: Text("Login"),
+      // ),
+      body: Stack(
+        children: [
+          Container(
+             width: double.infinity,
+            height: double.infinity,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  // Color(0xffb81736), // Blue shade
+                  // Color(0xff281537), // Lighter blue shade
+                  Color.fromARGB(255, 129, 209, 201), // Blue shade
+                  Color.fromARGB(255, 139, 1, 245), // Lighter blue shade
+                ],
               ),
-              const SizedBox(height: 24),
-              if (loginMessage != null)
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  margin: const EdgeInsets.only(bottom: 16.0),
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: loginMessage!.contains('successful')
-                        ? Colors.green.shade100
-                        : Colors.red.shade100,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    loginMessage!,
-                    style: TextStyle(
-                      color: loginMessage!.contains('successful')
-                          ? Colors.green.shade800
-                          : Colors.red.shade800,
+            ),
+            child: SingleChildScrollView(
+              child: Container(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // CachedNetworkImage(
+                    //   height: 150,
+                    //   imageUrl:
+                    //       "https://static.vecteezy.com/ti/vetor-gratis/p1/15271968-design-de-icone-plano-de-homem-de-negocios-conceito-de-icone-de-recurso-humano-e-empresario-icone-de-homem-em-estilo-plano-da-moda-simbolo-para-o-design-do-seu-site-logotipo-app-vetor.jpg",
+                    //   placeholder: (context, url) =>
+                    //       const CircularProgressIndicator(),
+                    //   errorWidget: (context, url, error) => const Icon(Icons.error),
+                    // ),
+                    const SizedBox(height: 24),
+                    Padding(
+                     padding: const EdgeInsets.only(top: 60, left: 20),
+                      child: Text(
+                        "Welcome Back\nPlease Login",
+                        style:
+                                TextStyle(fontSize: 30, color: Colors.white)
+                      ),
                     ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              TextFormField(
-                controller: _emailController,
-                keyboardType: TextInputType.emailAddress,
-                decoration: const InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter your email',
-                  prefixIcon: Icon(Icons.email),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              textFieldDefaultGap,
-              TextFormField(
-                controller: _passwordController,
-                obscureText: !visiblePassword,
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter your password',
-                  prefixIcon: const Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      visiblePassword ? Icons.visibility : Icons.visibility_off,
+                    const SizedBox(height: 24),
+                    if (loginMessage != null)
+                      Container(
+                        padding: const EdgeInsets.all(8.0),
+                        margin: const EdgeInsets.only(bottom: 16.0),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: loginMessage!.contains('successful')
+                              ? Colors.green.shade100
+                              : Colors.red.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          loginMessage!,
+                          style: TextStyle(
+                            color: loginMessage!.contains('successful')
+                                ? Colors.green.shade800
+                                : Colors.red.shade800,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    TextFormField(
+                      controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        labelStyle: TextStyle(color: Colors.white),
+                        hintText: 'Enter your email',
+                        helperStyle: TextStyle(color: Colors.white),
+                        prefixIcon: Icon(Icons.email,color: Colors.white,),
+                         border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color:
+                                      const Color.fromARGB(255, 250, 248, 248),
+                                  width: 1.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color:
+                                      const Color.fromARGB(255, 245, 242, 242),
+                                  width: 2.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                      ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        visiblePassword = !visiblePassword;
-                      });
-                    },
-                  ),
-                  border: const OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 24),
-              //TextButton("Forgot Password",style: TextStyle(fontSize: 25,color: Colors.blue),),
-              // TextButton(onPressed: (){
-              //    Navigator.push(
-              //         context,
-              //         MaterialPageRoute(
-              //             builder: (ctx) =>  ResetPasswordScreen()));
-              // }, child: Text("Forgot Password",
-              // style: TextStyle(fontSize: 20,color: Colors.blue),
-              // )
-              // ),
-              const SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: Container(
-                  color: Colors.pink,
-                  width: 50,
-                  margin: EdgeInsets.only(left: 90, right: 90),
-                  child: ElevatedButton(
-                    onPressed: isLoading
-                        ? null
-                        : () {
-                            final email = _emailController.text.trim();
-                            final password = _passwordController.text;
-                            if (email.isNotEmpty && password.isNotEmpty) {
-                              loginUser(email, password);
-                            } else {
-                              Fluttertoast.showToast(
-                                msg: "Please fill in all fields",
-                                backgroundColor: Colors.red,
-                              );
-                            }
+                    textFieldDefaultGap,
+                    TextFormField(
+                      controller: _passwordController,
+                      obscureText: !visiblePassword,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.white),
+                        hintText: 'Enter your password',
+                        helperStyle: TextStyle(color: Colors.white),
+                        prefixIcon: const Icon(Icons.lock,color: Colors.white,),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            visiblePassword ? Icons.visibility : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              visiblePassword = !visiblePassword;
+                            });
                           },
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: isLoading
-                          ? const CircularProgressIndicator()
-                          : const Text(
-                              'Login',
-                              style:
-                                  TextStyle(fontSize: 25, color: Colors.blue),
-                            ),
+                        ),
+                       border: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color:
+                                      const Color.fromARGB(255, 250, 248, 248),
+                                  width: 1.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                          focusedErrorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(
+                                  color:
+                                      const Color.fromARGB(255, 245, 242, 242),
+                                  width: 2.0),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
+                      ),
                     ),
-                  ),
+                    const SizedBox(height: 24),
+                    //TextButton("Forgot Password",style: TextStyle(fontSize: 25,color: Colors.blue),),
+                    // TextButton(onPressed: (){
+                    //    Navigator.push(
+                    //         context,
+                    //         MaterialPageRoute(
+                    //             builder: (ctx) =>  ResetPasswordScreen()));
+                    // }, child: Text("Forgot Password",
+                    // style: TextStyle(fontSize: 20,color: Colors.blue),
+                    // )
+                    // ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Container(
+                        // color: Colors.pink,
+                        width: 50,
+                        margin: EdgeInsets.only(left: 90, right: 90),
+                        child: ElevatedButton(
+                          onPressed: isLoading
+                              ? null
+                              : () {
+                                  final email = _emailController.text.trim();
+                                  final password = _passwordController.text;
+                                  if (email.isNotEmpty && password.isNotEmpty) {
+                                    loginUser(email, password);
+                                  } else {
+                                    Fluttertoast.showToast(
+                                      msg: "Please fill in all fields",
+                                      backgroundColor: Colors.red,
+                                    );
+                                  }
+                                },
+                          child: Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: isLoading
+                                ? const CircularProgressIndicator()
+                                : const Text(
+                                    'Login',
+                                    style:
+                                        TextStyle(fontSize: 25, color: Colors.blue),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(height: 10),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to registration screen
+                        // Navigator.pushNamed(context, '/register');
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (ctx) => const RegisterScreen()));
+                      },
+                      child: const Text(
+                        "New User? Creat Account",
+                        style: TextStyle(color: Color.fromARGB(255, 0, 35, 234), fontSize: 25),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-              SizedBox(height: 100),
-              TextButton(
-                onPressed: () {
-                  // Navigate to registration screen
-                  // Navigator.pushNamed(context, '/register');
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (ctx) => const RegisterScreen()));
-                },
-                child: const Text(
-                  "New User? Creat Account",
-                  style: TextStyle(color: Colors.blue, fontSize: 25),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+           Padding(
+            padding: const EdgeInsets.only(top: 580),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                    topRight: Radius.circular(40),
+                    topLeft: Radius.circular(40)),
+                color: Colors.white,
+              ),
+              height: double.infinity,
+              width: double.infinity,
+            ),
+          ),
+        ],
       ),
     );
   }

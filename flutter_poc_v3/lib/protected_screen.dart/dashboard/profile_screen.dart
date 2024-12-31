@@ -37,6 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     refreshUserDataFromApi();
+    
   }
 
   Future<void> loadUserData() async {
@@ -141,6 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               // onRefresh: refreshUserDataFromApi,
 
               child: SingleChildScrollView(
+           
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -148,6 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     elevation: 4,
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
+                      
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -190,7 +193,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: InkWell(
                                       onTap: () async {
                                         // Handle camera icon tap
-                                        ImagePicker imagePicker = ImagePicker();
+                                      final  ImagePicker imagePicker = ImagePicker();
                                    pickedXFile =  await  imagePicker
                                             .pickImage(source: ImageSource.camera,
                                             imageQuality: 30,
@@ -239,14 +242,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-
+                      
                           const SizedBox(height: 8),
                           Text(
                             'Email: ${profileData.email ?? ""}',
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                           const SizedBox(height: 16),
-
+                      
                           // Add these buttons after the email Text widget in the Column
                           const SizedBox(height: 20),
                           // In your ProfileScreen where you navigate to UpdateProfileScreen
@@ -279,11 +282,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     profileData.lastName = result['lastName'];
                                     profileData.email = result['email'];
                                   });
-
+                      
                                   // Optionally save updated data to SharedPreferences or refresh from API
                                   final prefs =
                                       await SharedPreferences.getInstance();
-
+                      
                                   await prefs.setString('first_name',
                                       profileData.firstName ?? '');
                                   await prefs.setString(
@@ -296,14 +299,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 padding:const EdgeInsets.all(10),
                                     // const EdgeInsets.symmetric(vertical: 15),
                                 backgroundColor:
-                                    const Color.fromARGB(255, 56, 52, 122), // You can customize the color
+                                    const Color.fromARGB(255, 93, 93, 132), // You can customize the color
                               ),
                               child: const Text(
                                 
                                 "Update Profile",style: TextStyle(fontSize: 20,color: Colors.white),),
                             ),
                           ),
-
+                      
                           const SizedBox(height: 12),
                           SizedBox(
                             width: double.infinity,

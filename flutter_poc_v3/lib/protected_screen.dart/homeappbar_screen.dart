@@ -2,18 +2,24 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
+ import 'package:geolocator/geolocator.dart';
+
 
 class HomeappbarScreen extends StatefulWidget {
-  const HomeappbarScreen({super.key});
+    final String location;
+  // const HomeappbarScreen({super.key, this.location="Select Location"});
+  const HomeappbarScreen({super.key, this.location = "Select Location"});
 
   @override
   State<HomeappbarScreen> createState() => _HomeappbarScreenState();
 }
 
 class _HomeappbarScreenState extends State<HomeappbarScreen> {
+  String? locationText;
   String? userName;
   // Add this method to check storage
   void checkStorageData() {
@@ -64,6 +70,8 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
   void initState() {
     super.initState();
     loadUserData();
+        // Initialize location from widget if provided
+    locationText = widget.location;
   }
 
   Future<void> loadUserData() async {
@@ -143,15 +151,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
               ),
 
               const Spacer(),
-              // Add debug button
-              // if (kDebugMode) // Only show in debug mode
-              //   IconButton(
-              //     icon: const Icon(Icons.storage),
-              //     onPressed: checkStorageData,
-              //     tooltip: 'Check Storage',
-              //   ),
-
-              const Spacer(),
+             
               const Icon(
                 Icons.location_on_outlined,
                 size: 30,
@@ -159,26 +159,47 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
               const SizedBox(width: 5),
               Expanded(
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     // Your location tap logic here
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LocationScreen(),
+                      ),
+                    );
+                    if (result != null) {
+                      setState(() {
+                        // Update the location text
+                         locationText = result.toString().replaceAll(RegExp(r'[{}()]'), '');
+                      });
+                    }
                   },
-                  child: Text(
-                    userName ?? 'User',
-                    style: const TextStyle(fontSize: 16),
+                  child:  Text(
+                  locationText ?? 'Location',
+                    style:const TextStyle(
+                      color: Colors.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
+                  // Text(
+                  //   userName ?? 'User',
+                  //   style: const TextStyle(fontSize: 16),
+                  //   overflow: TextOverflow.ellipsis,
+                  // ),
                 ),
               ),
               // Add logout icon button
-              IconButton(
-                icon: const Icon(
-                  Icons.logout,
-                  color: Colors.black87,
-                  size: 24,
-                ),
-                onPressed: logout,
-                tooltip: 'Logout',
-              ),
+              // IconButton(
+              //   icon: const Icon(
+              //     Icons.logout,
+              //     color: Colors.black87,
+              //     size: 24,
+              //   ),
+              //   onPressed: logout,
+              //   tooltip: 'Logout',
+              // ),
             ],
           ),
         ],
@@ -186,56 +207,3 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
     );
   }
 }
-
-// import 'package:flutter/material.dart';
-
-// class HomeappbarScreen extends StatelessWidget {
-//   const HomeappbarScreen({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return AppBar(
-//       elevation: 0.0,
-//       backgroundColor: const Color.fromARGB(255, 173, 171, 171),
-//       title: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Row(
-//             children: [
-//               const Padding(padding: EdgeInsets.only(top: 10)),
-//               const Text(
-//                 "Olx",
-//                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-//               ),
-//               const SizedBox(width: 160),
-//               const Icon(
-//                 Icons.location_on_outlined,
-//                 size: 30,
-//               ),
-//               const SizedBox(width: 5),
-//               Expanded(
-//                 child: GestureDetector(
-//                   onTap: () {
-//                     // Navigator.push(
-//                     //     context,
-//                     //     MaterialPageRoute(
-//                     //         builder: (ctx) => const Location()));
-//                   },
-//                   child: const Text(
-//                     'Miyapur, Hyderabad',
-//                     style: TextStyle(
-//                       color: Colors.black,
-//                       fontSize: 16,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                     overflow: TextOverflow.ellipsis,
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

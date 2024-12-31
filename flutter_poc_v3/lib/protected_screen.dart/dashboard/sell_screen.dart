@@ -28,7 +28,7 @@ class _SellScreenState extends State<SellScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sell Items'),
+        title: Text('What are you offering'),
       ),
       body: GridView.builder(
         itemCount: items.length,

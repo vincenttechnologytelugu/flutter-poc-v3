@@ -51,5 +51,18 @@
 	<string>For User Account Creation Profile Pic</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>For User Account Video Recording</string>
+
+	<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location when open to show your current location.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to location when in the background.</string>
+
+<!-- locatio -->
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>This app needs access to location when open to show nearby content.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>This app needs access to location when in the background.</string>
+
+
 </dict>
 </plist>

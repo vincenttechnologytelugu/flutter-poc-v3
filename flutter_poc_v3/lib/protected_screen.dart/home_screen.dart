@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart'
 
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/location_view.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/products_screen..dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -239,7 +240,7 @@ Future<void> _showLocationScreen() async {
         ],
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
+        unselectedItemColor: const Color.fromARGB(179, 230, 142, 142),
       ),
       body: _screens[currentIndex],
     );

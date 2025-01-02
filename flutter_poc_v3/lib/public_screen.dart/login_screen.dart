@@ -39,72 +39,7 @@ ProfileResponseModel profileData = ProfileResponseModel();
     checkLoginStatus();
   }
 
-  // Future<void>handleLogin(String email, String password) async {
-  //   try {
-  //     setState(() => isLoading = true);
-
-  //     // First login request
-  //     final response = await http.post(
-  //       Uri.parse('${ApiService.baseUrl}/login'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: jsonEncode({
-  //         'email': email,
-  //         'password': password,
-  //       }),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final responseData = jsonDecode(response.body);
-  //       final token = responseData['session'];
-
-  //       // Save token first
-  //       final prefs = await SharedPreferences.getInstance();
-  //       await prefs.setString('token', token);
-
-  //       // Then immediately fetch user details with the token
-  //       final userResponse = await http.get(
-  //         Uri.parse('${ApiService.baseUrl}/authentication/auth_user'),
-  //         headers: {
-  //           'Authorization': 'Bearer $token',
-  //           'Content-Type': 'application/json',
-  //         },
-  //       );
-
-  //       if (userResponse.statusCode == 200) {
-  //         final userData = jsonDecode(userResponse.body);
-
-  //         // Save user data with proper field names
-  //         await prefs.setString('first_name', userData['firstName'] ?? '');
-  //         await prefs.setString('last_name', userData['lastName'] ?? '');
-  //         await prefs.setString('email', userData['email'] ?? '');
-
-  //         // Debug logs to verify data is saved
-  //         log('Saved user data:');
-  //         log('Token: $token');
-  //         log('First Name: ${prefs.getString('first_name')}');
-  //         log('Last Name: ${prefs.getString('last_name')}');
-  //         log('Email: ${prefs.getString('email')}');
-           
-
-  //          refreshUserDataFromApi();
-          
-  //       } else {
-  //         throw Exception('Failed to fetch user details');
-  //       }
-  //     } else {
-  //       throw Exception('Login failed');
-  //     }
-  //   } catch (e) {
-  //     log('Login error: $e');
-  //     setState(() => isLoading = false);
-  //     Fluttertoast.showToast(
-  //       msg: "An error occurred. Please try again.",
-  //       backgroundColor: Colors.red,
-  //     );
-  //   } finally {
-  //     setState(() => isLoading = false);
-  //   }
-  // }
+  
 
 
 
@@ -224,14 +159,36 @@ ProfileResponseModel profileData = ProfileResponseModel();
             loginMessage = 'Login successful! Redirecting to home...';
             isLoading = false;
           });
+         // Replace Fluttertoast with SnackBar
+void showMessage(String message, bool isError) {
+  if (mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text("login success"),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+}
+
+// Then update your login method to use this:
+try {
+  // ... login logic ...
+  showMessage('Login successful! Redirecting to home...', false);
+} catch (e) {
+  showMessage(e.toString(), true);
+}
+
 
           // Show success toast
-          Fluttertoast.showToast(
-            msg: "Login successful!",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: Colors.green,
-          );
+          // Fluttertoast.showToast(
+          //   msg: "Login successful!",
+          //   toastLength: Toast.LENGTH_LONG,
+          //   gravity: ToastGravity.BOTTOM,
+          //   backgroundColor: Colors.green,
+          // );
+
 refreshUserDataFromApi();
           // if (mounted) {
           //   Navigator.pushReplacement(
@@ -251,6 +208,7 @@ refreshUserDataFromApi();
         loginMessage = 'Error: ${e.toString()}';
         isLoading = false;
       });
+      
 
       Fluttertoast.showToast(
         msg: e.toString(),

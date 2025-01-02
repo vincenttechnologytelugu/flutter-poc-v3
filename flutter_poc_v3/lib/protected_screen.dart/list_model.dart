@@ -19,10 +19,10 @@ class _ListModelState extends State<ListModel> {
             child: Container(
               //margin: EdgeInsets.symmetric(vertical: 10),
 
-              // padding: EdgeInsets.only(left: 20),
+           
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //crossAxisAlignment: CrossAxisAlignment.center,
+              
                 children: [
                   Row(
                     children: [

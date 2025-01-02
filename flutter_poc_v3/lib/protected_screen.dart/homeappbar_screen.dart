@@ -3,15 +3,17 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/location_view.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
- import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 
 
 class HomeappbarScreen extends StatefulWidget {
-    final String location;
-  // const HomeappbarScreen({super.key, this.location="Select Location"});
+  final String location;
+
   const HomeappbarScreen({super.key, this.location = "Select Location"});
 
   @override
@@ -23,13 +25,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
   String? userName;
   // Add this method to check storage
   void checkStorageData() {
-    // if (kIsWeb) {
-    //   // For Web
-    //   html.window.localStorage.forEach((key, value) {
-    //     log('Local Storage - $key: $value');
-    //   });
-    // } else {
-    //   // For Mobile
+  
     checkSharedPreferences();
     // }
   }
@@ -70,7 +66,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
   void initState() {
     super.initState();
     loadUserData();
-        // Initialize location from widget if provided
+    // Initialize location from widget if provided
     locationText = widget.location;
   }
 
@@ -149,9 +145,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
                 "Olx",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
               ),
-
               const Spacer(),
-             
               const Icon(
                 Icons.location_on_outlined,
                 size: 30,
@@ -164,42 +158,28 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const LocationScreen(),
+                        builder: (context) => LocationScreen(),
                       ),
                     );
                     if (result != null) {
                       setState(() {
                         // Update the location text
-                         locationText = result.toString().replaceAll(RegExp(r'[{}()]'), '');
+                        locationText =
+                            result.toString().replaceAll(RegExp(r'[{}()]'), '');
                       });
                     }
                   },
-                  child:  Text(
-                  locationText ?? 'Location',
-                    style:const TextStyle(
+                  child: Text(
+                    locationText ?? 'Location',
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
-                  // Text(
-                  //   userName ?? 'User',
-                  //   style: const TextStyle(fontSize: 16),
-                  //   overflow: TextOverflow.ellipsis,
-                  // ),
                 ),
               ),
-              // Add logout icon button
-              // IconButton(
-              //   icon: const Icon(
-              //     Icons.logout,
-              //     color: Colors.black87,
-              //     size: 24,
-              //   ),
-              //   onPressed: logout,
-              //   tooltip: 'Logout',
-              // ),
             ],
           ),
         ],

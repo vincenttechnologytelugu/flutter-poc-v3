@@ -319,45 +319,100 @@ void _showSuccess(String message) {
     }
   }
 
-  // Add this method to handle current location selection
-  Future<void> _handleCurrentLocationSelection() async {
-    if (currentPosition != null) {
-      try {
-        // Show loading indicator
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        );
+  // // Add this method to handle current location selection
+  // Future<void> _handleCurrentLocationSelection() async {
+  //   if (currentPosition != null) {
+  //     try {
+  //       // Show loading indicator
+  //       showDialog(
+  //         context: context,
+  //         barrierDismissible: false,
+  //         builder: (BuildContext context) {
+  //           return const Center(
+  //             child: CircularProgressIndicator(),
+  //           );
+  //         },
+  //       );
 
-        // Get address from coordinates
-        String address = await _getAddressFromCoordinates(currentPosition!);
+  //       // Get address from coordinates
+  //       String address = await _getAddressFromCoordinates(currentPosition!);
 
-        // Update location in backend
-        await _updateLocationWithCoordinates(
-          currentPosition!.latitude,
-          currentPosition!.longitude,
-          address,
-        );
+  //       // Update location in backend
+  //       await _updateLocationWithCoordinates(
+  //         currentPosition!.latitude,
+  //         currentPosition!.longitude,
+  //         address,
+  //       );
 
-        // Remove loading indicator
-        if (mounted) {
-          Navigator.pop(context); // Remove loading dialog
-            Navigator.pop(context, address.replaceAll(RegExp(r'[{}()]'), '')); // Remove brackets if any
-        }
-      } catch (e) {
-        // Remove loading indicator
-        if (mounted) {
-          Navigator.pop(context); // Remove loading dialog
-        }
-        _showError('Failed to update location: $e');
+  //       // Remove loading indicator
+  //       if (mounted) {
+  //         Navigator.pop(context); // Remove loading dialog
+  //           Navigator.pop(context, address.replaceAll(RegExp(r'[{}()]'), '')); // Remove brackets if any
+  //       }
+  //     } catch (e) {
+  //       // Remove loading indicator
+  //       if (mounted) {
+  //         Navigator.pop(context); // Remove loading dialog
+  //       }
+  //       _showError('Failed to update location: $e');
+  //     }
+  //   }
+  // }
+
+
+
+
+
+Future<void> _handleCurrentLocationSelection() async {
+  if (currentPosition != null) {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      // Get address from coordinates
+      String address = await _getAddressFromCoordinates(currentPosition!);
+
+      // Remove loading indicator and return the formatted address
+      if (mounted) {
+        Navigator.pop(context); // Remove loading dialog
+        // Format the address string and remove any special characters
+        String formattedAddress = address
+            .replaceAll(RegExp(r'[{}()]'), '')
+            .replaceAll(RegExp(r',+'), ',')
+            .trim();
+        // Remove any leading or trailing commas
+        formattedAddress = formattedAddress.replaceAll(RegExp(r'^,|,$'), '');
+        
+        Navigator.pop(context, formattedAddress);
       }
+    } catch (e) {
+      // Remove loading indicator
+      if (mounted) {
+        Navigator.pop(context); // Remove loading dialog
+      }
+      _showError('Failed to get location: $e');
     }
   }
+}
+
+
+
+
+
+
+
+
+
+
+
 
   // Add this method to update location with coordinates
   Future<void> _updateLocationWithCoordinates(

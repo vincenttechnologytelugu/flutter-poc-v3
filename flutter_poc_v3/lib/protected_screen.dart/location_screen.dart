@@ -221,26 +221,7 @@ void _performSearch(String query) {
     }
   }
 
- // Update the _updateLocation method
-  // Future<void> _updateLocation(String city) async {
-  //   try {
-  //     final response = await http.get(
-  //       Uri.parse('http://172.26.0.1:8080/adposts?city=$city')
-  //     );
-      
-  //     if (response.statusCode == 200) {
-  //       if (mounted) {
-  //           //  Navigator.pop(context, '$city, $selectedState'.replaceAll(RegExp(r'[()]'), ''));
-  //                 Navigator.pop(context, '$selectedState, $city');
-  //       }
-  //     } else {
-  //       // Handle error case
-  //       debugPrint('Error updating location: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     debugPrint('Error updating location: $e');
-  //   }
-  // }
+ 
 
 Future<void> _updateLocation(String city) async {
   try {
@@ -319,45 +300,7 @@ void _showSuccess(String message) {
     }
   }
 
-  // // Add this method to handle current location selection
-  // Future<void> _handleCurrentLocationSelection() async {
-  //   if (currentPosition != null) {
-  //     try {
-  //       // Show loading indicator
-  //       showDialog(
-  //         context: context,
-  //         barrierDismissible: false,
-  //         builder: (BuildContext context) {
-  //           return const Center(
-  //             child: CircularProgressIndicator(),
-  //           );
-  //         },
-  //       );
-
-  //       // Get address from coordinates
-  //       String address = await _getAddressFromCoordinates(currentPosition!);
-
-  //       // Update location in backend
-  //       await _updateLocationWithCoordinates(
-  //         currentPosition!.latitude,
-  //         currentPosition!.longitude,
-  //         address,
-  //       );
-
-  //       // Remove loading indicator
-  //       if (mounted) {
-  //         Navigator.pop(context); // Remove loading dialog
-  //           Navigator.pop(context, address.replaceAll(RegExp(r'[{}()]'), '')); // Remove brackets if any
-  //       }
-  //     } catch (e) {
-  //       // Remove loading indicator
-  //       if (mounted) {
-  //         Navigator.pop(context); // Remove loading dialog
-  //       }
-  //       _showError('Failed to update location: $e');
-  //     }
-  //   }
-  // }
+  
 
 
 
@@ -414,31 +357,7 @@ Future<void> _handleCurrentLocationSelection() async {
 
 
 
-  // Add this method to update location with coordinates
-  Future<void> _updateLocationWithCoordinates(
-    double latitude,
-    double longitude,
-    String address,
-  ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://172.26.0.1:8080/adposts/location'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          'latitude': latitude,
-          'longitude': longitude,
-          'address': address,
-        }),
-      );
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to update location');
-      }
-    } catch (e) {
-      debugPrint('Error updating location: $e');
-      throw e;
-    }
-  }
+  
 
 
 

@@ -1,12 +1,14 @@
+import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 // import 'package:flutter_poc_v3/models/post_model.dart';
-import 'package:flutter_poc_v3/models/category_model.dart';
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 
 class CategoryController extends GetxController {
-  List<CategoryModel> categoryModelList = [];
+  // List<CategoryModel> categoryModelList = [];
+   List<ProductModel> productModelList = [];
   // List<CategoryModel> cartModelList = [];
   List categoriesList = [];
   // List<PostModel>postModelList=[];
@@ -42,14 +44,14 @@ class CategoryController extends GetxController {
     update();
     http.Response response =
         // await http.get(Uri.parse("https://fakestoreapi.com/products"));
-         await http.get(Uri.parse("http://172.26.0.1:8080/categories"));
+         await http.get(Uri.parse("http://172.21.208.1:8080/categories"));
     var data = jsonDecode(response.body);
     // parsing
     for (var item in data) {
-      categoryModelList.add(CategoryModel.fromJson(item));
+      productModelList.add(ProductModel.fromJson(item));
     }
 
-    log(categoryModelList.length.toString());
+    log(productModelList.length.toString());
     // log(data.toString());
     isLoadingOne = false;
     update();

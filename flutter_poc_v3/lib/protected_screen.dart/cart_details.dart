@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+// import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/get_state_manager.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 
@@ -34,7 +34,7 @@ class CartDetails extends StatelessWidget {
                           "Total items count ${productsController.productModelList.length}"),
                      
                        Image.network(
-                      cartModel.image,
+                      cartModel.thumb,
                       height: 100,
                       width: 100,
                       fit: BoxFit.cover,

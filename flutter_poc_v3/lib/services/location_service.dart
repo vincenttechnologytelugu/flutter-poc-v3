@@ -3,6 +3,8 @@
 
 // lib/services/location_service.dart
 
+import 'dart:developer';
+
 import 'package:geolocator/geolocator.dart';
 
 class LocationService {
@@ -51,7 +53,7 @@ class LocationService {
       );
 
     } catch (e) {
-      print('Error getting location: $e');
+      log('Error getting location: $e');
       return null;
     }
   }

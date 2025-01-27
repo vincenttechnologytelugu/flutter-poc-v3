@@ -15,10 +15,10 @@ class _SellScreenState extends State<SellScreen> {
     {"icon": Icons.phone_android, "caption": "Mobiles", "color": Colors.orange},
     {"icon": Icons.work, "caption": "Jobs", "color": Colors.purple},
     {"icon": Icons.shopping_bag, "caption": "Fashion", "color": Colors.pink},
-    {"icon": Icons.book, "caption": "Books & Sports", "color": Colors.teal},
-    {"icon": Icons.motorcycle, "caption": "Bike", "color": Colors.red},
+    {"icon": Icons.book, "caption": "Books, Sports & Hobbies", "color": Colors.teal},
+    {"icon": Icons.motorcycle, "caption": "Bikes", "color": Colors.red},
     {"icon": Icons.devices_other, "caption": "Electronics", "color": Colors.indigo},
-    {"icon": Icons.local_shipping, "caption": "Commercial Vehicle", "color": Colors.brown},
+    {"icon": Icons.local_shipping, "caption": "Commercial Vehicles & Spares", "color": Colors.brown},
     {"icon": Icons.chair, "caption": "Furniture", "color": Colors.amber},
     {"icon": Icons.pets, "caption": "Pets", "color": Colors.cyan},
     {"icon": Icons.miscellaneous_services, "caption": "Services", "color": Colors.deepOrange},
@@ -80,35 +80,3 @@ class _SellScreenState extends State<SellScreen> {
   }
 }
 
-// class DetailScreen extends StatelessWidget {
-//   final Map<String, dynamic> item;
-
-//   const DetailScreen({Key? key, required this.item}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text(item["caption"]),
-//       ),
-//       body: Center(
-//         child: Column(
-//           mainAxisAlignment: MainAxisAlignment.center,
-//           children: [
-//             Icon(
-//               item["icon"],
-//               size: 100,
-//               color: item["color"],
-//             ),
-//             SizedBox(height: 20),
-//             Text(
-//               "Details for ${item["caption"]}",
-//               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-//             ),
-//             // Add more details or form fields here for the specific item category
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

@@ -56,7 +56,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
         log('Sending password update request...');
 
         final response = await http.post(
-          Uri.parse('http://172.26.0.1:8080/authentication/update_password'),
+          Uri.parse('http://172.21.208.1:8080/authentication/update_password'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -84,7 +84,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
           await prefs.setString('password', _newPasswordController.text);
           await prefs.setString(
               'confirmPassword', _confirmPasswordController.text);
-
+if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Password updated successfully'),
@@ -306,7 +306,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
 //         log('Sending password update request...');
 
 //         final response = await http.post(
-//           Uri.parse('http://172.26.0.1:8080/authentication/update_password'),
+//           Uri.parse('http://172.21.208.1:8080/authentication/update_password'),
 //           headers: {
 //             'Content-Type': 'application/json',
 //             'Authorization': 'Bearer $token',

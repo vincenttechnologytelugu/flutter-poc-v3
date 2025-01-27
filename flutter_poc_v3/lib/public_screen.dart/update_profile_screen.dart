@@ -53,7 +53,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://172.26.0.1:8080/authentication/auth_user'),
+        Uri.parse('http://172.21.208.1:8080/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -75,6 +75,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
      
 
         // Navigate back to ProfileScreen with updated data
+        if (!mounted) return;
         Navigator.pop(context, {
           'firstName': firstNameController.text,
           'lastName': lastNameController.text,
@@ -85,7 +86,9 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
         });
       } else {
         log('Failed to update profile: ${response.body}');
+        if (!mounted) return;
         showDialog(
+          
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
@@ -101,6 +104,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
       }
     } catch (e) {
       log('Error updating profile: $e');
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -121,28 +125,30 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Update Profile')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            TextField(
-              controller: firstNameController,
-              decoration: const InputDecoration(labelText: 'First Name'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: lastNameController,
-              decoration: const InputDecoration(labelText: 'Last Name'),
-            ),
-            const SizedBox(height: 8),
-            
-
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: updateProfileDetails,
-              child: const Text('Submit'),
-            ),
-          ],
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(
+                controller: firstNameController,
+                decoration: const InputDecoration(labelText: 'First Name'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: lastNameController,
+                decoration: const InputDecoration(labelText: 'Last Name'),
+              ),
+              const SizedBox(height: 8),
+              
+        
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: updateProfileDetails,
+                child: const Text('Submit'),
+              ),
+            ],
+          ),
         ),
       ),
     );

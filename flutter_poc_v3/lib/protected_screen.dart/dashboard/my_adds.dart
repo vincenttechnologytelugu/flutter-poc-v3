@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 
 class MyAdds extends StatefulWidget {
   const MyAdds({super.key});
@@ -46,8 +47,9 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
                 )
               ])),
       body: TabBarView(controller: tabController, children: [
-        Center(child: Text('Content 1')), // First tab content
-          Center(child: Text('Content 2')), // Second tab content
+        Center(child: Text('My Adds')), // First tab content
+        CartScreen(),
+          // Center(child: Text('Content 2')), // Second tab content
       ]),
     );
     // SingleChildScrollView(

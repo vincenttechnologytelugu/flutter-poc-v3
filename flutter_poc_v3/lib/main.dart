@@ -2,13 +2,16 @@
 import 'package:flutter/material.dart';
 
 
+
 import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 late SharedPreferences sharedPreferences;
 void main() async {
   
-
+ 
   runApp(const MyApp());
   sharedPreferences = await SharedPreferences.getInstance();
 }
@@ -19,7 +22,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
@@ -39,6 +42,12 @@ class MyApp extends StatelessWidget {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
+          // scaffoldBackgroundColor: Colors.white,
+          // primarySwatch: Colors.blue,
+    //        inputDecorationTheme: const InputDecorationTheme(
+    //   filled: true,
+    //   fillColor: Colors.white,
+    // ),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),

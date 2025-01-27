@@ -1,7 +1,8 @@
-import 'dart:developer';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/categories_model.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/dashboard/category_screen.dart';
+
+
+
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/chat_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/dashhome_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/my_adds.dart';
@@ -10,23 +11,26 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart'
 
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/location_view.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/products_screen..dart';
+
+
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+
 
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+   
   final pageController = PageController();
+
 
   String? userName;
   int currentIndex = 0;
@@ -43,13 +47,13 @@ String selectedLocation = 'Select Location';
   ];
 
   // List of screen titles
-  final List<String> _screenTitles = [
-    '', // Empty for home screen as it uses HomeappbarScreen
-    'Chat',
-    'Sell',
-    'My Ads',
-    'Profile',
-  ];
+  // final List<String> _screenTitles = [
+  //   '', // Empty for home screen as it uses HomeappbarScreen
+  //   'Chat',
+  //   'Sell',
+  //   'My Ads',
+  //   'Profile',
+  // ];
 
   @override
   void initState() {
@@ -58,7 +62,7 @@ String selectedLocation = 'Select Location';
   }
  
 // In your home screen
-Future<void> _showLocationScreen() async {
+Future<void> showLocationScreen() async {
   final result = await Navigator.push(
     context,
     MaterialPageRoute(builder: (context) => const LocationScreen()),
@@ -69,6 +73,9 @@ Future<void> _showLocationScreen() async {
       // Update your app bar with the selected location
       selectedLocation = result.toString();
     });
+     // Fetch products based on new location
+     
+
   }
 }
 
@@ -92,7 +99,7 @@ Future<void> _showLocationScreen() async {
         elevation: 0.0,
         backgroundColor: const Color.fromARGB(255, 173, 171, 171),
         title: const Text(
-          "Olx",
+          "U Sales",
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w600,
@@ -163,48 +170,48 @@ Future<void> _showLocationScreen() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 173, 171, 171),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Welcome!',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    userName ?? 'User',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.location_on),
-              title: Text(selectedLocation),
-              onTap: _showLocationScreen,
-            ),
-            ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
-              onTap: logout,
-            ),
-          ],
-        ),
-      ),
+      // drawer: Drawer(
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: [
+      //       DrawerHeader(
+      //         decoration: const BoxDecoration(
+      //           color: Color.fromARGB(255, 173, 171, 171),
+      //         ),
+      //         child: Column(
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           children: [
+      //             const Text(
+      //               'Welcome!',
+      //               style: TextStyle(
+      //                 color: Colors.white,
+      //                 fontSize: 24,
+      //               ),
+      //             ),
+      //             const SizedBox(height: 10),
+      //             Text(
+      //               userName ?? 'User',
+      //               style: const TextStyle(
+      //                 color: Colors.white,
+      //                 fontSize: 18,
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //       ListTile(
+      //         leading: const Icon(Icons.location_on),
+      //         title: Text(selectedLocation),
+      //         onTap: _showLocationScreen,
+      //       ),
+      //       ListTile(
+      //         leading: const Icon(Icons.logout),
+      //         title: const Text('Logout'),
+      //         onTap: logout,
+      //       ),
+      //     ],
+      //   ),
+      // ),
       
       bottomNavigationBar: BottomNavigationBar(
         selectedFontSize: 20,
@@ -218,29 +225,30 @@ Future<void> _showLocationScreen() async {
         },
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.white),
+            icon: Icon(Icons.home, color: Color.fromARGB(255, 171, 5, 189)),
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline, color: Colors.white),
+            icon: Icon(Icons.chat_bubble_outline, color: Color.fromARGB(255, 171, 5, 189)),
             label: "Chat",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline, color: Colors.white),
+            icon: Icon(Icons.add_circle_outline, color:  Color.fromARGB(255, 171, 5, 189)),
             label: "Sell",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_rounded, color: Colors.white),
+            icon: Icon(Icons.favorite_rounded, color: Color.fromARGB(255, 171, 5, 189)),
             label: "My Ads",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined, color: Colors.white),
+            icon: Icon(Icons.person_2_outlined, color: Color.fromARGB(255, 171, 5, 189)),
             label: "Profile",
           ),
         ],
         type: BottomNavigationBarType.fixed,
+     
         selectedItemColor: Colors.white,
-        unselectedItemColor: const Color.fromARGB(179, 230, 142, 142),
+        unselectedItemColor: const Color.fromARGB(179, 22, 1, 1),
       ),
       body: _screens[currentIndex],
     );

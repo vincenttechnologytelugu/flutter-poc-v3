@@ -1,8 +1,9 @@
-
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/category_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/search_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/notifications_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
 
 class DashhomeScreen extends StatefulWidget {
@@ -14,11 +15,35 @@ class DashhomeScreen extends StatefulWidget {
 
 class _DashhomeScreenState extends State<DashhomeScreen> {
   final ScrollController _scrollController = ScrollController();
+  final List<String> searchTexts = [
+    'Cars',
+    'Bikes',
+    'Properties',
+    'Mobiles',
+    'Jobs'
+  ];
+  int currentIndex = 0;
 
   @override
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void startAnimation() {
+    Timer.periodic(Duration(seconds: 2), (timer) {
+      if (mounted) {
+        setState(() {
+          currentIndex = (currentIndex + 1) % searchTexts.length;
+        });
+      }
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    startAnimation();
   }
 
   @override
@@ -58,13 +83,31 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                         children: [
                           Icon(Icons.search, color: Colors.grey),
                           SizedBox(width: 10),
-                          Text(
-                            'Find Cars, Mobile and More...',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 16,
+                          AnimatedSwitcher(
+                            duration: Duration(milliseconds: 500),
+                            transitionBuilder:
+                                (Widget child, Animation<double> animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                            child: Text(
+                              'Find ${searchTexts[currentIndex]}...',
+                              key: ValueKey<int>(currentIndex),
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 33, 4, 221),
+                                fontSize: 16,
+                              ),
                             ),
                           ),
+                          // Text(
+                          //   'Find Cars, Mobile and More...',
+                          //   style: TextStyle(
+                          //     color: Colors.grey,
+                          //     fontSize: 16,
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
@@ -72,47 +115,48 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                 ),
                 SizedBox(width: 10),
                 IconButton(
-                  icon: Icon(Icons.notifications_outlined),
+                  icon: Icon(Icons.notifications_outlined,size: 25,color: const Color.fromARGB(255, 240, 6, 232),),
                   onPressed: () {
-                    // Handle notification tap
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => NotificationsScreen(),
+                      ),
+                    );
                   },
                 ),
               ],
             ),
-          ),  
-          // Container for CategoryScreen with fixed height
-          Expanded(
+          ),
 
+          // Container for CategoryScreen with fixed height
+          SizedBox(height: 10),
+          Expanded(
             child: SingleChildScrollView(
               controller: _scrollController,
               child: Column(
                 children: [
                   Container(
+                    margin: EdgeInsets.only(top: 0),
+
                     height: 210, // Adjust this height as needed
-                    child: CategoryScreen(
-                      
+                    child: CategoryScreen(),
+                  ),
+                  SizedBox(height: 15),
+                  Container(
+                    margin: EdgeInsets.only(top: 0),
+                    height: MediaQuery.of(context).size.height -
+                        212, // Adjust this value based on your needs
+                    child: ResponsiveProductsScreen(
+                     
                     ),
                   ),
-                  SizedBox(height: 20),
-                   Container(
-                    margin: EdgeInsets.only(top: 0),
-                height: MediaQuery.of(context).size.height - 200, // Adjust this value based on your needs
-                child: ResponsiveProductsScreen(),
-              ),
                 ],
               ),
             ),
           ),
-          
-          // Container for ResponsiveProductsScreen
-          // Container(
-          //   height: MediaQuery.of(context).size.height - 200, // Adjust this value based on your needs
-          //   child: ResponsiveProductsScreen(),
-          // ),
         ],
       ),
     );
   }
 }
-
-

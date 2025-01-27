@@ -1,10 +1,9 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
-import 'package:flutter_poc_v3/services/api_services.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
@@ -41,6 +40,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return emailValid && passwordValid;
   }
 
+  // void handleDummyRegister() {
+  //   if (_formKey.currentState!.validate()) {
+  //     final firstName = firstNameController.text.trim();
+  //     final lastName = lastNameController.text.trim();
+  //     final email = emailController.text.trim();
+  //     final password = passwordController.text.trim();
+
+  //     // Show success message
+  //     Fluttertoast.showToast(
+  //       msg: "Registration successful!",
+  //       toastLength: Toast.LENGTH_LONG,
+  //       gravity: ToastGravity.BOTTOM,
+  //     );
+
+  //     // Navigate to home screen
+  //     Navigator.pushReplacement(
+  //       context,
+  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
+  //     );
+  //   }
+  // }
+
+
+  
+
   bool isLoading = false;
 // function to register to user
   Future<void> registerUser(
@@ -59,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://172.26.0.1:8080/authentication/register"),
+        Uri.parse("http://172.21.208.1:8080/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -78,6 +102,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
       // Hide loading indicator
       if (context.mounted) {
+        if (!mounted) return;
         Navigator.pop(context);
       }
 
@@ -129,9 +154,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             await prefs.setString('email', responseData['data']['email']);
           }
           // Add after saving data
-          log('Saved user data - First Name: ${await prefs.getString('first_name')}');
-          log('Saved user data - Last Name: ${await prefs.getString('last_name')}');
-          log('Saved user data - Email: ${await prefs.getString('email')}');
+          log('Saved user data - First Name: ${prefs.getString('first_name')}');
+          log('Saved user data - Last Name: ${prefs.getString('last_name')}');
+          log('Saved user data - Email: ${prefs.getString('email')}');
 
           // Show success message
           Fluttertoast.showToast(
@@ -143,6 +168,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
           // Navigate to home screen
           if (context.mounted) {
+            if (!mounted) return;
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -158,6 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } catch (e) {
       // Hide loading indicator if it's still showing
       if (context.mounted) {
+        if (!mounted) return;
         Navigator.pop(context);
       }
 
@@ -285,8 +312,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         padding: const EdgeInsets.only(top: 60, left: 20),
                         child: Text("Welcome\nCreate your Account",
                             style:
-                                TextStyle(fontSize: 30, color: Colors.white)
-                                ),
+                                TextStyle(fontSize: 30, color: Colors.white)),
                       ),
                       textFieldDefaultGap,
                       textFieldDefaultGap,
@@ -325,7 +351,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           counterText: "",
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white,width: 2),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -333,9 +360,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Colors.white,width: 2
-                            ),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                         ),
@@ -384,14 +410,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                           counterText: "",
                           border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white,width: 2),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
                           ),
                           focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white,width: 2),
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
                             borderRadius: BorderRadius.all(Radius.circular(15)),
                           ),
                           enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15))),
                         ),
@@ -418,7 +447,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           final bool emailValid = RegExp(
                                   r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                               .hasMatch(value ?? "");
-                          log("emailValid ${emailValid}");
+                          log("emailValid $emailValid");
                           if (value == null || value.isEmpty) {
                             return "Please enter email address";
                           } else if (!emailValid) {
@@ -512,7 +541,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         obscureText: vissiblePassword,
                         decoration: InputDecoration(
                           hintText: "Enter Password",
-                          hintStyle: TextStyle(color: Colors.white,),
+                          hintStyle: TextStyle(
+                            color: Colors.white,
+                          ),
                           label: const Text(
                             "Password",
                             style: TextStyle(color: Colors.white),
@@ -538,11 +569,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             borderSide: BorderSide(color: Colors.white),
                           ),
                           focusedBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15))),
                           enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white,width: 2),
+                              borderSide:
+                                  BorderSide(color: Colors.white, width: 2),
                               borderRadius:
                                   BorderRadius.all(Radius.circular(15))),
                           errorBorder: OutlineInputBorder(
@@ -579,8 +612,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             )),
                       ),
                       textFieldDefaultGap,
+
+    //                   ElevatedButton(
+    //                     style: ElevatedButton.styleFrom(
+    //                         backgroundColor:
+    //                             const Color.fromARGB(255, 219, 9, 205),
+    //                         shape: RoundedRectangleBorder(
+    //                             borderRadius: BorderRadius.circular(15))),
+    //                     onPressed: () {
+    //                       // Comment out your API call logic
+    //                       /*
+    // Your existing API call code here
+    // */
+
+    //                       // Call dummy register instead
+    //                       handleDummyRegister();
+    //                     },
+    //                     child: const Text("Register"),
+    //                   ),
+
                       ElevatedButton(
-                          style: ElevatedButton.styleFrom(
+                          style:
+                          ElevatedButton.styleFrom(
                               backgroundColor:
                                   const Color.fromARGB(255, 219, 9, 205),
                               shape: RoundedRectangleBorder(
@@ -605,18 +658,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             "Register",
                             style: TextStyle(color: Colors.white, fontSize: 20),
                           )),
-
-                      // TextButton(
-                      //     onPressed: () {
-                      //       firstNameController.clear();
-                      //       lastNameController.clear();
-                      //       emailController.clear();
-                      //       passwordController.clear();
-                      //     },
-                      //     child: Text(
-                      //       "Clear",
-                      //       style: TextStyle(color: Colors.white, fontSize: 20),
-                      //     )),
                     ],
                   ),
                 ),

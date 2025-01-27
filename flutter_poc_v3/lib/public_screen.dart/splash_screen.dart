@@ -1,12 +1,13 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
-import 'package:flutter_poc_v3/public_screen.dart/register_screen.dart';
-import 'package:flutter_poc_v3/services/api_services.dart';
+
+
 import 'package:flutter_poc_v3/services/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -48,8 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
             // Clear invalid token
             await prefs.remove('token');
             await prefs.remove('user_data');
+            
 
             Navigator.pushReplacement(
+            
               context,
               MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
@@ -65,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } catch (e) {
       // Handle any errors
-      print('Error in checkAuthAndNavigate: $e');
+      log('Error in checkAuthAndNavigate: $e');
       if (mounted) {
         Navigator.pushReplacement(
           context,

@@ -5,13 +5,16 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 
 class CartController extends GetxController {
   List<ProductModel> cartList = [];
+  
+
 
   addToCart(BuildContext context, ProductModel productModel) {
     cartList.add(productModel);
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text("Added to cart")));
+        .showSnackBar(const SnackBar(content: Text("Added to Favourite")));
     update();
   }
+  
 
   removeFromCart(BuildContext context, ProductModel productModel) {
     // Find the index of the first matching item
@@ -20,9 +23,15 @@ class CartController extends GetxController {
       // Remove only one item at that index
       cartList.removeAt(index);
       ScaffoldMessenger.of(context)
-          .showSnackBar(const SnackBar(content: Text("Removed from cart")));
+          .showSnackBar(const SnackBar(content: Text("Removed from Favourite")));
+      update();
+      } else {
+      // Handle the case where the item is not found in the cartList
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("Item not found in cart")));
       update();
     }
+
 }
 
 

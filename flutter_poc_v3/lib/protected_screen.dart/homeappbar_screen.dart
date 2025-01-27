@@ -1,15 +1,15 @@
-import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
+
+// import 'package:flutter/foundation.dart';
+
+
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/location_view.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart';
-
 
 class HomeappbarScreen extends StatefulWidget {
   final String location;
@@ -21,19 +21,32 @@ class HomeappbarScreen extends StatefulWidget {
 }
 
 class _HomeappbarScreenState extends State<HomeappbarScreen> {
+  final ProductsController productsController = ProductsController();
+
+
+
   String? locationText;
   String? userName;
+//  String? selectedLocationFromMap = "Location";  // Initial value
+
+
+
+
+ 
+
+
+
+
   // Add this method to check storage
   void checkStorageData() {
-  
     checkSharedPreferences();
-    // }
   }
 
 // Check SharedPreferences
   Future<void> checkSharedPreferences() async {
     final prefs = await SharedPreferences.getInstance();
     final allKeys = prefs.getKeys();
+    if (!mounted) return;
 
     showDialog(
       context: context,
@@ -70,10 +83,13 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
     locationText = widget.location;
   }
 
+
+
   Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       userName = prefs.getString('first_name') ?? 'User';
+      //  selectedLocationFromMap = prefs.getString('pickedLocation') ?? 'Location';  // Load the saved location
     });
   }
 
@@ -142,7 +158,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
             children: [
               const Padding(padding: EdgeInsets.only(top: 10)),
               const Text(
-                "Olx",
+                "U Sales",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
               ),
               const Spacer(),
@@ -154,29 +170,38 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
               Expanded(
                 child: GestureDetector(
                   onTap: () async {
-                    // Your location tap logic here
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => LocationScreen(),
                       ),
                     );
+
+                   
                     if (result != null) {
                       setState(() {
                         // Update the location text
                         locationText =
                             result.toString().replaceAll(RegExp(r'[{}()]'), '');
+                        //      selectedLocationFromMap = result.toString().replaceAll(RegExp(r'[{}()]'), '');
+                        // _saveLocationToPreferences(selectedLocationFromMap!);  // Save updated location
+                          
                       });
                     }
                   },
-                  child: Text(
-                    locationText ?? 'Location',
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
+                  child: Column(
+                    children: [
+                      Text(
+                        locationText ?? 'Location',
+                        // selectedLocationFromMap ?? 'Location',  // Display selected locatin
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -186,4 +211,10 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
       ),
     );
   }
+
+  // // Method to save the selected location to SharedPreferences
+  // Future<void> _saveLocationToPreferences(String location) async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   await prefs.setString('pickedLocation', location);  // Store location in SharedPreferences
+  // }
 }

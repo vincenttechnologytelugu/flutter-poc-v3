@@ -69,7 +69,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "http://172.21.208.1:8080/adposts?page=$currentPage&psize=$pageSize"),
+              "http://192.168.0.179:8080/adposts?page=$currentPage&psize=$pageSize"),
         );
 
         if (response.statusCode == 200) {

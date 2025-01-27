@@ -32,7 +32,7 @@ class ProductsController extends GetxController {
     isLoadingOne = true;
     update();
     
-     http.Response response = await http.get(Uri.parse("http://172.21.208.1:8080/adposts"));
+     http.Response response = await http.get(Uri.parse("http://192.168.0.179:8080/adposts"));
    //  http.Response response = await http.get(Uri.parse("https://jsonplaceholder.typicode.com/posts"));
     var data = jsonDecode(response.body);
     
@@ -98,7 +98,7 @@ class ProductsController extends GetxController {
   //   update();
   //   productModelList.clear();
   //   http.Response response = await http
-  //       .get(Uri.parse("http://172.21.208.1:8080/categories/$categories"));
+  //       .get(Uri.parse("http://192.168.0.179:8080/categories/$categories"));
   //   if (response.statusCode == 200) {
   //     var data = jsonDecode(response.body);
   //     for (var item in data) {
@@ -121,7 +121,7 @@ getProductsByCategory(String categories) async {
       // Updated URL to fetch all categories
       http.Response response = await http
           .get(
-             Uri.parse("http://172.21.208.1:8080/adposts/category/$categories")
+             Uri.parse("http://192.168.0.179:8080/adposts/category/$categories")
             );
       
       if (response.statusCode == 200) {
@@ -171,7 +171,7 @@ getProductsByCategory(String categories) async {
 Future<void> getAllCategories() async {
     try {
       final response = await http.get(
-        Uri.parse("http://172.21.208.1:8080/categories")
+        Uri.parse("http://192.168.0.179:8080/categories")
       );
       
       if (response.statusCode == 200) {

@@ -159,7 +159,7 @@ class _LocationScreenState extends State<LocationScreen> {
     });
     try {
       final response = await http.get(
-        Uri.parse('http://172.21.208.1:8080/cities'),
+        Uri.parse('http://192.168.0.179:8080/cities'),
       );
 
       if (response.statusCode == 200) {
@@ -221,7 +221,7 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _fetchCities(String state) async {
     try {
       final response = await http.get(
-        Uri.parse('http://172.21.208.1:8080/cities?state=$state'),
+        Uri.parse('http://192.168.0.179:8080/cities?state=$state'),
       );
 
       if (response.statusCode == 200) {
@@ -238,7 +238,7 @@ class _LocationScreenState extends State<LocationScreen> {
   Future<void> _updateLocation(String city) async {
     try {
       final response = await http
-          .get(Uri.parse('http://172.21.208.1:8080/adposts?city=$city'));
+          .get(Uri.parse('http://192.168.0.179:8080/adposts?city=$city'));
 
       if (response.statusCode == 200) {
         if (mounted) {

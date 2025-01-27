@@ -82,7 +82,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Make API call to get user details
       final response = await http.get(
-        Uri.parse('http://172.21.208.1:8080/authentication/auth_user'),
+        Uri.parse('http://192.168.0.179:8080/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -156,7 +156,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://172.21.208.1:8080/authentication/login'),
+        Uri.parse('http://192.168.0.179:8080/authentication/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

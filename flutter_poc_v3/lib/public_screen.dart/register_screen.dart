@@ -83,7 +83,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://172.21.208.1:8080/authentication/register"),
+        Uri.parse("http://192.168.0.179:8080/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },

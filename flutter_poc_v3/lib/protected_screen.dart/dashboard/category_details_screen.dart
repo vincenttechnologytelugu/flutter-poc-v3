@@ -203,7 +203,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
 
   void navigateToCategoryPosts(
       {String? findkey, String? priceStart, String? priceEnd, String? year}) {
-    String baseUrl = 'http://172.21.208.1:8080/adposts';
+    String baseUrl = 'http://192.168.0.179:8080/adposts';
     String category = Uri.encodeComponent(widget.productModel.category ?? '');
     String url;
 

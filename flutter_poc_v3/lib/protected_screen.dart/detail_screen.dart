@@ -104,7 +104,7 @@ class _DetailScreenState extends State<DetailScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://172.21.208.1:8080/adposts'),
+        Uri.parse('http://192.168.0.179:8080/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

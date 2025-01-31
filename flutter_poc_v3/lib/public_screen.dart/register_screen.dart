@@ -62,9 +62,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //   }
   // }
 
-
-  
-
   bool isLoading = false;
 // function to register to user
   Future<void> registerUser(
@@ -83,7 +80,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://192.168.0.179:8080/authentication/register"),
+        Uri.parse("http://192.168.0.167:8080/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -169,10 +166,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
           // Navigate to home screen
           if (context.mounted) {
             if (!mounted) return;
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false, // This removes all previous routes
             );
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+            // );
           }
         } else {
           throw Exception('Session token not received from server');
@@ -613,27 +615,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       textFieldDefaultGap,
 
-    //                   ElevatedButton(
-    //                     style: ElevatedButton.styleFrom(
-    //                         backgroundColor:
-    //                             const Color.fromARGB(255, 219, 9, 205),
-    //                         shape: RoundedRectangleBorder(
-    //                             borderRadius: BorderRadius.circular(15))),
-    //                     onPressed: () {
-    //                       // Comment out your API call logic
-    //                       /*
-    // Your existing API call code here
-    // */
+                      //                   ElevatedButton(
+                      //                     style: ElevatedButton.styleFrom(
+                      //                         backgroundColor:
+                      //                             const Color.fromARGB(255, 219, 9, 205),
+                      //                         shape: RoundedRectangleBorder(
+                      //                             borderRadius: BorderRadius.circular(15))),
+                      //                     onPressed: () {
+                      //                       // Comment out your API call logic
+                      //                       /*
+                      // Your existing API call code here
+                      // */
 
-    //                       // Call dummy register instead
-    //                       handleDummyRegister();
-    //                     },
-    //                     child: const Text("Register"),
-    //                   ),
+                      //                       // Call dummy register instead
+                      //                       handleDummyRegister();
+                      //                     },
+                      //                     child: const Text("Register"),
+                      //                   ),
 
                       ElevatedButton(
-                          style:
-                          ElevatedButton.styleFrom(
+                          style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   const Color.fromARGB(255, 219, 9, 205),
                               shape: RoundedRectangleBorder(

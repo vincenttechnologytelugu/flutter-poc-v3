@@ -130,8 +130,8 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
                                         colors: [
-                                          Colors.white,
-                                          Colors.purple.shade50,
+                                          Colors.red,
+                                          Colors.purple.shade100,
                                         ],
                                       ),
                                     ),
@@ -145,7 +145,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                             shape: BoxShape.circle,
                                             boxShadow: [
                                               BoxShadow(
-                                                color: Colors.purple.withOpacity(0.1),
+                                                color: Colors.purple.withAlpha(100),
                                                 spreadRadius: 10,
                                                 blurRadius: 15,
                                               ),

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
+
+// import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
@@ -69,7 +71,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "http://192.168.0.179:8080/adposts?page=$currentPage&psize=$pageSize"),
+              "http://192.168.0.167:8080/adposts?page=$currentPage&psize=$pageSize"),
         );
 
         if (response.statusCode == 200) {
@@ -111,8 +113,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    log("buildsize width ${size.width}");
-    log("buildsize height ${size.height}");
+    // log("buildsize width ${size.width}");
+    // log("buildsize height ${size.height}");
     return GetBuilder<ProductsController>(builder: (productsController) {
       return Scaffold(
         appBar: AppBar(
@@ -121,7 +123,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10),
               margin: EdgeInsets.only(top: 5),
-              child: const Text("Fresh Recomendations")),
+              child: const Text("Updated Suggestions")),
           actions: [
             GetBuilder<CartController>(builder: (cartController) {
               return Stack(
@@ -131,26 +133,28 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                     child: IconButton(
                         onPressed: () {
                           Navigator.of(context).push(MaterialPageRoute(
-                              builder: (builder) => const CartScreen()));
+                              builder: (builder) => const FavouriteScreen()));
                         },
-                        icon: const Icon(
+                        icon: Icon(
                           size: 30,
                           Icons.favorite_rounded,
-                          color: Colors.amber,
+                          color: cartController.favouriteIds.isNotEmpty
+                              ? Colors.pink
+                              : Color.fromARGB(255, 141, 138, 128),
                         )),
                   ),
                   Container(
                     margin: EdgeInsets.only(top: 15, left: 30),
                     child: CircleAvatar(
                       radius: 12,
-                      backgroundColor: Colors.amber,
+                      backgroundColor: const Color.fromARGB(255, 81, 7, 255),
                       child: Container(
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(2),
                           margin: const EdgeInsets.all(1),
                           decoration: const BoxDecoration(
                               shape: BoxShape.circle, color: Colors.white),
-                          child: Text("${cartController.cartList.length}")),
+                          child: Text("${cartController.favouriteIds.length}")),
                     ),
                   )
                 ],
@@ -219,7 +223,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                               color: const Color.fromARGB(255, 245, 242, 242),
                               shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15)),
-                              surfaceTintColor: Colors.amber,
+                              // surfaceTintColor: Colors.amber,
                               shadowColor:
                                   const Color.fromARGB(255, 237, 43, 9),
                               margin: const EdgeInsets.all(4),
@@ -283,31 +287,281 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                             right: 5,
                                             child: Container(
                                               decoration: BoxDecoration(
-                                                color: const Color.fromARGB(255, 239, 232, 7),
+                                                color: const Color.fromARGB(
+                                                    255, 203, 203, 189),
                                                 borderRadius:
                                                     BorderRadius.circular(20),
-                                              ),
-                                              child: IconButton(
-                                                onPressed: () {
-                                                  cartController.addToCart(
-                                                      context, productModel);
-                                                },
-                                                icon: const Icon(
-                                                  Icons
-                                                      .favorite_border_outlined,
-                                                  // Icons
-                                                  //     .add_shopping_cart_outlined,
-                                                  color: Colors.black,
-                                                  size: 20,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width:
+                                                      3.0, // Thick white border
                                                 ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.2),
+                                                    blurRadius: 4,
+                                                    spreadRadius: 1,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: TweenAnimationBuilder(
+                                                duration:
+                                                    Duration(milliseconds: 500),
+                                                tween: Tween<double>(
+                                                  begin: 0,
+                                                  end: cartController
+                                                          .isFavourite(
+                                                              productModel.id
+                                                                  .toString())
+                                                      ? 1
+                                                      : 0,
+                                                ),
+                                                builder:
+                                                    (context, double value, _) {
+                                                  return IconButton(
+                                                    onPressed: () {
+                                                      if (cartController
+                                                          .isFavourite(
+                                                              productModel.id
+                                                                  .toString())) {
+                                                        cartController
+                                                            .removeFromFavourite(
+                                                                context,
+                                                                productModel.id
+                                                                    .toString());
+                                                      } else {
+                                                        cartController
+                                                            .addToFavourite(
+                                                                context,
+                                                                productModel.id
+                                                                    .toString());
+                                                      }
+                                                    },
+                                                    icon: Stack(
+                                                      alignment:
+                                                          Alignment.center,
+                                                      children: [
+                                                        if (cartController
+                                                            .isFavourite(
+                                                                productModel.id
+                                                                    .toString()))
+                                                          ...List.generate(
+                                                            5, // Increased number of layers for more rainbow effect
+                                                            (index) =>
+                                                                AnimatedOpacity(
+                                                              duration: Duration(
+                                                                  milliseconds:
+                                                                      500),
+                                                              opacity: value,
+                                                              child: Transform
+                                                                  .scale(
+                                                                scale: 1 +
+                                                                    (index *
+                                                                            0.2) *
+                                                                        value,
+                                                                child: Transform
+                                                                    .rotate(
+                                                                  angle: (index *
+                                                                          0.2) *
+                                                                      value *
+                                                                      3.14, // Adds rotation
+                                                                  child: Icon(
+                                                                    Icons
+                                                                        .favorite,
+                                                                    color: HSLColor
+                                                                        .fromAHSL(
+                                                                      1.0,
+                                                                      (index *
+                                                                              30.0 *
+                                                                              value) %
+                                                                          360, // Rainbow hue rotation
+                                                                      0.8,
+                                                                      0.5 +
+                                                                          (value *
+                                                                              0.3),
+                                                                    ).toColor().withOpacity(1 -
+                                                                        (index *
+                                                                            0.15)),
+                                                                    size: 20,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ).toList(),
+                                                        Icon(
+                                                          Icons.favorite,
+                                                          
+                                                          color: TweenSequence<
+                                                              Color?>([
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin:
+                                                                    Colors.grey,
+                                                                end: Colors
+                                                                    .purple,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: Colors
+                                                                    .purple,
+                                                                end:
+                                                                    Colors.blue,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin:
+                                                                    Colors.blue,
+                                                                end: const Color.fromARGB(255, 226, 234, 227),
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: const Color.fromARGB(255, 89, 76, 175),
+                                                                end: Colors
+                                                                    .yellow,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: Colors
+                                                                    .yellow,
+                                                                end: Colors
+                                                                    .orange,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: Colors
+                                                                    .orange,
+                                                                end: Colors.red,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin:
+                                                                    Colors.red,
+                                                                end:
+                                                                    Colors.pink,
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    167,
+                                                                    219,
+                                                                    11),
+                                                                end: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    202,
+                                                                    4,
+                                                                    237),
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    27,
+                                                                    4,
+                                                                    237),
+                                                                end: const Color
+                                                                    .fromARGB(
+                                                                    255,
+                                                                    164,
+                                                                    11,
+                                                                    219),
+                                                              ),
+                                                            ),
+                                                            TweenSequenceItem(
+                                                              weight: 1.0,
+                                                              tween: ColorTween(
+                                                                begin:
+                                                                    Colors.red,
+                                                                end:
+                                                                    Colors.pink,
+                                                              ),
+                                                            ),
+                                                          ]).evaluate(
+                                                              AlwaysStoppedAnimation(
+                                                                  value)),
+                                                          size: 20,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                },
                                               ),
                                             ),
                                           ),
+
+                                          // Positioned(
+                                          //   top: 5,
+                                          //   right: 5,
+                                          //   child: Container(
+                                          //     decoration: BoxDecoration(
+                                          //       color: const Color.fromARGB(
+                                          //           255, 203, 203, 189),
+                                          //       borderRadius:
+                                          //           BorderRadius.circular(20),
+                                          //     ),
+                                          //     child: IconButton(
+                                          //       onPressed: () {
+                                          //         if (cartController
+                                          //             .isFavourite(productModel
+                                          //                 .id
+                                          //                 .toString())) {
+                                          //           cartController
+                                          //               .removeFromFavourite(
+                                          //                   context,
+                                          //                   productModel.id
+                                          //                       .toString());
+                                          //         } else {
+                                          //           cartController
+                                          //               .addToFavourite(
+                                          //                   context,
+                                          //                   productModel.id
+                                          //                       .toString());
+                                          //         }
+                                          //         // cartController.addToCart(
+                                          //         //     context, productModel);
+                                          //       },
+                                          //       icon: Icon(
+                                          //         Icons.favorite,
+
+                                          //         // Icons
+                                          //         //     .add_shopping_cart_outlined,
+                                          //         color: cartController
+                                          //                 .isFavourite(
+                                          //                     productModel.id
+                                          //                         .toString())
+                                          //             ? Colors.pink
+                                          //             : Colors.grey,
+                                          //         size: 20,
+                                          //       ),
+                                          //     ),
+                                          //   ),
+                                          // ),
                                         ],
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 30),
+                                  const SizedBox(height: 20),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 8,
@@ -319,7 +573,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                         Text(
                                             "₹ ${productModel.price.toString()}",
                                             style: const TextStyle(
-                                                color: Color.fromARGB(255, 243, 6, 176),
+                                                color: Color.fromARGB(
+                                                    255, 243, 6, 176),
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold)),
                                         Text(
@@ -372,7 +627,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                       ],
                                     ),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 2),
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:

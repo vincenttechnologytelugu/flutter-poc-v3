@@ -55,6 +55,9 @@ dependencies:
   flutter_staggered_animations: ^1.1.1
   animated_flip_card: ^1.0.2
   flutter_animate: ^4.5.2
+  animated_introduction: ^1.0.4
+ 
+  
   
  
   
@@ -97,6 +100,9 @@ flutter:
     - assets/images/pets.png
     - assets/images/services.jpg
     - assets/images/Register.jpg
+    - assets/images/allevents.jpeg
+    - assets/images/events.jpeg
+    - assets/images/cricket.jpeg
     - assets/images/
 
   # - images/a_dot_ham.jpeg

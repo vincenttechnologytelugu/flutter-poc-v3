@@ -203,7 +203,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
 
   void navigateToCategoryPosts(
       {String? findkey, String? priceStart, String? priceEnd, String? year}) {
-    String baseUrl = 'http://192.168.0.179:8080/adposts';
+    String baseUrl = 'http://192.168.0.167:8080/adposts';
     String category = Uri.encodeComponent(widget.productModel.category ?? '');
     String url;
 
@@ -964,10 +964,10 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                             begin: const Offset(1.1, 1.1),
                                             end: const Offset(1, 1),
                                           ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: 10),
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
-                                            horizontal: 12),
+                                            horizontal: 10),
                                         child: Text(
                                           subcategory['title'],
                                           textAlign: TextAlign.center,

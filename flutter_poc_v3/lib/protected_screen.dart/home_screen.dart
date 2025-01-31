@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/profile_screen.da
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
 
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/introduction_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
 
 
@@ -34,13 +35,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? userName;
   int currentIndex = 0;
+  
+  
 
 String selectedLocation = 'Select Location';
   // Define screens list properly
   final List<Widget> _screens = [
     
     const DashhomeScreen(),
-    const ChatScreen(),
+    IntroductionScreen(),
+    // const ChatScreen(),
     const SellScreen(),
     const MyAdds(),
     const ProfileScreen(),
@@ -229,7 +233,7 @@ Future<void> showLocationScreen() async {
             label: "Home",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline, color: Color.fromARGB(255, 171, 5, 189)),
+            icon: Icon(Icons.chat, color: Color.fromARGB(255, 171, 5, 189)),
             label: "Chat",
           ),
           BottomNavigationBarItem(
@@ -241,7 +245,7 @@ Future<void> showLocationScreen() async {
             label: "My Ads",
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined, color: Color.fromARGB(255, 171, 5, 189)),
+            icon: Icon(Icons.person, color: Color.fromARGB(255, 171, 5, 189)),
             label: "Profile",
           ),
         ],

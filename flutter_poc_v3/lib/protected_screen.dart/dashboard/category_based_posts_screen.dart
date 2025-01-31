@@ -25,8 +25,9 @@ class CategoryBasedPostsScreen extends StatefulWidget {
 }
 
 class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
+  CartController cartController = Get.put(CartController());
   final ScrollController _scrollController = ScrollController();
-  List<ProductModel> posts = [];
+  List<ProductModel> productModel = [];
   bool isLoading = false;
   bool hasMore = true;
   int page = 0;
@@ -104,13 +105,13 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
             data.map((json) => ProductModel.fromJson(json)).toList();
 
         setState(() {
-          posts.addAll(newPosts);
+          productModel.addAll(newPosts);
           hasMore = newPosts.length == pageSize;
           isLoading = false;
         });
 
         log('Number of posts loaded: ${newPosts.length}');
-        log('Total posts: ${posts.length}');
+        log('Total posts: ${productModel.length}');
       } else {
         log('Error: ${response.statusCode}');
         setState(() {
@@ -137,16 +138,16 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: posts.isEmpty && isLoading
+      body: productModel.isEmpty && isLoading
           ? const Center(child: CircularProgressIndicator())
-          : posts.isEmpty
+          : productModel.isEmpty
               ? Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        const Color.fromARGB(255, 11, 175, 224)!,
+                        const Color.fromARGB(255, 11, 175, 224),
                         Colors.grey[100]!,
                       ],
                     ),
@@ -249,10 +250,10 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
               : ListView.builder(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  itemCount: posts.length + (hasMore ? 1 : 0),
+                  itemCount: productModel.length + (hasMore ? 1 : 0),
                   controller: _scrollController,
                   itemBuilder: (context, index) {
-                    if (index == posts.length) {
+                    if (index == productModel.length) {
                       return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
@@ -263,7 +264,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                       );
                     }
 
-                    final post = posts[index];
+                    final post = productModel[index];
                     return Card(
                       elevation: 8,
                       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -313,7 +314,9 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                     Icon(
                                                       Icons.image_outlined,
                                                       size: 70,
-                                                      color: const Color.fromARGB(255, 127, 85, 85),
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 127, 85, 85),
                                                     ),
                                                     const SizedBox(height: 8),
                                                     Text(
@@ -338,7 +341,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                 Icon(
                                                   Icons.image_outlined,
                                                   size: 70,
-                                                  color: const Color.fromARGB(255, 113, 90, 90),
+                                                  color: const Color.fromARGB(
+                                                      255, 113, 90, 90),
                                                 ),
                                                 const SizedBox(height: 8),
                                                 Text(
@@ -359,22 +363,84 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                     top: 8,
                                     right: 8,
                                     child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.9),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: IconButton(
-                                        icon: const Icon(
-                                          Icons.favorite_border,
-                                          color: Colors.red,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white.withOpacity(0.9),
+                                          shape: BoxShape.circle,
                                         ),
-                                        onPressed: () {
-                                          // Add your favorite functionality here using CartController
-                                          Get.find<CartController>()
-                                              .addToCart(context, post);
-                                        },
-                                      ),
-                                    ),
+                                        child: GetBuilder<CartController>(
+                                          builder: (controller) => IconButton(
+                                            onPressed: () {
+                                              if (cartController.isFavourite(
+                                                  post.id.toString())) {
+                                                cartController
+                                                    .removeFromFavourite(
+                                                        context,
+                                                        post.id.toString());
+                                              } else {
+                                                cartController.addToFavourite(
+                                                    context,
+                                                    post.id.toString());
+                                              }
+                                            },
+                                            icon: Icon(
+                                              Icons.favorite,
+                                              color: cartController.isFavourite(
+                                                      post.id.toString())
+                                                  ? Colors.pink
+                                                  : Colors.grey,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        )
+
+                                        //  child: IconButton(
+                                        //         onPressed: () {
+                                        //           if (cartController
+                                        //               .isFavourite(post
+                                        //                   .id
+                                        //                   .toString())) {
+                                        //             cartController
+                                        //                 .removeFromFavourite(
+                                        //                     context,
+                                        //                     post.id
+                                        //                         .toString());
+                                        //           } else {
+                                        //             cartController
+                                        //                 .addToFavourite(
+                                        //                     context,
+                                        //                     post.id
+                                        //                         .toString());
+                                        //           }
+
+                                        //           // cartController.addToCart(
+                                        //           //     context, productModel);
+                                        //         },
+                                        //         icon:  Icon(
+                                        //           Icons.favorite,
+
+                                        //           // Icons
+                                        //           //     .add_shopping_cart_outlined,
+                                        //           color: cartController
+                                        //                   .isFavourite(
+                                        //                       post.id
+                                        //                           .toString())
+                                        //               ? Colors.pink
+                                        //               : Colors.grey,
+                                        //           size: 20,
+                                        //         ),
+                                        //       ),
+                                        // child: IconButton(
+                                        //   icon: const Icon(
+                                        //     Icons.favorite_border,
+                                        //     color: Colors.red,
+                                        //   ),
+                                        //   onPressed: () {
+                                        //     // Add your favorite functionality here using CartController
+                                        //     // Get.find<CartController>()
+                                        //     //     .addToCart(context, post);
+                                        //   },
+                                        // ),
+                                        ),
                                   ),
                                 ],
                               ),
@@ -403,7 +469,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(255, 243, 6, 176),
+                                            color: Color.fromARGB(
+                                                255, 243, 6, 176),
                                           ),
                                         ),
                                       ],

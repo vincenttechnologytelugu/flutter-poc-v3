@@ -1,20 +1,51 @@
-
 import 'package:flutter/material.dart';
+import 'package:animated_introduction/animated_introduction.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/notifications_screen.dart';
+class IntroductionScreen extends StatefulWidget {
+   IntroductionScreen({super.key});
+  
+  /// List of pages to be shown in the introduction
+///
+final List<SingleIntroScreen> pages = [
+  const SingleIntroScreen(
+    title: 'Welcome to the Event Management App !',
+    description: 'You plans your Events, We\'ll do the rest and will be the best! Guaranteed!  ',
+    imageAsset: 'assets/images/allevents.jpeg',
+  ),
+  const SingleIntroScreen(
+    title: 'Book tickets to cricket matches and events',
+    description: 'Tickets to the latest movies, crickets matches, concerts, comedy shows, plus lots more !',
+    imageAsset: 'assets/images/cricket.jpeg',
+  ),
+  const SingleIntroScreen(
+    title: 'Grabs all events now only in your hands',
+    description: 'All events are now in your hands, just a click away ! ',
+    imageAsset: 'assets/images/events.jpeg',
+  ),
+];
 
-class ProductsScreen extends StatefulWidget {
-  const ProductsScreen({super.key});
+/// Example page
 
   @override
-  State<ProductsScreen> createState() => _ProductsScreenState();
+  State<IntroductionScreen> createState() => _IntroductionScreenState();
 }
 
-class _ProductsScreenState extends State<ProductsScreen> {
-  @override
+class _IntroductionScreenState extends State<IntroductionScreen> {
+  
+ @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: Text("Products Screen"),
-      ),
+    return AnimatedIntroduction(
+      slides: widget.pages,
+      // slides: pages,
+      indicatorType: IndicatorType.circle,
+      onDone: () {
+      Navigator.pushReplacement(
+            
+              context,
+              MaterialPageRoute(builder: (context) => const NotificationsScreen()),
+            );
+        /// TODO: Go to desire page like login or home
+      },
     );
   }
 }

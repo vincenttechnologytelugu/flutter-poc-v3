@@ -4,7 +4,7 @@
 import 'dart:developer';
 
 class ProductModel {
-  final int? id;
+ final String? id;
   final String? title;
   final double? price;
   final String? model;
@@ -253,8 +253,19 @@ class ProductModel {
   factory ProductModel.fromJson(Map<String, dynamic> map) {
     try {
       log('Parsing JSON: $map'); // Add this debug log
+        String id = map['_id']?.toString() ?? '';
+    //         var id = map['_id'];
+    // if (id is Map) {
+    //   id = id['\$oid']; // MongoDB ObjectId format
+    // } else if (id ??= "") {
+    //   id = map['id']; // Fallback to regular id field
+    // }
+    //    log('Parsed ID: $id'); // Debug print to verify parsed ID
       return ProductModel(
-        id: map['id'],
+        id: id,
+  // id: int.tryParse(id.toString()), // Convert to int if needed
+        
+        // id: map['id'],
         icon: map['icon'] ?? '',
         title: map['title']?.toString(),
         price: map['price'] != null 

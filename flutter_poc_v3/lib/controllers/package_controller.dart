@@ -35,7 +35,7 @@ class PackageController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.179:8080/packages'),
+        Uri.parse('http://192.168.0.167:8080/packages'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',

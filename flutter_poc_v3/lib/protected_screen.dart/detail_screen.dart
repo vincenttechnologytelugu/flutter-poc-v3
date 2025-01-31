@@ -1,9 +1,11 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+
 
 class DetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
@@ -15,8 +17,18 @@ class DetailScreen extends StatefulWidget {
 }
 
 class _DetailScreenState extends State<DetailScreen> {
-  final Map<String, TextEditingController> controllers = {};
+  final Map<String, TextEditingController> controllers = {
+    
+
+    'brand': TextEditingController(),
+    'ownership': TextEditingController(), // Initialize here!
+  };
+ 
+  
   final _formKey = GlobalKey<FormState>();
+
+  
+  // String? selectedBrand;
 
   @override
   void initState() {
@@ -28,6 +40,104 @@ class _DetailScreenState extends State<DetailScreen> {
   void dispose() {
     controllers.values.forEach((controller) => controller.dispose());
     super.dispose();
+  }
+
+
+
+void _showOwnershipSnackBar(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(" Number of Owners",
+                 style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue[900],
+                                      ),
+                ),
+                SizedBox(height: 16),
+                _buildOwnershipTile(context, " First", setState),
+                _buildOwnershipTile(context, " Second", setState),
+                _buildOwnershipTile(context, " Third", setState),
+                _buildOwnershipTile(context, " Fourth", setState),
+            
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancel",style:TextStyle(color:Colors.red)),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+
+Widget _buildOwnershipTile(BuildContext context, String ownership, StateSetter setState) {
+  return ListTile(
+    title: Text(ownership),
+    trailing: Icon(Icons.arrow_forward_ios),
+    onTap: () {
+      setState(() {
+        controllers['ownership']?.text = ownership; // Use the null-aware operator ?.
+      });
+      Navigator.pop(context);
+    },
+  );
+}
+
+
+
+
+
+  List<Widget> _buildBrandSection(dynamic brands,
+      {required Function(String) onBrandSelected}) {
+    // Check if brands is a List<String>
+    if (brands is List<String>) {
+      return brands.map((brand) {
+        return ListTile(
+          title: Text(brand),
+          onTap: () {
+            onBrandSelected(brand);
+          },
+        );
+      }).toList();
+    }
+    // If brands is a Map, try to extract a List from it
+    else if (brands is Map) {
+      // Check if the Map contains a key with a List of brands
+      if (brands.containsKey('brands') && brands['brands'] is List) {
+        return (brands['brands'] as List).map((brand) {
+          return ListTile(
+            title: Text(brand.toString()),
+            onTap: () {
+              onBrandSelected(brand.toString());
+            },
+          );
+        }).toList();
+      } else {
+        debugPrint(
+            'Error: Expected List<String> or Map with key "brands", but got $brands');
+        return []; // Return an empty list to avoid crashing
+      }
+    }
+    // Handle other cases
+    else {
+      debugPrint(
+          'Error: Expected List<String> or Map, but got ${brands.runtimeType}');
+      return []; // Return an empty list to avoid crashing
+    }
   }
 
   void initializeControllers() {
@@ -104,7 +214,7 @@ class _DetailScreenState extends State<DetailScreen> {
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.179:8080/adposts'),
+        Uri.parse('http://192.168.0.167:8080/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -169,9 +279,11 @@ class _DetailScreenState extends State<DetailScreen> {
                   child: ElevatedButton(
                     onPressed: _postItem,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 212, 33, 243), // Background color
+                      backgroundColor: const Color.fromARGB(
+                          255, 212, 33, 243), // Background color
                       shadowColor: Colors.white, // Text color
-                      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -182,10 +294,10 @@ class _DetailScreenState extends State<DetailScreen> {
                       child: Text(
                         'Post Item',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.2,color: Colors.white
-                        ),
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                            color: Colors.white),
                       ),
                     ),
                   ),
@@ -254,8 +366,14 @@ class _DetailScreenState extends State<DetailScreen> {
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['title'],
-          decoration:
-              InputDecoration(labelText: 'Title', border: OutlineInputBorder()),
+          decoration: InputDecoration(
+            labelText: 'Title *',
+            hintText:
+                'Mention the key features of your item (e.g. brand, model, age, type)',
+            border: OutlineInputBorder(),
+            // suffixIcon: Icon(Icons.star, color: Colors.red, size: 10),
+          ),
+          maxLines: 2,
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
@@ -283,8 +401,13 @@ class _DetailScreenState extends State<DetailScreen> {
         TextFormField(
           controller: controllers['description'],
           decoration: InputDecoration(
-              labelText: 'description', border: OutlineInputBorder()),
+            labelText: 'Description *',
+            hintText: 'Include condition, features and reason for selling',
+            border: OutlineInputBorder(),
+            // suffixIcon: Icon(Icons.star, color: Colors.red, size: 5),
+          ),
           maxLines: 3,
+          maxLength: 4000,
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
@@ -299,12 +422,171 @@ class _DetailScreenState extends State<DetailScreen> {
         // Text("Specifications",
         //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['make'],
-          decoration:
-              InputDecoration(labelText: 'Make', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: controllers['brand'],
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Brand *',
+                  hintText: 'Select Car Brand',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: Icon(Icons.arrow_drop_down),
+                ),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Required' : null,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      return Container(
+                        padding: EdgeInsets.all(0),
+                        height: MediaQuery.of(context).size.height * 0.9,
+                        child: Column(
+                          children: [
+                            // Cancel button at the top
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Popular Brands',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue[900],
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Expanded(
+                                      child: ListView(
+                                        children: [
+                                          // Popular Brands Section
+                                          ..._buildBrandSection([
+                                            'Maruti Suzuki',
+                                            'Hyundai',
+                                            'Tata',
+                                            'Mahindra',
+                                            'Toyota',
+                                            'Honda'
+                                          ], onBrandSelected: (brand) {
+                                            if (controllers['brand'] != null) {
+                                              controllers['brand']!.text =
+                                                  brand;
+                                            } else {
+                                              debugPrint(
+                                                  'Error: controllers["brand"] is null');
+                                            }
+                                            Navigator.pop(context);
+                                          }),
+
+                                          Divider(height: 32),
+                                          Text(
+                                            'All Brands',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue[900],
+                                            ),
+                                          ),
+                                          SizedBox(height: 16),
+
+                                          // All Brands Section
+                                          ..._buildBrandSection([
+                                            'Ambassador',
+                                            'Ashok Leyland',
+                                            'Aston Martin',
+                                            'Audi',
+                                            'BYD',
+                                            'Bajaj',
+                                            'Bentley',
+                                            'Citroen',
+                                            'Lotus',
+                                            'Tesla',
+                                            'BMW',
+                                            'Bugatti',
+                                            'Cadillac',
+                                            'Chevrolet',
+                                            'Chrysler',
+                                            'Daewoo',
+                                            'Datsun',
+                                            'DC',
+                                            'Eicher Polaris',
+                                            'Ferrari',
+                                            'Fiat',
+                                            'Force Motors',
+                                            'Ford',
+                                            'Honda',
+                                            'Hummer',
+                                            'Hyundai',
+                                            'ICML',
+                                            'ISUZU',
+                                            'Jaguar',
+                                            'Jeep',
+                                            'Kia',
+                                            'Lamborghini',
+                                            'Land Rover',
+                                            'Lexus',
+                                            'Mahindra',
+                                            'Mahindra Renault',
+                                            'Maruti Suzuki'
+                                          ], onBrandSelected: (brand) {
+                                            if (controllers['brand'] != null) {
+                                              controllers['brand']!.text =
+                                                  brand;
+                                            } else {
+                                              debugPrint(
+                                                  'Error: controllers["brand"] is null');
+                                            }
+                                            Navigator.pop(context);
+                                          }),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
+
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['model'],
@@ -345,26 +627,212 @@ class _DetailScreenState extends State<DetailScreen> {
         //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         // ),
         SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['transmissionType'],
-          decoration: InputDecoration(
-              labelText: 'transmissionType', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // Replace the transmission type text field with this:
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Transmission Type *',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+              ),
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        controllers['transmissionType']?.text = 'Automatic';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          controllers['transmissionType']?.text == 'Automatic'
+                              ? Colors.blue
+                              : Colors.grey[300],
+                      foregroundColor:
+                          controllers['transmissionType']?.text == 'Automatic'
+                              ? Colors.white
+                              : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Automatic'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        controllers['transmissionType']?.text = 'Manual';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          controllers['transmissionType']?.text == 'Manual'
+                              ? Colors.blue
+                              : Colors.grey[300],
+                      foregroundColor:
+                          controllers['transmissionType']?.text == 'Manual'
+                              ? Colors.white
+                              : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Manual'),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
+        // TextFormField(
+        //   controller: controllers['transmissionType'],
+        //   decoration: InputDecoration(
+        //       labelText: 'transmissionType', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['fuelType'],
+          readOnly: true, // Make the field read-only to prevent manual input
           decoration: InputDecoration(
-              labelText: 'Fuel Type', border: OutlineInputBorder()),
+            labelText: 'Fuel Type',
+            border: OutlineInputBorder(),
+          ),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+          onTap: () {
+            // Show a modal bottom sheet with fuel type options
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      Text(
+                        'Select Fuel Type',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+
+                      // List of fuel types
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            ListTile(
+                              title: Text('Petrol'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Petrol';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('LPG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'LPG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Electric'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Electric';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Diesel'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Diesel';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('CNG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'CNG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Hybrid'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Hybrid';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Cancel button
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close the bottom sheet
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         ),
+        // TextFormField(
+        //   controller: controllers['fuelType'],
+        //   decoration: InputDecoration(
+        //       labelText: 'Fuel Type', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
         SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['ownership'],
-          decoration: InputDecoration(
-              labelText: 'ownership', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
+     TextFormField(
+    controller: controllers['ownership'],
+    decoration: InputDecoration(
+      labelText: 'ownership',
+      border: OutlineInputBorder(),
+    ),
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+    onTap: () {
+      _showOwnershipSnackBar(context); // Call the bottom sheet function
+    },
+    readOnly: true, // Prevent direct text input
+  ),
       ],
     );
   }
@@ -485,92 +953,73 @@ class _DetailScreenState extends State<DetailScreen> {
       children: [
         TextFormField(
           controller: controllers['title'],
-          decoration: InputDecoration(labelText: 'title',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration:
+              InputDecoration(labelText: 'title', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['company'],
-          decoration: InputDecoration(labelText: 'Company',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'Company', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['jobType'],
-          decoration: InputDecoration(labelText: 'Job Type',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'Job Type', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['location'],
-          decoration: InputDecoration(labelText: 'Location',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'Location', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['salary'],
-          decoration: InputDecoration(labelText: 'Salary',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'Salary', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['city'],
-          decoration: InputDecoration(labelText: 'city',
-          border: OutlineInputBorder()
-          
-          ),
+          decoration:
+              InputDecoration(labelText: 'city', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['experienceLevel'],
-          decoration: InputDecoration(labelText: 'Experience Level',
-            border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'Experience Level', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['position'],
-          decoration: InputDecoration(labelText: 'position',
-            border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'position', border: OutlineInputBorder()),
           maxLines: 3,
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['industry'],
-          decoration: InputDecoration(labelText: 'industry',
-            border: OutlineInputBorder()
-          
-          ),
+          decoration: InputDecoration(
+              labelText: 'industry', border: OutlineInputBorder()),
           maxLines: 3,
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
           controller: controllers['contact_info'],
-          decoration: InputDecoration(labelText: 'Contact Information',
-            border: OutlineInputBorder()
-          ),
+          decoration: InputDecoration(
+              labelText: 'Contact Information', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
       ],

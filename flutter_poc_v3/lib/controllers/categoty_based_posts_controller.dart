@@ -33,7 +33,7 @@ class CategoryBasedPostsController extends GetxController {
 
       final encodedCategory = Uri.encodeComponent(category);
       final response = await http.get(
-         Uri.parse('http://192.168.0.179:8080/adposts?category=$encodedCategory&page=$currentPage'),
+         Uri.parse('http://192.168.0.167:8080/adposts?category=$encodedCategory&page=$currentPage'),
        //   Uri.parse('https://jsonplaceholder.typicode.com/posts?category=$encodedCategory&page=$currentPage'),
       );
 
@@ -76,7 +76,7 @@ getProductsByCategory(String categories) async {
       // Updated URL to fetch all categories
       http.Response response = await http
           .get(
-             Uri.parse("http://192.168.0.179:8080/adposts/category/$categories")
+             Uri.parse("http://192.168.0.167:8080/adposts/category/$categories")
             //  Uri.parse("https://jsonplaceholder.typicode.com/posts/category/$categories")
             );
       

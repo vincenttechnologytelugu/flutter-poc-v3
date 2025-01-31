@@ -3,7 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
+// import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -29,7 +30,6 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
   int currentPage = 0;
   bool isLoading = false;
   bool hasMore = true;
-  
 
   @override
   void initState() {
@@ -60,7 +60,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
       final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
 
       final url =
-          'http://192.168.0.179:8080/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
+          'http://192.168.0.167:8080/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
       log('Fetching URL: $url');
 
       final response = await http.get(Uri.parse(url));
@@ -109,6 +109,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
           //     .toList();
           final List<ProductModel> newPosts = jsonList
               .map((item) => ProductModel(
+                    id: item['_id']?.toString(), // Add this line
                     icon: item['icon'] ??
                         '', // Add null check with default empty string
                     title: item['title']?.toString() ?? 'No Title',
@@ -169,8 +170,6 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
     }
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -181,29 +180,32 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
             return Stack(
               children: [
                 Container(
-                  margin: EdgeInsets.only(top: 5),
+                  margin: EdgeInsets.only(top: 15),
                   child: IconButton(
                       onPressed: () {
                         Navigator.of(context).push(MaterialPageRoute(
-                            builder: (builder) => const CartScreen()));
+                            builder: (builder) => const FavouriteScreen()));
                       },
-                      icon: const Icon(
+                      icon: Icon(
                         size: 30,
                         Icons.favorite_rounded,
+                        color: cartController.favouriteIds.isNotEmpty
+                            ? Colors.pink
+                            : Color.fromARGB(255, 141, 138, 128),
                       )),
                 ),
                 Container(
-                  margin: EdgeInsets.only(top: 5, left: 30),
+                  margin: EdgeInsets.only(top: 15, left: 30),
                   child: CircleAvatar(
                     radius: 12,
-                    backgroundColor: Colors.amber,
+                    backgroundColor: const Color.fromARGB(255, 81, 7, 255),
                     child: Container(
                         alignment: Alignment.center,
                         padding: const EdgeInsets.all(2),
                         margin: const EdgeInsets.all(1),
                         decoration: const BoxDecoration(
                             shape: BoxShape.circle, color: Colors.white),
-                        child: Text("${cartController.cartList.length}")),
+                        child: Text("${cartController.favouriteIds.length}")),
                   ),
                 )
               ],
@@ -327,7 +329,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                       }
 
                       final post = posts[index];
-                      return ProductDetailsScreen(product: post);
+                      return ProductDetailsScreen(productModel: post);
                     },
                   );
                 },
@@ -344,11 +346,11 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
 }
 
 class ProductDetailsScreen extends StatefulWidget {
-  final ProductModel product;
+  final ProductModel productModel;
 
   const ProductDetailsScreen({
     super.key,
-    required this.product,
+    required this.productModel,
   });
 
   @override
@@ -356,8 +358,8 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  final cartController = Get.find<CartController>();
-   String formatDate(String? dateString) {
+  final CartController cartController = Get.find<CartController>();
+  String formatDate(String? dateString) {
     if (dateString == null || dateString.isEmpty) {
       return 'No date';
     }
@@ -374,6 +376,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    log('Product ID in details: ${widget.productModel.id}');
     return Card(
       //  color:const Color.fromARGB(255, 126, 89, 87),
       elevation: 4,
@@ -387,7 +390,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) =>
-                      ProductDetails(productModel: widget.product),
+                      ProductDetails(productModel: widget.productModel),
                 ),
               );
               // Navigate to product details
@@ -400,10 +403,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ClipRRect(
                   borderRadius: const BorderRadius.vertical(
                       top: Radius.circular(12), bottom: Radius.circular(12)),
-                  child: widget.product.thumb != null &&
-                          widget.product.thumb!.isNotEmpty
+                  child: widget.productModel.thumb != null &&
+                          widget.productModel.thumb!.isNotEmpty
                       ? Image.network(
-                          widget.product.thumb!,
+                          widget.productModel.thumb!,
                           fit: BoxFit.cover,
                           errorBuilder: (context, error, stackTrace) {
                             return Container(
@@ -438,7 +441,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.product.title ?? 'No Title',
+                          widget.productModel.title ?? 'No Title',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -448,20 +451,31 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '₹ ${widget.product.price ?? 'N/A'}',
+                          '₹ ${widget.productModel.price ?? 'N/A'}',
                           style: const TextStyle(
-                           color: Color.fromARGB(255, 243, 6, 176),
+                            color: Color.fromARGB(255, 243, 6, 176),
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
                         ),
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 10),
+                        // Text(
+                        //   widget.productModel.id.toString(),
+                        //   maxLines: 1,
+                        //   overflow: TextOverflow.ellipsis,
+                        //   style: const TextStyle(fontSize: 14),
+                        // ),
+
+                        const SizedBox(
+                          height: 2,
+                        ),
+
                         Row(
                           children: [
                             const Icon(Icons.location_on, size: 18),
                             Expanded(
                               child: Text(
-                                '${widget.product.city ?? ''}, ${widget.product.location ?? ''}',
+                                '${widget.productModel.city ?? ''}, ${widget.productModel.location ?? ''}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 14),
@@ -483,9 +497,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                             Flexible(
+                            Flexible(
                               child: Text(
-                                formatDate(widget.product.posted_at),
+                                formatDate(widget.productModel.posted_at),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(
@@ -525,21 +539,70 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             right: 2,
             child: Container(
               decoration: BoxDecoration(
-                color:  Colors.yellow,
+                color: const Color.fromARGB(255, 234, 233, 229),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: IconButton(
-                onPressed: () {
-                  cartController.addToCart(context, widget.product);
-                },
-                icon: const Icon(
-                  Icons.favorite_border_outlined,
-                  // Icons
-                  //     .add_shopping_cart_outlined,
-                  color: Colors.black,
-                  size: 16,
+              child: GetBuilder<CartController>(
+                builder: (controller) => IconButton(
+                  onPressed: () {
+                    final productId = widget.productModel.id.toString();
+                    if (cartController.isFavourite(productId)) {
+                      cartController.removeFromFavourite(
+                        context,
+                        productId,
+                      );
+                    } else {
+                      cartController.addToFavourite(
+                        context,
+                        productId,
+                      );
+                    }
+                  },
+                  icon: Icon(
+                    Icons.favorite,
+                    color: cartController
+                            .isFavourite(widget.productModel.id.toString())
+                        ? Colors.pink
+                        : Colors.grey,
+                    size: 24,
+                  ),
                 ),
               ),
+              // child: IconButton(
+              //   onPressed: () {
+              //     if (cartController.isFavourite(widget.productModel.id.toString())) {
+              //       cartController.removeFromFavourite(
+              //           context, widget.productModel.id.toString());
+              //     } else {
+              //       cartController.addToFavourite(
+              //           context, widget.productModel.id.toString());
+              //     }
+              //     // cartController.addToCart(
+              //     //     context, productModel);
+              //   },
+              //   icon: Icon(
+              //     Icons.favorite,
+
+              //     // Icons
+              //     //     .add_shopping_cart_outlined,
+              //     color: cartController.isFavourite(widget.productModel.id.toString())
+              //         ? Colors.pink
+              //         : Colors.grey,
+              //     size: 20,
+              //   ),
+              // ),
+              // child: IconButton(
+              //   onPressed: () {
+              //     cartController.addToCart(context, widget.product);
+              //   },
+              //   icon: const Icon(
+              //     Icons.favorite_border_outlined,
+              //     // Icons
+              //     //     .add_shopping_cart_outlined,
+              //     color: Colors.black,
+              //     size: 16,
+              //   ),
+              // ),
             ),
           ),
         ],

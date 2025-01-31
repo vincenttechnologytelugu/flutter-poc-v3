@@ -40,9 +40,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
   // In your login_screen.dart or auth_controller.dart
 
-
-
-
   // void handleDummyLogin() {
   //   // Dummy credentials
   //   const String dummyEmail = "test@example.com";
@@ -82,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Make API call to get user details
       final response = await http.get(
-        Uri.parse('http://192.168.0.179:8080/authentication/auth_user'),
+        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -129,10 +126,15 @@ class _LoginScreenState extends State<LoginScreen> {
         if (isValid) {
           // Token is valid, navigate to HomeScreen
           if (mounted) {
-            Navigator.pushReplacement(
+            Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomeScreen()),
+              (route) => false, // This removes all previous routes
             );
+            // Navigator.pushReplacement(
+            //   context,
+            //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+            // );
           }
         } else {
           // Token is invalid, clear it and stay on LoginScreen
@@ -156,7 +158,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.179:8080/authentication/login'),
+        Uri.parse('http://192.168.0.167:8080/authentication/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -205,9 +207,7 @@ class _LoginScreenState extends State<LoginScreen> {
             showMessage(e.toString(), true);
           }
 
-
           refreshUserDataFromApi();
-        
         } else {
           throw Exception('Session token not received from server');
         }
@@ -241,7 +241,6 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-     
       body: Stack(
         children: [
           Container(
@@ -252,7 +251,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                
                   Color.fromARGB(255, 129, 209, 201), // Blue shade
                   Color.fromARGB(255, 139, 1, 245), // Lighter blue shade
                 ],
@@ -392,7 +390,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                  
+
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
@@ -400,26 +398,26 @@ class _LoginScreenState extends State<LoginScreen> {
                         // color: Colors.pink,
                         width: 50,
                         margin: EdgeInsets.only(left: 90, right: 90),
-                        child: 
-          //               ElevatedButton(
-          //                 onPressed: isLoading
-          //                     ? null
-          //                     : () {
-          //                         final email = _emailController.text.trim();
-          //                         final password = _passwordController.text;
+                        child:
+                            //               ElevatedButton(
+                            //                 onPressed: isLoading
+                            //                     ? null
+                            //                     : () {
+                            //                         final email = _emailController.text.trim();
+                            //                         final password = _passwordController.text;
 
-          //                         // Comment out your API call logic
-          //                         /*
-          // Your existing API call code here
-          // */
+                            //                         // Comment out your API call logic
+                            //                         /*
+                            // Your existing API call code here
+                            // */
 
-          //                         // Call dummy login instead
-          //                         handleDummyLogin();
-          //                       },
-          //                 child: Text("Login"),
-          //               ),
+                            //                         // Call dummy login instead
+                            //                         handleDummyLogin();
+                            //                       },
+                            //                 child: Text("Login"),
+                            //               ),
 
-                        ElevatedButton(
+                            ElevatedButton(
                           onPressed: isLoading
                               ? null
                               : () {
@@ -440,8 +438,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? const CircularProgressIndicator()
                                 : const Text(
                                     'Login',
-                                    style:
-                                        TextStyle(fontSize: 25, color: Colors.blue),
+                                    style: TextStyle(
+                                        fontSize: 25, color: Colors.blue),
                                   ),
                           ),
                         ),
@@ -470,8 +468,12 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 580),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            height: MediaQuery.of(context).size.height *
+                0.15, // 15% of screen height
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
@@ -479,10 +481,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     topLeft: Radius.circular(40)),
                 color: Colors.white,
               ),
-              height: double.infinity,
-              width: double.infinity,
             ),
           ),
+
+          // Padding(
+          //   padding: const EdgeInsets.only(top: 580),
+          //   child: Container(
+          //     decoration: BoxDecoration(
+          //       borderRadius: BorderRadius.only(
+          //           topRight: Radius.circular(40),
+          //           topLeft: Radius.circular(40)),
+          //       color: Colors.white,
+          //     ),
+          //     height: double.infinity,
+          //     width: double.infinity,
+          //   ),
+          // ),
         ],
       ),
     );

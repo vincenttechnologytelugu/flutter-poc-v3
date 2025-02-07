@@ -21,7 +21,7 @@ class CartController extends GetxController {
 
       // First check server favorites
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourites'),
+        Uri.parse('http://192.168.0.170:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -81,7 +81,7 @@ class CartController extends GetxController {
 
   //     // Then fetch from server to sync
   //     final response = await http.get(
-  //       Uri.parse('http://192.168.0.167:8080/favourite_adposts'),
+  //       Uri.parse('http://192.168.0.170:8080/favourite_adposts'),
   //       headers: {
   //         'Authorization': 'Bearer $token',
   //         'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/add_to_favourite'),
+        Uri.parse('http://192.168.0.170:8080/add_to_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -157,7 +157,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourites'),
+        Uri.parse('http://192.168.0.170:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -196,7 +196,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
   log('Removing post with ID: $adpostId'); // Debug log
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/remove_from_favourite'),
+        Uri.parse('http://192.168.0.170:8080/remove_from_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

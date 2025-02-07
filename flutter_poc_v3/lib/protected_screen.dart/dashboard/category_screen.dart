@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -39,7 +37,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       } else {
         _currentPage = 0;
       }
-      
+
       if (_pageController.hasClients) {
         _pageController.animateToPage(
           _currentPage,
@@ -69,7 +67,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               colors: [
                 // Colors.purple.shade100,
                 // Colors.purple.shade50,
-                 const Color.fromARGB(255, 202, 4, 241),
+                const Color.fromARGB(255, 202, 4, 241),
                 const Color.fromARGB(255, 250, 62, 5),
               ],
             ),
@@ -91,7 +89,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         },
                         itemCount: categoryController.productModelList.length,
                         itemBuilder: (context, index) {
-                          ProductModel product = 
+                          ProductModel product =
                               categoryController.productModelList[index];
                           double scale = _currentPage == index ? 1.0 : 0.9;
                           return TweenAnimationBuilder(
@@ -122,94 +120,198 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20),
                                   ),
-                                  child: Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.red,
-                                          Colors.purple.shade100,
-                                        ],
-                                      ),
-                                    ),
-                                    child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.all(0),
-                                          decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            shape: BoxShape.circle,
-                                            boxShadow: [
-                                              BoxShadow(
-                                                color: Colors.purple.withAlpha(100),
-                                                spreadRadius: 10,
-                                                blurRadius: 15,
-                                              ),
-                                            ],
-                                          ),
-                                          child: Image.network(
-                                            product.icon,
-                                            height: 55,
-                                            width: 55,
-                                            fit: BoxFit.contain,
-                                            errorBuilder: (context, error, stackTrace) {
-                                              return Icon(
+                                  child: Stack(
+                                    children: [
+                                      
+                                      // Background Image
+                                      ClipRRect(
+
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Image.network(
+                                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwVLs8BDLx5ndhLuTZAq4uMSMkEHO24xdfgw&s',
+                                          // product.icon,
+                                          height: double.infinity,
+                                          width: double.infinity,
+                                          fit: BoxFit.cover,
+                                          errorBuilder:
+                                              (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.purple.shade50,
+                                              child: Icon(
                                                 Icons.category,
                                                 size: 40,
-                                                color: Colors.purple.shade300,
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(height: 10),
-                                        Text(
-                                          product.category.toString(),
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.purple.shade700,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                        const SizedBox(height: 10),
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => 
-                                                    CategoryDetailsScreen(
-                                                      productModel: product,
-                                                    ),
+                                                color: const Color.fromARGB(255, 239, 236, 240),
                                               ),
                                             );
                                           },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.purple.shade400,
-                                            padding: const EdgeInsets.symmetric(
-                                              horizontal: 15,
-                                              vertical: 5,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(30),
-                                            ),
-                                          ),
-                                          child: const Text(
-                                            'View Details',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              color: Colors.white,
-                                            ),
+                                        ),
+                                      ),
+                                      // Gradient Overlay
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              const Color.fromARGB(0, 245, 226, 235),
+                                              const Color.fromARGB(255, 11, 11, 11).withOpacity(0.9),
+                                            ],
                                           ),
                                         ),
-                                      ],
-                                    ),
+                                      ),
+                                      // Content
+                                      Container(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                              product.category.toString(),
+                                              style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: Color.fromARGB(255, 250, 249, 252),
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                            const SizedBox(height: 10),
+                                            ElevatedButton(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CategoryDetailsScreen(
+                                                      productModel: product,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor:
+                                                    Colors.purple.shade400,
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                  horizontal: 15,
+                                                  vertical: 5,
+                                                ),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(30),
+                                                ),
+                                              ),
+                                              child: const Text(
+                                                'View Details',
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
+
+                                // child: Card(
+                                //   elevation: 6,
+                                //   shape: RoundedRectangleBorder(
+                                //     borderRadius: BorderRadius.circular(20),
+                                //   ),
+                                //   child: Container(
+                                //     padding: const EdgeInsets.all(10),
+                                //     decoration: BoxDecoration(
+                                //       borderRadius: BorderRadius.circular(30),
+                                //       gradient: LinearGradient(
+                                //         begin: Alignment.topLeft,
+                                //         end: Alignment.bottomRight,
+                                //         colors: [
+                                //           const Color.fromARGB(255, 233, 233, 239),
+                                //           const Color.fromARGB(255, 233, 224, 231),
+                                //         ],
+                                //       ),
+                                //     ),
+                                //     child: Column(
+                                //       mainAxisAlignment: MainAxisAlignment.center,
+                                //       children: [
+
+                                //         Container(
+                                //           padding: const EdgeInsets.all(0),
+                                //           decoration: BoxDecoration(
+                                //             color: Colors.white,
+                                //             shape: BoxShape.circle,
+                                //             boxShadow: [
+                                //               BoxShadow(
+                                //                 color: const Color.fromARGB(255, 179, 160, 182).withAlpha(100),
+                                //                 spreadRadius: 1,
+                                //                 blurRadius: 1,
+                                //               ),
+                                //             ],
+                                //           ),
+                                //           child: Image.network(
+                                //             product.icon,
+                                //             height: 55,
+                                //             width: 55,
+                                //             fit: BoxFit.contain,
+                                //             errorBuilder: (context, error, stackTrace) {
+                                //               return Icon(
+                                //                 Icons.category,
+                                //                 size: 40,
+                                //                 color: Colors.purple.shade300,
+                                //               );
+                                //             },
+                                //           ),
+                                //         ),
+                                //         const SizedBox(height: 10),
+                                //         Text(
+                                //           product.category.toString(),
+                                //           style: TextStyle(
+                                //             fontSize: 20,
+                                //             fontWeight: FontWeight.bold,
+                                //             color: Colors.purple.shade700,
+                                //           ),
+                                //           textAlign: TextAlign.center,
+                                //         ),
+                                //         const SizedBox(height: 10),
+                                //         ElevatedButton(
+                                //           onPressed: () {
+                                //             Navigator.push(
+                                //               context,
+                                //               MaterialPageRoute(
+                                //                 builder: (context) =>
+                                //                     CategoryDetailsScreen(
+                                //                       productModel: product,
+                                //                     ),
+                                //               ),
+                                //             );
+                                //           },
+                                //           style: ElevatedButton.styleFrom(
+                                //             backgroundColor: Colors.purple.shade400,
+                                //             padding: const EdgeInsets.symmetric(
+                                //               horizontal: 15,
+                                //               vertical: 5,
+                                //             ),
+                                //             shape: RoundedRectangleBorder(
+                                //               borderRadius: BorderRadius.circular(30),
+                                //             ),
+                                //           ),
+                                //           child: const Text(
+                                //             'View Details',
+                                //             style: TextStyle(
+                                //               fontSize: 15,
+                                //               color: Colors.white,
+                                //             ),
+                                //           ),
+                                //         ),
+                                //       ],
+                                //     ),
+                                //   ),
+                                // ),
                               ),
                             ),
                           );
@@ -217,7 +319,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 10,top: 2),
+                      padding: const EdgeInsets.only(bottom: 10, top: 2),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: List.generate(

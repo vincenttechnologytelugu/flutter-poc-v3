@@ -149,7 +149,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
   Widget build(BuildContext context) {
     return AppBar(
       elevation: 0.0,
-      backgroundColor: const Color.fromARGB(255, 173, 171, 171),
+      backgroundColor: const Color.fromARGB(255, 244, 113, 6),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -159,7 +159,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen> {
               const Padding(padding: EdgeInsets.only(top: 10)),
               const Text(
                 "U Sales",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600,color:Colors.white70),
               ),
               const Spacer(),
               const Icon(

@@ -71,7 +71,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       try {
         final response = await http.get(
           Uri.parse(
-              "http://192.168.0.167:8080/adposts?page=$currentPage&psize=$pageSize"),
+              "http://192.168.0.170:8080/adposts?page=$currentPage&psize=$pageSize"),
         );
 
         if (response.statusCode == 200) {
@@ -123,7 +123,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
               alignment: Alignment.centerLeft,
               padding: const EdgeInsets.all(10),
               margin: EdgeInsets.only(top: 5),
-              child: const Text("Updated Suggestions")),
+              child: const Text("Updated Suggestions",style: TextStyle(color: Color.fromARGB(255, 234, 17, 2)),)),
           actions: [
             GetBuilder<CartController>(builder: (cartController) {
               return Stack(

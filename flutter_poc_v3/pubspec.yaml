@@ -100,10 +100,10 @@ flutter:
     - assets/images/pets.png
     - assets/images/services.jpg
     - assets/images/Register.jpg
-    - assets/images/allevents.jpeg
-    - assets/images/events.jpeg
-    - assets/images/cricket.jpeg
-    - assets/images/
+    - assets/images/allevents.png
+    - assets/images/events.png
+    - assets/images/cricket.png
+    - assets/images/alltypes.jpg
 
   # - images/a_dot_ham.jpeg
 

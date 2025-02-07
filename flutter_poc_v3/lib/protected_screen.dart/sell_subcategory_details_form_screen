@@ -1,0 +1,2358 @@
+// screens/sell_subcategory_details_form_screen.dart
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
+class SellSubcategoryDetailsFormScreen extends StatefulWidget {
+  final String category;
+  final String subcategory;
+  final Color categoryColor;
+
+  const SellSubcategoryDetailsFormScreen({
+    Key? key,
+    required this.category,
+    required this.subcategory,
+    required this.categoryColor,
+  }) : super(key: key);
+
+  @override
+  State<SellSubcategoryDetailsFormScreen> createState() =>
+      _SellSubcategoryDetailsFormScreenState();
+}
+
+class _SellSubcategoryDetailsFormScreenState
+    extends State<SellSubcategoryDetailsFormScreen> {
+      late Map<String, TextEditingController> controllers;
+  final _formKey = GlobalKey<FormState>();
+    String selectedType = 'Type'; // Add this line at the class level
+  String selectedFurnishing = 'Furnishing'; // Add this variable
+  String selectedListed="Listed by";
+  String selectedBrand = 'Brand';
+  String selectedPeriod='Salary Period';
+  String selectedPosition='Position Type';
+
+ 
+
+  //  final Map<String, TextEditingController> controllers = {
+    
+
+  //   'brand': TextEditingController(),
+  //   'ownership': TextEditingController(),
+  //   'fuelType': TextEditingController(),
+  //   "transmissionType":TextEditingController(),
+  
+    
+   
+  //    // Initialize here!
+  // };
+
+  List<Widget> _buildBrandSection(dynamic brands,
+      {required Function(String) onBrandSelected}) {
+    // Check if brands is a List<String>
+    if (brands is List<String>) {
+      return brands.map((brand) {
+        return ListTile(
+          title: Text(brand),
+          onTap: () {
+            onBrandSelected(brand);
+          },
+        );
+      }).toList();
+    }
+    // If brands is a Map, try to extract a List from it
+    else if (brands is Map) {
+      // Check if the Map contains a key with a List of brands
+      if (brands.containsKey('brands') && brands['brands'] is List) {
+        return (brands['brands'] as List).map((brand) {
+          return ListTile(
+            title: Text(brand.toString()),
+            onTap: () {
+              onBrandSelected(brand.toString());
+            },
+          );
+        }).toList();
+      } else {
+        debugPrint(
+            'Error: Expected List<String> or Map with key "brands", but got $brands');
+        return []; // Return an empty list to avoid crashing
+      }
+    }
+    // Handle other cases
+    else {
+      debugPrint(
+          'Error: Expected List<String> or Map, but got ${brands.runtimeType}');
+      return []; // Return an empty list to avoid crashing
+    }
+  }
+
+  void _showOwnershipSnackBar(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                Text(" Number of Owners",
+                 style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue[900],
+                                      ),
+                ),
+                SizedBox(height: 16),
+                _buildOwnershipTile(context, " First", setState),
+                _buildOwnershipTile(context, " Second", setState),
+                _buildOwnershipTile(context, " Third", setState),
+                _buildOwnershipTile(context, " Fourth", setState),
+            
+                SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text("Cancel",style:TextStyle(color:Colors.red)),
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    },
+  );
+}
+Widget _buildOwnershipTile(BuildContext context, String ownerType, StateSetter setState) {
+  return ListTile(
+    title: Text(ownerType),
+    trailing: Icon(Icons.arrow_forward_ios),
+    onTap: () {
+      setState(() {
+        controllers['ownerType']?.text = ownerType; // Use the null-aware operator ?.
+      });
+      Navigator.pop(context);
+    },
+  );
+}
+
+ @override
+  void dispose() {
+    controllers.forEach((_, controller) => controller.dispose());
+    super.dispose();
+  }
+@override
+void initState() {
+  super.initState();
+  controllers = {
+    'category': TextEditingController(text: widget.category),
+   
+    'title': TextEditingController(),
+    'city': TextEditingController(),
+    'price': TextEditingController(),
+    'condition': TextEditingController(),
+    'thumb': TextEditingController(),
+    'description': TextEditingController(),
+    'brand': TextEditingController(),
+    'year': TextEditingController(),
+    // 'kmDriven': TextEditingController(),
+    'ownerType': TextEditingController(),
+    'fuelType': TextEditingController(),
+    'transmission': TextEditingController(),
+    'make':TextEditingController(),
+    "model":TextEditingController()
+
+  };
+}
+
+
+
+
+void _submitForm() async {
+  // First unfocus any active text field
+  FocusScope.of(context).unfocus();
+
+  if (_formKey.currentState!.validate()) {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      // Safely parse numbers with error handling
+      int price = 0;
+      int year = 0;
+      int kmDriven = 0;
+
+      try {
+        price = int.parse(controllers['price']?.text ?? '0');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid price number')),
+        );
+        return;
+      }
+
+      try {
+        year = int.parse(controllers['year']?.text ?? '0');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter a valid year number')),
+        );
+        return;
+      }
+
+      try {
+        kmDriven = int.parse(controllers['kmDriven']?.text ?? '0');
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please enter valid kilometers driven')),
+        );
+        return;
+      }
+
+      Map<String, dynamic> formData = {
+        'title': controllers['title']?.text?.trim() ?? '',
+        'city': controllers['city']?.text?.trim() ?? '',
+        'category': widget.category,
+        'price': price,  // Using parsed number
+        'condition': controllers['condition']?.text?.trim() ?? '',
+        'thumb': 'https://loremflickr.com/500/300/fish',
+        'description': controllers['description']?.text?.trim() ?? '',
+        'make': controllers['brand']?.text?.trim() ?? '',
+        'model': controllers['title']?.text?.trim() ?? '',
+        'year': year,  // Using parsed number
+        // 'kmDriven': kmDriven,  // Using parsed number
+        'ownerType': controllers['ownerType']?.text?.trim() ?? '',
+        'fuelType': controllers['fuelType']?.text?.trim() ?? '',
+        'transmission': controllers['transmission']?.text?.trim() ?? '',
+        // 'subcategory': widget.subcategory,
+      };
+
+      // Validate required fields
+      List<String> requiredFields = ['make', 'model', 'year', 'condition'];
+      String emptyFields = requiredFields
+          .where((field) => formData[field].toString().trim().isEmpty)
+          .join(', ');
+
+      if (emptyFields.isNotEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please fill in: $emptyFields')),
+        );
+        return;
+      }
+
+      final response = await http.post(
+        Uri.parse('http://192.168.0.170:8080/adposts'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode(formData),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Ad posted successfully!')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+}
+
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Post in ${widget.subcategory}'),
+      ),
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Add form fields based on category and subcategory
+              _buildFormFields(),
+              SizedBox(height: 20),
+              ElevatedButton(
+  onPressed: _submitForm,
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.blue,
+    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+  ),
+  child: Text(
+    'Submit',
+    style: TextStyle(
+      color: Colors.white,
+      fontSize: 16,
+    ),
+  ),
+),
+
+              // ElevatedButton(
+              //   onPressed: () {
+              //     if (_formKey.currentState!.validate()) {
+              //       // Handle form submission
+              //     }
+              //   },
+              //   child: Text('Submit'),
+              // ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormFields() {
+    // Return different form fields based on category and subcategory
+    switch (widget.category) {
+      case 'Cars':
+        return _buildCarsForm();
+      case 'Property':
+        return _buildPropertyForm();
+      case 'Mobiles':
+        return _buildMobilesForm();
+         case 'Jobs':
+        return _buildJobForm();
+        case 'Bikes':
+         return _buildBikesForm();
+         case 'Fashion':
+        return _buildFashionForm();
+        case 'Electronics & Appliances':
+        return _buildElectronicsAppliancesForm();
+        case 'Services':
+        return _buildServicesForm();
+        case 'Books, Sports & Hobbies':
+        return _buildBooksSportsHobbiesForm();
+          case 'Commercial Vehicles & Spares':
+        return _buildCommercialVehiclesSparesForm();
+        case 'Pets':
+        return _buildPetsForm();
+
+      default:
+        return _buildDefaultForm();
+    }
+  }
+
+  Widget _buildPropertyForm() {
+   
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+            hintText:
+                'Mention the key features of your item (e.g. brand, model, age, type)',
+          
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a title';
+            }
+            return null;
+          },
+        ),
+TextFormField(
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter price';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid number';
+    }
+    return null;
+  },
+),
+
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'BHK'),
+         
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter number of BHK';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Bathrooms'),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter number of Bathrooms';
+            }
+            return null;
+          },
+        ),
+       TextFormField(
+          readOnly: true,
+          controller: TextEditingController(text: selectedFurnishing),
+          decoration: InputDecoration(
+            labelText: 'Furnishing *',
+            suffixIcon: Icon(Icons.arrow_drop_down),
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text('Furnishing Status'),
+                        trailing: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: Text('Furnished'),
+                        onTap: () {
+                          setState(() {
+                            selectedFurnishing = 'Furnished';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Furnished'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Semi-Furnished'),
+                        onTap: () {
+                          setState(() {
+                            selectedFurnishing = 'Semi-Furnished';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Semi-Furnished'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Unfurnished'),
+                        onTap: () {
+                          setState(() {
+                            selectedFurnishing = 'Unfurnished';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Unfurnished'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty || value == 'Furnishing') {
+              return 'Please select furnishing status';
+            }
+            return null;
+          },
+        ),
+            TextFormField(
+          decoration: InputDecoration(labelText: 'Super Buildup area sqft *'),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a Super Buildup area sqft';
+            }
+            return null;
+          },
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Carpet area sqft *'),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter Carpet area sqft';
+            }
+            return null;
+          },
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Maintenance(Monthly)'),
+        
+        ),
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Total Floors'),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter number of Total Floors';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Car Parking'),
+          keyboardType: TextInputType.number,
+         
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Floor Number'),
+          keyboardType: TextInputType.number,
+        
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Facing'),
+          keyboardType: TextInputType.number,
+         
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Project Name'),
+         
+        ),
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Location'),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a location';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'City'),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a city';
+            }
+            return null;
+          },
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'State'),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a State';
+            }
+            return null;
+          },
+        ),
+
+
+        TextFormField(
+        readOnly: true, // Make it read-only since we'll use bottom sheet
+        controller: TextEditingController(text: selectedType), // Add controller
+        decoration: InputDecoration(
+          labelText: 'Type *',
+          suffixIcon: Icon(Icons.arrow_drop_down),
+        ),
+        onTap: () {
+          // Show bottom sheet when field is tapped
+          showModalBottomSheet(
+            context: context,
+            builder: (BuildContext context) {
+              return Container(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    ListTile(
+                      title: Text('Property Type'),
+                      trailing: IconButton(
+                        icon: Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                    Divider(),
+                    ListTile(
+                      title: Text('Flats/Apartments'),
+                      onTap: () {
+                        setState(() {
+                          selectedType = 'Flats/Apartments';
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Selected: Flats/Apartments'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Independent / Builder Floors'),
+                      onTap: () {
+                        setState(() {
+                          selectedType = 'Independent / Builder Floors';
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Selected: Independent / Builder Floors'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: Text('Farm House'),
+                      onTap: () {
+                        setState(() {
+                          selectedType = 'Farm House';
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Selected: Farm House'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      title: Text('House & Villa'),
+                      onTap: () {
+                        setState(() {
+                          selectedType = 'House & Villa';
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Selected: House & Villa'),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+        validator: (value) {
+          if (value == null || value.isEmpty || value == 'Type') {
+            return 'Please select a property type';
+          }
+          return null;
+        },
+      ),
+        TextFormField(
+           readOnly: true,
+          controller: TextEditingController(text: selectedListed),
+          decoration: InputDecoration(
+            labelText: 'Listed by *',
+            suffixIcon: Icon(Icons.arrow_drop_down),
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: Text('Listed By'),
+                        trailing: IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      Divider(),
+                      ListTile(
+                        title: Text('Builder'),
+                        onTap: () {
+                          setState(() {
+                            selectedListed = 'Builder'; 
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Builder'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Dealer'),
+                        onTap: () {
+                          setState(() {
+                            selectedFurnishing = 'Dealer';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Dealer'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: Text('Owner'),
+                        onTap: () {
+                          setState(() {
+                            selectedFurnishing = 'Owner';
+                          });
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Selected: Owner'),
+                              duration: Duration(seconds: 2),
+                            ),
+                          );
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty || value == 'Listed by') {
+              return 'Please select Listed by';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a description';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMobilesForm() {
+    // Add mobile-specific form fields
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+            hintText:
+                'Mention the key features of your item (e.g. brand, model, age, type)',
+          ),
+        ),
+  TextFormField(
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter price';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid number';
+    }
+    return null;
+  },
+),
+
+
+        TextFormField(
+          readOnly: true,
+          controller: TextEditingController(text: selectedBrand),
+          decoration: InputDecoration(
+            labelText: 'brand *',
+            suffixIcon: Icon(Icons.arrow_drop_down),
+          ),
+          onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: Text('Popular Brands'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                        Divider(),
+                        // Popular Brands
+                        ListTile(
+                          title: Text('Apple'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Apple';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Apple'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Samsung'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Samsung';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Samsung'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('OnePlus'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'OnePlus';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: OnePlus'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        Divider(),
+                        ListTile(
+                          title: Text('All Brands'),
+                          dense: true,
+                        ),
+                        // All Brands
+                        ListTile(
+                          title: Text('Asus'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Asus';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Asus'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('BlackBerry'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'BlackBerry';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: BlackBerry'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Google'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Google';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Google'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('HTC'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'HTC';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: HTC'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Huawei'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Huawei';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Huawei'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Lenovo'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Lenovo';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Lenovo'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('LG'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'LG';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: LG'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Motorola'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Motorola';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Motorola'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Nokia'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Nokia';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Nokia'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Realme'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Realme';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Realme'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Vivo'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Vivo';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Vivo'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Xiaomi'),
+                          onTap: () {
+                            setState(() {
+                              selectedBrand = 'Xiaomi';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Xiaomi'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+          validator: (value) {
+            if (value == null || value.isEmpty || value == 'Brand') {
+              return 'Please select a brand';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: 16.0),
+        TextFormField(
+      
+          decoration:
+              InputDecoration(labelText: 'RAM', border: OutlineInputBorder()),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a description';
+            }
+            return null;
+          },
+        ),
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+
+
+        // Add mobile-specific fields
+      ],
+    );
+  }
+  Widget _buildJobForm(){
+    return Column(
+      children: [
+        TextFormField(
+            readOnly: true,
+          controller: TextEditingController(text: selectedPeriod),
+          decoration: InputDecoration(labelText: 'Salary Period *',
+          suffixIcon: Icon(Icons.arrow_drop_down),
+          
+          ),
+            onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: Text('Salary Period'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                        Divider(),
+                        // Popular Brands
+                        ListTile(
+                          title: Text('Hourly'),
+                          onTap: () {
+                            setState(() {
+                              selectedPeriod = 'Hourly';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Hourly'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Monthly'),
+                          onTap: () {
+                            setState(() {
+                              selectedPeriod = 'Monthly';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Monthly'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Weekly'),
+                          onTap: () {
+                            setState(() {
+                              selectedPeriod = 'Weekly';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Weekly'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                   
+                       
+                     
+                        ListTile(
+                          title: Text('Yearly'),
+                          onTap: () {
+                            setState(() {
+                              selectedPeriod = 'Yearly';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Yearly'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+           validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a Period';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+           readOnly: true,
+          controller: TextEditingController(text: selectedPosition),
+          decoration: InputDecoration(labelText: 'Position Type *',
+  suffixIcon: Icon(Icons.arrow_drop_down),
+          
+          
+          ),
+          
+        onTap: () {
+            showModalBottomSheet(
+              context: context,
+              builder: (BuildContext context) {
+                return Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: Text('Position type'),
+                          trailing: IconButton(
+                            icon: Icon(Icons.close),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ),
+                        Divider(),
+                        // Popular Brands
+                        ListTile(
+                          title: Text('Hourly'),
+                          onTap: () {
+                            setState(() {
+                              selectedPosition = 'Contract';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Contract'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Full-time'),
+                          onTap: () {
+                            setState(() {
+                              selectedPosition = 'Full-time';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Full-time'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                        ListTile(
+                          title: Text('Part-time'),
+                          onTap: () {
+                            setState(() {
+                              selectedPosition = 'Part-time';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Part-time'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                   
+                       
+                     
+                        ListTile(
+                          title: Text('Tempory'),
+                          onTap: () {
+                            setState(() {
+                              selectedPosition = 'Tempory';
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Selected: Tempory'),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                            Navigator.pop(context);
+                          },
+                        ),
+                       
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
+           validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a Position';
+            }
+            return null;
+          },
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Salary From'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Salary to'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+          hintText: 'Include job title and company name',
+
+          
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+        
+       
+    
+  }
+
+  Widget _buildBikesForm() {
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+            hintText:
+                'Mention the key features of your item (e.g. brand, model, age, type)',
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a title';
+            }
+            return null;
+          },
+        ),
+TextFormField(
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter price';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid number';
+    }
+    return null;
+  },
+),
+
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'KM Driven'),
+          keyboardType: TextInputType.number,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter KM Driven';
+            }
+            return null;
+          },
+        ),
+     TextFormField(
+  controller: controllers['year'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Year *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter year';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid year';
+    }
+    return null;
+  },
+),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'City'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'State'),
+        ),
+                TextFormField(
+          controller: controllers['fuelType'],
+          readOnly: true, // Make the field read-only to prevent manual input
+          decoration: InputDecoration(
+            labelText: 'fuelType',
+            hintText: 'Select Fuel Type',
+            suffixIcon: Icon(Icons.arrow_drop_down),
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+          onTap: () {
+
+            // Show a modal bottom sheet with fuel type options
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      Text(
+                        'Select Fuel Type',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+
+                      // List of fuel types
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            ListTile(
+                              title: Text('Petrol'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Petrol';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('LPG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'LPG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Electric'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Electric';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Diesel'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Diesel';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('CNG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'CNG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Hybrid'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Hybrid';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Cancel button
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close the bottom sheet
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        // TextFormField(
+        //   decoration: InputDecoration(labelText: 'fuelType'),
+        // ),
+           TextFormField(
+          decoration: InputDecoration(labelText: 'Category'),
+        ),
+        
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          ),
+          maxLines: 3,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a description';
+            }
+            return null;
+          },
+        ),
+      ],
+    );
+}
+Widget _buildCommercialVehiclesSparesForm(){
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Prise'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'City'),
+        ),
+
+ TextFormField(
+          decoration: InputDecoration(labelText: 'State'),
+
+        ),
+        
+ TextFormField(
+          decoration: InputDecoration(labelText: 'Category'),
+
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+          hintText: 'A minimum length of Ten Charactrs required',
+
+          
+          ),
+        ),
+        
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+
+ 
+}
+
+  Widget _buildFashionForm(){
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Prise'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'City'),
+        ),
+
+ TextFormField(
+          decoration: InputDecoration(labelText: 'State'),
+
+        ),
+        
+ TextFormField(
+          decoration: InputDecoration(labelText: 'Category'),
+
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+          hintText: 'A minimum length of Ten Charactrs required',
+
+          
+          ),
+        ),
+        
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+  
+  Widget _buildBooksSportsHobbiesForm(){
+    return Column(
+      children: [
+         TextFormField(
+          decoration: InputDecoration(labelText: 'category'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'location'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'city'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'state'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'prise'),
+        ),
+         TextFormField(
+          decoration: InputDecoration(labelText: 'Condition'),
+        ),
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title'),
+        ),
+
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+  Widget _buildElectronicsAppliancesForm(){
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'prise',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'category',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'city',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'state',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Condition',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'location',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'warranty',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description',
+              hintText: 'Include condition, features and reason for selling',
+          
+          ),
+          maxLines: 3,
+        ),
+      ],
+    );
+
+  }
+
+  Widget _buildServicesForm() {
+    return Column(
+      children: [
+          TextFormField(
+          decoration: InputDecoration(labelText: 'Categoty'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description'),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+
+   Widget _buildCarsForm() {
+    return SingleChildScrollView(
+    child:Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: controllers['thumb'],
+          decoration:
+              InputDecoration(labelText: 'thumb', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['title'],
+          decoration: InputDecoration(
+            labelText: 'Title *',
+            hintText:
+                'Mention the key features of your item (e.g. brand, model, age, type)',
+            border: OutlineInputBorder(),
+            // suffixIcon: Icon(Icons.star, color: Colors.red, size: 10),
+          ),
+          maxLines: 2,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['city'],
+          decoration:
+              InputDecoration(labelText: 'City', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['verifiedSeller'],
+          decoration: InputDecoration(
+              labelText: 'verifiedSeller', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['category'],
+          decoration: InputDecoration(
+              labelText: 'category', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+ controller: controllers['condition'],
+          decoration: InputDecoration(
+              labelText: 'condition', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        TextFormField(
+          controller: controllers['description'],
+          decoration: InputDecoration(
+            labelText: 'Description *',
+            hintText: 'Include condition, features and reason for selling',
+            border: OutlineInputBorder(),
+            // suffixIcon: Icon(Icons.star, color: Colors.red, size: 5),
+          ),
+          maxLines: 3,
+          maxLength: 4000,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+TextFormField(
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter price';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid number';
+    }
+    return null;
+  },
+),
+
+
+        // SizedBox(height: 20),
+        // Text("Specifications",
+        //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        SizedBox(height: 10),
+
+
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextFormField(
+                controller: controllers['brand'],
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Brand *',
+                  hintText: 'Select Car Brand',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  suffixIcon: Icon(Icons.arrow_drop_down),
+                ),
+                validator: (value) =>
+                    value?.isEmpty ?? true ? 'Required' : null,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    builder: (context) {
+                      return Container(
+                        padding: EdgeInsets.all(0),
+                        height: MediaQuery.of(context).size.height * 0.9,
+                        child: Column(
+                          children: [
+                            // Cancel button at the top
+                            Container(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 8),
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: Text(
+                                  'Cancel',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Popular Brands',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue[900],
+                                      ),
+                                    ),
+                                    SizedBox(height: 16),
+                                    Expanded(
+                                      child: ListView(
+                                        children: [
+                                          // Popular Brands Section
+                                          ..._buildBrandSection([
+                                            'Maruti Suzuki',
+                                            'Hyundai',
+                                            'Tata',
+                                            'Mahindra',
+                                            'Toyota',
+                                            'Honda'
+                                          ], onBrandSelected: (brand) {
+                                            if (controllers['brand'] != null) {
+                                              controllers['brand']!.text =
+                                                  brand;
+                                            } else {
+                                              debugPrint(
+                                                  'Error: controllers["brand"] is null');
+                                            }
+                                            Navigator.pop(context);
+                                          }),
+
+                                          Divider(height: 32),
+                                          Text(
+                                            'All Brands',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.blue[900],
+                                            ),
+                                          ),
+                                          SizedBox(height: 16),
+
+                                          // All Brands Section
+                                          ..._buildBrandSection([
+                                            'Ambassador',
+                                            'Ashok Leyland',
+                                            'Aston Martin',
+                                            'Audi',
+                                            'BYD',
+                                            'Bajaj',
+                                            'Bentley',
+                                            'Citroen',
+                                            'Lotus',
+                                            'Tesla',
+                                            'BMW',
+                                            'Bugatti',
+                                            'Cadillac',
+                                            'Chevrolet',
+                                            'Chrysler',
+                                            'Daewoo',
+                                            'Datsun',
+                                            'DC',
+                                            'Eicher Polaris',
+                                            'Ferrari',
+                                            'Fiat',
+                                            'Force Motors',
+                                            'Ford',
+                                            'Honda',
+                                            'Hummer',
+                                            'Hyundai',
+                                            'ICML',
+                                            'ISUZU',
+                                            'Jaguar',
+                                            'Jeep',
+                                            'Kia',
+                                            'Lamborghini',
+                                            'Land Rover',
+                                            'Lexus',
+                                            'Mahindra',
+                                            'Mahindra Renault',
+                                            'Maruti Suzuki'
+                                          ], onBrandSelected: (brand) {
+                                            if (controllers['brand'] != null) {
+                                              controllers['brand']!.text =
+                                                  brand;
+                                            } else {
+                                              debugPrint(
+                                                  'Error: controllers["brand"] is null');
+                                            }
+                                            Navigator.pop(context);
+                                          }),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['model'],
+          decoration:
+              InputDecoration(labelText: 'Model', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+      TextFormField(
+  controller: controllers['year'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Year *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter year';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid year';
+    }
+    return null;
+  },
+),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['odoReading'],
+          decoration: InputDecoration(
+              labelText: 'Odometer Reading', border: OutlineInputBorder()),
+          keyboardType: TextInputType.number,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+
+        TextFormField(
+          controller: controllers['inWarranty'],
+          decoration: InputDecoration(
+              labelText: 'In Warranty', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        // SizedBox(height: 10),
+        // TextFormField(
+        //   controller: controllers['variant'],
+        //   decoration: InputDecoration(labelText: 'variant',
+
+        //    border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
+        SizedBox(height: 10),
+        // Replace the transmission type text field with this:
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'transmission *',
+              
+
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey[700],
+                
+              ),
+              
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        controllers['transmission']?.text = 'Automatic';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          controllers['transmission']?.text == 'Automatic'
+                              ? Colors.blue
+                              : Colors.grey[300],
+                      foregroundColor:
+                          controllers['transmission']?.text == 'Automatic'
+                              ? Colors.white
+                              : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Automatic'),
+                  ),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        controllers['transmission']?.text = 'Manual';
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          controllers['transmission']?.text == 'Manual'
+                              ? Colors.blue
+                              : Colors.grey[300],
+                      foregroundColor:
+                          controllers['transmission']?.text == 'Manual'
+                              ? Colors.white
+                              : Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Manual'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        // TextFormField(
+        //   controller: controllers['transmissionType'],
+        //   decoration: InputDecoration(
+        //       labelText: 'transmissionType', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['fuelType'],
+          readOnly: true, // Make the field read-only to prevent manual input
+          decoration: InputDecoration(
+            labelText: 'fuelType',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+          onTap: () {
+            // Show a modal bottom sheet with fuel type options
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              ),
+              builder: (context) {
+                return Container(
+                  padding: EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Title
+                      Text(
+                        'Select Fuel Type',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 16),
+
+                      // List of fuel types
+                      Expanded(
+                        child: ListView(
+                          children: [
+                            ListTile(
+                              title: Text('Petrol'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Petrol';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('LPG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'LPG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Electric'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Electric';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Diesel'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Diesel';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('CNG'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'CNG';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                            ListTile(
+                              title: Text('Hybrid'),
+                              trailing: Icon(Icons.arrow_forward),
+                              onTap: () {
+                                controllers['fuelType']?.text = 'Hybrid';
+                                Navigator.pop(
+                                    context); // Close the bottom sheet
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      // Cancel button
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Close the bottom sheet
+                        },
+                        child: Text(
+                          'Cancel',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ),
+        // TextFormField(
+        //   controller: controllers['fuelType'],
+        //   decoration: InputDecoration(
+        //       labelText: 'Fuel Type', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
+        SizedBox(height: 10),
+     TextFormField(
+    controller: controllers['ownerType'],
+    decoration: InputDecoration(
+      labelText: 'ownerType',
+      border: OutlineInputBorder(),
+      suffixIcon: Icon(Icons.arrow_drop_down),
+    ),
+    
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+    onTap: () {
+      _showOwnershipSnackBar(context); // Call the bottom sheet function
+    },
+    readOnly: true, // Prevent direct text input
+  ),
+      ],
+    ),
+    );
+  }
+  Widget _buildPetsForm(){
+    return Column(
+      children: [
+        TextFormField(
+          controller: controllers['petName'],
+          decoration: InputDecoration(
+              labelText: 'Pet Name', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petAge'],
+          decoration: InputDecoration(
+              labelText: 'Pet Age', border: OutlineInputBorder()),
+          keyboardType: TextInputType.number,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petBreed'],
+          decoration: InputDecoration(
+              labelText: 'Pet Breed', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petWeight'],
+          decoration: InputDecoration(
+              labelText: 'Pet Weight', border: OutlineInputBorder()),
+          keyboardType: TextInputType.number,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petHeight'],
+          decoration: InputDecoration(
+              labelText: 'Pet Height', border: OutlineInputBorder()),
+          keyboardType: TextInputType.number,
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petColor'],
+          decoration: InputDecoration(
+              labelText: 'Pet Color', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petGender'],
+          decoration: InputDecoration(
+              labelText: 'Pet Gender', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petVaccination'],
+          decoration: InputDecoration(
+              labelText: 'Pet Vaccination', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petDeworming'],
+          decoration: InputDecoration(
+              labelText: 'Pet Deworming', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petMicrochip'],
+          decoration: InputDecoration(
+              labelText: 'Pet Microchip', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petNeutered'],
+          decoration: InputDecoration(
+              labelText: 'Pet Neutered', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petHealth'],
+          decoration: InputDecoration(
+              labelText: 'Pet Health', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['petOther'],
+          decoration: InputDecoration(
+              labelText: 'Pet Other', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+      ],
+    );
+  }
+
+
+
+
+  Widget _buildDefaultForm() {
+    return Column(
+      children: [
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Title'),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Description'),
+          maxLines: 3,
+        ),
+      ],
+    );
+  }
+}

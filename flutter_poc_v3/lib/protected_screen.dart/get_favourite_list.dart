@@ -37,7 +37,7 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourites'),
+        Uri.parse('http://192.168.0.170:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

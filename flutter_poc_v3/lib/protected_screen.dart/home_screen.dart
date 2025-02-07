@@ -10,7 +10,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/profile_screen.da
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
 
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/introduction_screen.dart';
+
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
 
 
@@ -43,8 +43,8 @@ String selectedLocation = 'Select Location';
   final List<Widget> _screens = [
     
     const DashhomeScreen(),
-    IntroductionScreen(),
-    // const ChatScreen(),
+    // IntroductionScreen(),
+    const ChatScreen(),
     const SellScreen(),
     const MyAdds(),
     const ProfileScreen(),
@@ -101,12 +101,13 @@ Future<void> showLocationScreen() async {
       // Other screens - use simple AppBar with Olx logo
       return AppBar(
         elevation: 0.0,
-        backgroundColor: const Color.fromARGB(255, 173, 171, 171),
+        backgroundColor: const Color.fromARGB(255, 244, 113, 6),
         title: const Text(
           "U Sales",
           style: TextStyle(
             fontSize: 30,
             fontWeight: FontWeight.w600,
+            color: Color.fromARGB(255, 242, 241, 240),
           ),
         ),
         centerTitle: true,
@@ -220,8 +221,14 @@ Future<void> showLocationScreen() async {
       bottomNavigationBar: BottomNavigationBar(
         selectedFontSize: 20,
         iconSize: 25,
-        backgroundColor: Colors.grey,
+        backgroundColor: const Color.fromARGB(255, 233, 212, 118),
         currentIndex: currentIndex,
+      
+        showUnselectedLabels: true,
+       
+        showSelectedLabels: true,
+
+       
         onTap: (index) {
           setState(() {
             currentIndex = index;
@@ -251,7 +258,7 @@ Future<void> showLocationScreen() async {
         ],
         type: BottomNavigationBarType.fixed,
      
-        selectedItemColor: Colors.white,
+        selectedItemColor: const Color.fromARGB(255, 247, 4, 69),
         unselectedItemColor: const Color.fromARGB(179, 22, 1, 1),
       ),
       body: _screens[currentIndex],

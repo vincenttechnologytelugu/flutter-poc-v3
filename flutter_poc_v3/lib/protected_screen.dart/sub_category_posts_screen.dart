@@ -60,7 +60,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
       final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
 
       final url =
-          'http://192.168.0.167:8080/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
+          'http://192.168.0.170:8080/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
       log('Fetching URL: $url');
 
       final response = await http.get(Uri.parse(url));

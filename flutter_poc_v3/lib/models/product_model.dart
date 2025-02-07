@@ -109,6 +109,9 @@ class ProductModel {
   final String? firstName;
   final String? lastName;
   final String? state;
+  final String? convesationId;
+  
+ 
   
    
   String? name;
@@ -231,7 +234,10 @@ class ProductModel {
     this.createdAt,
     this.lastUpdated,
     this.isActive,
+    this.convesationId,
    required this.icon,
+ 
+   
     
 
 
@@ -254,6 +260,17 @@ class ProductModel {
     try {
       log('Parsing JSON: $map'); // Add this debug log
         String id = map['_id']?.toString() ?? '';
+
+          // Handle MongoDB ObjectId
+    if (map['_id'] != null) {
+      if (map['_id'] is Map && map['_id']['\$oid'] != null) {
+        id = map['_id']['\$oid'].toString();
+      } else {
+        id = map['_id'].toString();
+      }
+    }
+    
+    log('Parsed ID: $id');
     //         var id = map['_id'];
     // if (id is Map) {
     //   id = id['\$oid']; // MongoDB ObjectId format
@@ -410,26 +427,15 @@ class ProductModel {
                 : bool.tryParse(map['is_active'].toString())) 
             : null,
             state: map['state']?.toString(),
+            convesationId: map['convesationId']?.toString(),
+          
 
 
 
            
 
       
-      //        id: json['id'],
-      // name: json['name'],
-      // price: json['price']?.toDouble(),
-      // description: json['description'],
-      // features: json['features'] != null ? List<String>.from(json['features']) : null,
-      // postCount: json['post_count'],
-      // validityMonths: json['validity_months'],
-      // imageAttachments: json['image_attachments'],
-      // videoAttachments: json['video_attachments'],
-      // contacts: json['contacts'],
-      // manualBoostInterval: json['manual_boost_interval'],
-      // createdAt: json['created_at'],
-      // lastUpdated: json['last_updated'],
-      // isActive: json['is_active'],
+     
      
            
           
@@ -445,3 +451,4 @@ class ProductModel {
     }
   }
 }
+

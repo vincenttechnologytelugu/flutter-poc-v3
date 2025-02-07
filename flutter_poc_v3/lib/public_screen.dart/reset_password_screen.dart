@@ -56,7 +56,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
         log('Sending password update request...');
 
         final response = await http.post(
-          Uri.parse('http://192.168.0.167:8080/authentication/update_password'),
+          Uri.parse('http://192.168.0.170:8080/authentication/update_password'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
@@ -306,7 +306,7 @@ if (!mounted) return;
 //         log('Sending password update request...');
 
 //         final response = await http.post(
-//           Uri.parse('http://192.168.0.167:8080/authentication/update_password'),
+//           Uri.parse('http://192.168.0.170:8080/authentication/update_password'),
 //           headers: {
 //             'Content-Type': 'application/json',
 //             'Authorization': 'Bearer $token',

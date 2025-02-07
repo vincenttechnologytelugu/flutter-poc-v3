@@ -214,7 +214,7 @@ Widget _buildOwnershipTile(BuildContext context, String ownership, StateSetter s
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/adposts'),
+        Uri.parse('http://192.168.0.170:8080/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

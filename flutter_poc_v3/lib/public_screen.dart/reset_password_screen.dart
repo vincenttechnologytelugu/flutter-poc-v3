@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +22,6 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
   bool validatePassword(String password) {
     // Updated regex to match backend requirements
     final RegExp passwordRegex = RegExp(
- 
       r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{6,12}$',
     );
     return passwordRegex.hasMatch(password);
@@ -56,12 +54,11 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
         log('Sending password update request...');
 
         final response = await http.post(
-          Uri.parse('http://192.168.0.170:8080/authentication/update_password'),
+          Uri.parse('http://192.168.0.167:8080/authentication/update_password'),
           headers: {
             'Content-Type': 'application/json',
             'Authorization': 'Bearer $token',
           },
-          
           body: jsonEncode({
             // 'currentPassword': _oldPasswordController.text,
             // 'newPassword': _newPasswordController.text,
@@ -69,7 +66,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
           }),
         );
         log('Response received: ${response.statusCode}');
-         
+
         log('Request body: ${jsonEncode({
               'currentPassword': _oldPasswordController.text,
               'newPassword': _newPasswordController.text,
@@ -84,7 +81,7 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
           await prefs.setString('password', _newPasswordController.text);
           await prefs.setString(
               'confirmPassword', _confirmPasswordController.text);
-if (!mounted) return;
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Password updated successfully'),
@@ -244,8 +241,6 @@ if (!mounted) return;
   }
 }
 
-
-
 // import 'dart:developer';
 
 // import 'package:flutter/material.dart';
@@ -306,7 +301,7 @@ if (!mounted) return;
 //         log('Sending password update request...');
 
 //         final response = await http.post(
-//           Uri.parse('http://192.168.0.170:8080/authentication/update_password'),
+//           Uri.parse('http://192.168.0.167:8080/authentication/update_password'),
 //           headers: {
 //             'Content-Type': 'application/json',
 //             'Authorization': 'Bearer $token',

@@ -156,7 +156,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                             end: Alignment.bottomCenter,
                                             colors: [
                                               const Color.fromARGB(0, 245, 226, 235),
-                                              const Color.fromARGB(255, 11, 11, 11).withOpacity(0.9),
+                                              const Color.fromARGB(255, 11, 11, 11).withAlpha((0.9 * 255).round()),
                                             ],
                                           ),
                                         ),
@@ -333,7 +333,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               borderRadius: BorderRadius.circular(4),
                               color: _currentPage == index
                                   ? Colors.white
-                                  : Colors.purple.withOpacity(0.3),
+                                  : Colors.purple.withAlpha((0.9 * 255).round()),
                             ),
                           ),
                         ),

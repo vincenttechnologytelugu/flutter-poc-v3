@@ -46,11 +46,11 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>For Registaration Profile Pic</string>
+	<string>For Registaration Profile Pic and videos</string>
 	<key>NSCameraUsageDescription</key>
-	<string>For User Account Creation Profile Pic</string>
+	<string>This app needs access to camera to take photos and videos</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>For User Account Video Recording</string>
+	<string>This app needs access to microphone to record videos</string>
 
 	<key>NSLocationWhenInUseUsageDescription</key>
 <string>This app needs access to location when open to show your current location.</string>

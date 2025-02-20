@@ -32,7 +32,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   List<Message> messages = [];
- 
 
   bool isLoading = true;
   String? userName;
@@ -79,7 +78,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
       final currentUserId = prefs.getString('userId');
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/chat/messages'),
+        Uri.parse('http://192.168.0.167:8080/chat/messages'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -99,8 +98,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
           messages = messagesList
               .map((m) => Message.fromJson(m, currentUserId ?? ''))
               .toList();
-              // Update seller name if available in messages
-       
+          // Update seller name if available in messages
 
           isLoading = false;
         });
@@ -143,7 +141,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
       });
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/chat/send'),
+        Uri.parse('http://192.168.0.167:8080/chat/send'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -185,7 +183,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
     }
   }
 
-  Widget buildThumbImage(String? thumbUrl, {double size = 40}) {
+  Widget buildThumbImage(String? thumbUrl, {double size = 60}) {
     return thumbUrl != null && thumbUrl.isNotEmpty
         ? Image.network(
             thumbUrl,
@@ -195,7 +193,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
             errorBuilder: (context, error, stackTrace) => Icon(
               Icons.image_not_supported,
               size: size * 0.75,
-              color: Colors.grey[400],
+              color: const Color.fromARGB(255, 182, 20, 20),
             ),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
@@ -212,7 +210,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
         : Icon(
             Icons.image_not_supported,
             size: size * 0.75,
-            color: Colors.grey[400],
+            color: const Color.fromARGB(255, 227, 33, 33),
           );
   }
 
@@ -220,113 +218,123 @@ class _UserChatScreenState extends State<UserChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-  elevation: 0, // Remove shadow
-  backgroundColor: Colors.white, // Modern clean look
-  leading: IconButton(
-    icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87), // Modern back icon
-    onPressed: () => Navigator.pop(context),
-  ),
-  title: Row(
-    children: [
-      Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              spreadRadius: 1,
-              blurRadius: 3,
-              offset: const Offset(0, 1),
-            ),
-          ],
+        elevation: 0, // Remove shadow
+        backgroundColor: Colors.white, // Modern clean look
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.black87), // Modern back icon
+          onPressed: () => Navigator.pop(context),
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(12),
-          child: SizedBox(
-            width: 45,
-            height: 45,
-            child: buildThumbImage(widget.product.thumb),
-          ),
-        ),
-      ),
-      const SizedBox(width: 12),
-      Expanded(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Row(
           children: [
-            Text(
-              widget.product.title ?? 'No Title',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black87,
-                fontWeight: FontWeight.w600,
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withAlpha((0.9 * 255).round()),
+                    spreadRadius: 1,
+                    blurRadius: 1,
+                    offset: const Offset(0, 1),
+                  ),
+                ],
               ),
-              overflow: TextOverflow.ellipsis,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: buildThumbImage(widget.product.thumb),
+                ),
+              ),
             ),
-            Text(
-              '₹${widget.product.price?.toString() ?? '0.0'}',
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.green,
-                fontWeight: FontWeight.w500,
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.product.title ?? 'No Title',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    '₹${widget.product.price?.toString() ?? '0.0'}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-      ),
-    ],
-  ),
-  actions: [
-    Container(
-      margin: const EdgeInsets.symmetric(horizontal: 8),
-      decoration: BoxDecoration(
-        color: Colors.blue.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: IconButton(
-        icon: const Icon(Icons.call, color: Colors.blue),
-        onPressed: () {
-          // Implement call functionality
-        },
-      ),
-    ),
-    Theme(
-      data: Theme.of(context).copyWith(
-        popupMenuTheme: PopupMenuThemeData(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          elevation: 4,
-        ),
-      ),
-      child: PopupMenuButton(
-        icon: const Icon(Icons.more_vert, color: Colors.black87),
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            value: 'block',
-            child: Row(
-              children: const [
-                Icon(Icons.block, size: 20, color: Colors.red),
-                SizedBox(width: 8),
-                Text('Block User'),
+        actions: [
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 8),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(179, 220, 210, 210)
+                  .withAlpha((0.9 * 255).round()),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withAlpha((0.9 * 255).round()),
+                  spreadRadius: 1,
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
               ],
             ),
+            child: IconButton(
+              icon: const Icon(Icons.call, color: Colors.green),
+              onPressed: () {
+                // Implement call functionality
+              },
+            ),
           ),
-          PopupMenuItem(
-            value: 'report',
-            child: Row(
-              children: const [
-                Icon(Icons.flag, size: 20, color: Colors.orange),
-                SizedBox(width: 8),
-                Text('Report'),
+          Theme(
+            data: Theme.of(context).copyWith(
+              popupMenuTheme: PopupMenuThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 4,
+              ),
+            ),
+            child: PopupMenuButton(
+              icon: const Icon(Icons.more_vert, color: Colors.black87),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'block',
+                  child: Row(
+                    children: const [
+                      Icon(Icons.block, size: 20, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Block User'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'report',
+                  child: Row(
+                    children: const [
+                      Icon(Icons.flag, size: 20, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text('Report'),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ],
       ),
-    ),
-  ],
-),
 
       // appBar: AppBar(
       //   leading: IconButton(
@@ -408,7 +416,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
+                  color: Colors.grey.withAlpha((0.9 * 255).round()),
                   blurRadius: 4,
                 ),
               ],
@@ -517,8 +525,6 @@ class _MessageBubbleState extends State<_MessageBubble> {
   }
 }
 
-
-
 // Add these model classes at the bottom of the file or in a separate models file
 
 class Message {
@@ -548,8 +554,6 @@ class Message {
   }
 }
 
-
-
 class Conversation {
   final String id;
   final String adPostId;
@@ -561,7 +565,6 @@ class Conversation {
   final DateTime createdAt;
   final ProductModel product;
   final bool isBuying;
-
 
   // final String? firstName;
   // final String? lastName;
@@ -577,7 +580,7 @@ class Conversation {
     required this.createdAt,
     required this.product,
     required this.isBuying,
-    
+
     // this.firstName,
     // this.lastName,
   });

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.0.170:8080'; // Your server URL
+  static const String baseUrl = 'http://192.168.0.167:8080'; // Your server URL
 
   // Get authenticated user details
   static Future<Map<String, dynamic>> getAuthenticatedUser(String token) async {
@@ -21,7 +21,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final prefs = await SharedPreferences.getInstance();
-        
+
         // Save user details in SharedPreferences
         await prefs.setString('user_data', jsonEncode(responseData));
         return responseData;
@@ -33,7 +33,8 @@ class ApiService {
   }
 
   // Login method
-  static Future<Map<String, dynamic>> login(String email, String password) async {
+  static Future<Map<String, dynamic>> login(
+      String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/authentication/login'),
@@ -47,22 +48,21 @@ class ApiService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final token = responseData['session'];
-         final userData = responseData['user'];
-          // Debug log
-      log('Login Response: ${response.body}');
+        final userData = responseData['user'];
+        // Debug log
+        log('Login Response: ${response.body}');
 
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
-          
 
           // Get and save user details
           final userData = await getAuthenticatedUser(token);
           await prefs.setString('user_data', jsonEncode(userData));
-          
+
           // Save individual fields
           if (userData['data'] != null) {
-             log('User Data received: ${userData['data']}'); // Add this
+            log('User Data received: ${userData['data']}'); // Add this
             await prefs.setString('first_name', userData['data']['first_name']);
             await prefs.setString('last_name', userData['data']['last_name']);
             await prefs.setString('email', userData['data']['email']);
@@ -114,7 +114,7 @@ class ApiService {
           // Get and save user details
           final userData = await getAuthenticatedUser(token);
           await prefs.setString('user_data', jsonEncode(userData));
-          
+
           // Save individual fields
           if (userData['data'] != null) {
             await prefs.setString('first_name', userData['data']['first_name']);
@@ -139,39 +139,38 @@ class ApiService {
   }
 
   // In api_services.dart
-static Future<Map<String, dynamic>> getUserDetails(String token) async {
-  try {
-    final response = await http.get(
-      Uri.parse('$baseUrl/user/profile'), // adjust endpoint as per your API
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-    );
+  static Future<Map<String, dynamic>> getUserDetails(String token) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/user/profile'), // adjust endpoint as per your API
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
 
-    if (response.statusCode == 200) {
-      final userData = jsonDecode(response.body);
-      
-      // Save to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('first_name', userData['first_name'] ?? '');
-      await prefs.setString('last_name', userData['last_name'] ?? '');
-      await prefs.setString('email', userData['email'] ?? '');
-      
+      if (response.statusCode == 200) {
+        final userData = jsonDecode(response.body);
 
-       // Debug logs
+        // Save to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('first_name', userData['first_name'] ?? '');
+        await prefs.setString('last_name', userData['last_name'] ?? '');
+        await prefs.setString('email', userData['email'] ?? '');
+
+        // Debug logs
         log('User details saved to SharedPreferences:');
         log('First Name: ${userData['firstName']}');
         log('Last Name: ${userData['lastName']}');
         log('Email: ${userData['email']}');
-      return userData;
+        return userData;
+      }
+      return {};
+    } catch (e) {
+      log('Error fetching user details: $e');
+      return {};
     }
-    return {};
-  } catch (e) {
-    log('Error fetching user details: $e');
-    return {};
   }
-}
 
 // static Future<void> logout() async {
 //   final prefs = await SharedPreferences.getInstance();
@@ -179,25 +178,25 @@ static Future<Map<String, dynamic>> getUserDetails(String token) async {
 //   await prefs.remove('token');
 //   // Remove user_data if needed
 //     // await prefs.remove('user_data');
-  
+
 //   // Don't remove these
 //   await prefs.remove('first_name');
 //   await prefs.remove('last_name');
 //   await prefs.remove('email');
 // }
 
-Future<void> logout() async {
-  final prefs = await SharedPreferences.getInstance();
-  
-  // Only remove authentication-related data
-  await prefs.remove('token');
-  await prefs.remove('session');
-  
-  // Do NOT remove these
-  // await prefs.remove('first_name');
-  // await prefs.remove('last_name');
-  // await prefs.remove('email');
-}
+  Future<void> logout() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Only remove authentication-related data
+    await prefs.remove('token');
+    await prefs.remove('session');
+
+    // Do NOT remove these
+    // await prefs.remove('first_name');
+    // await prefs.remove('last_name');
+    // await prefs.remove('email');
+  }
 
   // // Logout method
   // static Future<void> logout() async {
@@ -216,9 +215,9 @@ Future<void> logout() async {
 // import 'package:shared_preferences/shared_preferences.dart';
 
 // class ApiService {
-//   static const String baseUrl = 'http:// 192.168.0.170:8080'; // Update with your server URL
+//   static const String baseUrl = 'http:// 192.168.0.167:8080'; // Update with your server URL
 // // For real android device
-// //static const String baseUrl = 'http:// 192.168.0.170:8080'; // Update with your server URL
+// //static const String baseUrl = 'http:// 192.168.0.167:8080'; // Update with your server URL
 //   // Get authenticated user details
 //   static Future<Map<String, dynamic>> getAuthenticatedUser(String token) async {
 //     try {

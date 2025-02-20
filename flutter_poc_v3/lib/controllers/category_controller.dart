@@ -8,17 +8,17 @@ import 'package:http/http.dart' as http;
 
 class CategoryController extends GetxController {
   // List<CategoryModel> categoryModelList = [];
-   List<ProductModel> productModelList = [];
+  List<ProductModel> productModelList = [];
   // List<CategoryModel> cartModelList = [];
   List categoriesList = [];
   // List<PostModel>postModelList=[];
 
 // bool isLoading = false;
 //  getPost() async{
- 
+
 //     isLoading=true;
 //      update();
-//    http.Response response = 
+//    http.Response response =
 //    await http.get(Uri.parse("https://jsonplaceholder.typicode.com/posts"));
 // var post=jsonDecode(response.body);
 
@@ -32,9 +32,8 @@ class CategoryController extends GetxController {
 
 //   }
 
-
   bool isLoadingOne = false;
-   bool _hasInitialized = false;
+  bool _hasInitialized = false;
   getData() async {
     if (_hasInitialized) {
       return;
@@ -44,7 +43,7 @@ class CategoryController extends GetxController {
     update();
     http.Response response =
         // await http.get(Uri.parse("https://fakestoreapi.com/products"));
-         await http.get(Uri.parse("http://192.168.0.170:8080/categories"));
+        await http.get(Uri.parse("http://192.168.0.167:8080/categories"));
     var data = jsonDecode(response.body);
     // parsing
     for (var item in data) {
@@ -92,7 +91,6 @@ class CategoryController extends GetxController {
   //     // api failed
   //   }
   // }
-  
 
   // deletPost() async {
   //   http.Response response = await http.delete(

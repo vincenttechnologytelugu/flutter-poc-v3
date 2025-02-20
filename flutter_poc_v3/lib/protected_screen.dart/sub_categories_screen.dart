@@ -8,10 +8,10 @@ class SubcategoriesScreen extends StatefulWidget {
   final Color categoryColor;
 
   const SubcategoriesScreen({
-    Key? key,
+    super.key,
     required this.category,
     required this.categoryColor,
-  }) : super(key: key);
+  });
 
   @override
   State<SubcategoriesScreen> createState() => _SubcategoriesScreenState();

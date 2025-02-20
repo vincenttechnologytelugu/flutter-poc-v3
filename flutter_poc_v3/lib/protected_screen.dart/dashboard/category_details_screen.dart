@@ -203,7 +203,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
 
   void navigateToCategoryPosts(
       {String? findkey, String? priceStart, String? priceEnd, String? year}) {
-    String baseUrl = 'http://192.168.0.170:8080/adposts';
+    String baseUrl = 'http://192.168.0.167:8080/adposts';
     String category = Uri.encodeComponent(widget.productModel.category ?? '');
     String url;
 
@@ -264,9 +264,12 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(Icons.attach_money,color:Colors.white),
+                    Icon(Icons.attach_money, color: Colors.white),
                     SizedBox(width: 8),
-                    Text('Budget & Brands',style: TextStyle(color:Colors.white,fontSize: 18),),
+                    Text(
+                      'Budget & Brands',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ],
                 ),
               ),
@@ -274,9 +277,12 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: const [
-                    Icon(Icons.calendar_today,color:Colors.white),
+                    Icon(Icons.calendar_today, color: Colors.white),
                     SizedBox(width: 8),
-                    Text('Year',style: TextStyle(color:Colors.white,fontSize: 18),),
+                    Text(
+                      'Year',
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
                   ],
                 ),
               ),
@@ -289,7 +295,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                const Color.fromARGB(255, 184, 52, 12).withOpacity(0.9),
+                const Color.fromARGB(255, 184, 52, 12)
+                    .withAlpha((0.9 * 255).round()),
                 Colors.white,
               ],
             ),
@@ -339,7 +346,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color:
+                                    Colors.black.withAlpha((0.9 * 255).round()),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -421,7 +429,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
                                       color: const Color(0xFF1A237E)
-                                          .withOpacity(0.1),
+                                          .withAlpha((0.3 * 255).round()),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
@@ -492,7 +500,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
+                                color:
+                                    Colors.black.withAlpha((0.9 * 255).round()),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -774,7 +783,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
         categorySubcategories[widget.productModel.category] ?? [];
 
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 182, 171, 162),
+      backgroundColor: const Color.fromARGB(255, 129, 127, 126),
       appBar: AppBar(
         title: Text(widget.productModel.category ?? ''),
         elevation: 0,
@@ -786,7 +795,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
             end: Alignment.bottomCenter,
             colors: [
               Theme.of(context).primaryColor.withAlpha(51),
-              Colors.white,
+              const Color.fromARGB(255, 243, 8, 8),
             ],
           ),
         ),
@@ -799,9 +808,9 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                 Text(
                   'Explore ${widget.productModel.category}',
                   style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white70),
                 ),
                 const SizedBox(height: 20),
 
@@ -821,8 +830,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                       // Stunning gradient color combinations
                       final List<List<Color>> cardGradients = [
                         [
-                          const Color.fromARGB(255, 24, 14, 216),
-                          const Color.fromARGB(255, 224, 7, 141),
+                          const Color.fromARGB(255, 169, 169, 184),
+                          const Color.fromARGB(255, 144, 148, 145),
                           const Color.fromARGB(255, 167, 5, 217),
                         ],
                         [
@@ -861,7 +870,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                           const Color(0xFFFAD0C4),
                         ],
                         [
-                          const Color.fromARGB(255, 229, 99, 6),
+                          const Color.fromARGB(255, 207, 6, 229),
                           const Color(0xFFFFBBEC),
                         ],
                         [
@@ -869,7 +878,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                           const Color(0xFFB721FF),
                         ],
                         [
-                          const Color(0xFFFF3D00),
+                          const Color.fromARGB(255, 235, 229, 226),
                           const Color.fromARGB(255, 63, 10, 197),
                         ],
                       ];
@@ -887,7 +896,8 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                           child: FadeInAnimation(
                             child: Card(
                               elevation: 8,
-                              shadowColor: gradientColors[0].withOpacity(0.1),
+                              shadowColor: gradientColors[0]
+                                  .withAlpha((0.3 * 255).round()),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -906,10 +916,11 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        gradientColors[0].withOpacity(0.1),
+                                        gradientColors[0]
+                                            .withAlpha((0.3 * 255).round()),
                                         gradientColors[
                                                 gradientColors.length - 1]
-                                            .withOpacity(0.15),
+                                            .withAlpha((0.3 * 255).round()),
                                       ],
                                     ),
                                   ),
@@ -923,15 +934,18 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
                                             colors: gradientColors
-                                                .map((color) =>
-                                                    color.withOpacity(0.1))
+                                                .map(
+                                                  (color) => color.withAlpha(
+                                                      (0.3 * 255).round()),
+                                                )
                                                 .toList(),
                                           ),
                                           shape: BoxShape.circle,
                                           boxShadow: [
                                             BoxShadow(
                                               color: gradientColors[0]
-                                                  .withOpacity(0.1),
+                                                  .withAlpha(
+                                                      (0.3 * 255).round()),
                                               blurRadius: 12,
                                               spreadRadius: 2,
                                             ),
@@ -950,7 +964,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                             duration: 2000.ms,
                                             color: gradientColors[
                                                     gradientColors.length - 1]
-                                                .withOpacity(0.1),
+                                                .withAlpha((0.3 * 255).round()),
                                           )
                                           .then()
                                           .scale(
@@ -980,7 +994,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                                 colors: gradientColors,
                                               ).createShader(
                                                 const Rect.fromLTWH(
-                                                    0.0, 0.0, 200.0, 70.0),
+                                                    0.0, 0.0, 100.0, 0.0),
                                               ),
                                           ),
                                           maxLines: 2,
@@ -1001,11 +1015,11 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              gradientColors[0]
-                                                  .withOpacity(0.1),
+                                              gradientColors[0].withAlpha(
+                                                  (0.3 * 255).round()),
                                               ...gradientColors,
-                                              gradientColors[0]
-                                                  .withOpacity(0.1),
+                                              gradientColors[0].withAlpha(
+                                                  (0.3 * 255).round()),
                                             ],
                                           ),
                                           borderRadius:
@@ -1034,14 +1048,15 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                 .animate()
                                 .scale(
                                   duration: 400.ms,
-                                  curve: Curves.easeOutBack,
+                                  curve: Curves.linearToEaseOut,
                                   begin: const Offset(0.8, 0.8),
                                   end: const Offset(1, 1),
                                 )
                                 .then()
                                 .shimmer(
                                   duration: 1200.ms,
-                                  color: gradientColors[0].withOpacity(0.1),
+                                  color: gradientColors[0]
+                                      .withAlpha((0.6 * 255).round()),
                                 ),
                           ),
                         ),

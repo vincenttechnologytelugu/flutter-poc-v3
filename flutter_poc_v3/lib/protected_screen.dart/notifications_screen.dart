@@ -82,13 +82,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     Container(
                       padding: const EdgeInsets.all(32),
                       decoration: BoxDecoration(
-                        color: Colors.blue.withOpacity(0.1),
+                        color: const Color.fromARGB(255, 175, 180, 180).withAlpha((0.9 * 255).round()),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.notifications_off_outlined,
                         size: 86,
-                        color: Colors.blue[300],
+                        color: const Color.fromARGB(255, 232, 92, 5),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -199,7 +199,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       _formatTime(notification.time),
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey[600],
+                        color: const Color.fromARGB(255, 243, 136, 136),
                       ),
                     ),
                   ],
@@ -210,7 +210,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                    color: Colors.blue,
+                    color: Color.fromARGB(255, 227, 231, 235),
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -243,7 +243,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: iconColor.withOpacity(0.1),
+        color: iconColor.withAlpha((0.9 * 255).round()),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Icon(

@@ -19,9 +19,8 @@ class _ChatScreenState extends State<ChatScreen>
   late TabController _tabController;
 
   List<Conversation> conversations = [];
-  
-  bool isLoading = true;
 
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -46,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen>
       // lastName = prefs.getString('lastName');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/chat/conversations'),
+        Uri.parse('http://192.168.0.167:8080/chat/conversations'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -60,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen>
         for (var conv in data) {
           // Load messages for each conversation
           final messagesResponse = await http.post(
-            Uri.parse('http://192.168.0.170:8080/chat/messages'),
+            Uri.parse('http://192.168.0.167:8080/chat/messages'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -73,7 +72,6 @@ class _ChatScreenState extends State<ChatScreen>
           if (messagesResponse.statusCode == 200) {
             final messages = json.decode(messagesResponse.body);
             conv['messages'] = messages;
-           
           }
 
           final conversation = await Conversation.fromJsonList([conv]);
@@ -83,12 +81,9 @@ class _ChatScreenState extends State<ChatScreen>
         }
 
         setState(() {
-
           conversations = conversationsList;
 
           isLoading = false;
-
-          
         });
       } else {
         throw Exception('Failed to load conversations');
@@ -252,7 +247,7 @@ class _ConversationTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withAlpha((0.9 * 255).round()),
             spreadRadius: 1,
             blurRadius: 5,
             offset: const Offset(0, 2),
@@ -278,7 +273,6 @@ class _ConversationTile extends StatelessWidget {
             ),
           ),
         ),
-
         title: Text(
           conversation.product.title ?? 'No Title',
           style: const TextStyle(
@@ -286,13 +280,10 @@ class _ConversationTile extends StatelessWidget {
             fontSize: 16,
           ),
         ),
-        
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-          
-           
             Text(
               conversation.lastMessage ?? 'No messages',
               style: TextStyle(
@@ -398,8 +389,6 @@ class _ConversationTile extends StatelessWidget {
       ),
     );
   }
-
-  
 
   String _formatTime(DateTime time) {
     final now = DateTime.now();

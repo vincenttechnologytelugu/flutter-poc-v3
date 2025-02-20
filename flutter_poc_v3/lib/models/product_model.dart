@@ -21,6 +21,7 @@ class ProductModel {
   final String? city;
   final String? thumb;
  final String icon;
+ final String? electronics_category;
 
   // Properties specific
   final String? propertyType;
@@ -89,7 +90,7 @@ class ProductModel {
 
   //electronics
   // ignore: non_constant_identifier_names
-  final String? electronics_category;
+
   final String? product;
   
   final String? color;
@@ -127,6 +128,12 @@ class ProductModel {
   String? createdAt;
   String? lastUpdated;
   bool? isActive;
+  String? posted_by;
+  int? created_at;
+  int? last_updated_at;
+  int? valid_till;
+  int? published_at;
+  
 
    
 
@@ -236,6 +243,12 @@ class ProductModel {
     this.isActive,
     this.convesationId,
    required this.icon,
+    this.posted_by,
+    this.created_at,
+    this.last_updated_at,
+    this.valid_till,
+    this.published_at
+   
  
    
     
@@ -428,6 +441,28 @@ class ProductModel {
             : null,
             state: map['state']?.toString(),
             convesationId: map['convesationId']?.toString(),
+            posted_by: map['posted_by']?.toString(),
+            created_at: map['created_at'] != null 
+            ? (map['created_at'] is int 
+                ? map['created_at'] 
+                : int.tryParse(map['created_at'].toString())) 
+            : null,
+            last_updated_at: map['last_updated_at'] != null 
+            ? (map['last_updated_at'] is int 
+                ? map['last_updated_at'] 
+                : int.tryParse(map['last_updated_at'].toString())) 
+            : null,
+            valid_till: map['valid_till'] != null 
+            ? (map['valid_till'] is int 
+                ? map['valid_till'] 
+                : int.tryParse(map['valid_till'].toString())) 
+            : null,
+            published_at: map['published_at'] != null 
+            ? (map['published_at'] is int 
+                ? map['published_at'] 
+                : int.tryParse(map['published_at'].toString())) 
+            : null,
+
           
 
 

@@ -13,16 +13,16 @@ class GetFavouriteList extends StatefulWidget {
 }
 
 class _GetFavouriteListState extends State<GetFavouriteList> {
-   List<ProductModel> favorites = [];
+  List<ProductModel> favorites = [];
   bool isLoading = true;
   String? errorMessage;
-   @override
+  @override
   void initState() {
     super.initState();
     fetchFavorites();
   }
 
- Future<void> fetchFavorites() async {
+  Future<void> fetchFavorites() async {
     try {
       setState(() {
         isLoading = true;
@@ -37,7 +37,7 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/favourites'),
+        Uri.parse('http://192.168.0.167:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -47,9 +47,10 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
       if (response.statusCode == 200) {
         // Parse the response body
         final Map<String, dynamic> responseData = json.decode(response.body);
-        
+
         // Directly use the response data if it's the list we need
-        final List<dynamic> data = responseData['favourites'] ?? []; // Changed from 'data' to 'favourites'
+        final List<dynamic> data = responseData['favourites'] ??
+            []; // Changed from 'data' to 'favourites'
         setState(() {
           favorites = data.map((item) => ProductModel.fromJson(item)).toList();
           isLoading = false;
@@ -64,10 +65,11 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
-    return  Scaffold(
-       backgroundColor: Colors.grey[50],
+    return Scaffold(
+      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
@@ -213,14 +215,14 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
       ),
       child: InkWell(
         onTap: () {
-           Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProductDetails(
-                                  productModel: productModel,
-                                ),
-                              ),
-           );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ProductDetails(
+                productModel: productModel,
+              ),
+            ),
+          );
           // Navigate to product details
         },
         borderRadius: BorderRadius.circular(15),
@@ -229,7 +231,6 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               // Product Image
               // ClipRRect(
               //   borderRadius: BorderRadius.circular(12),
@@ -254,13 +255,13 @@ class _GetFavouriteListState extends State<GetFavouriteList> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                      Text(
-                    productModel.id.toString(),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
+                    Text(
+                      productModel.id.toString(),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
 
                     // Text(
                     //   productModel.title ?? 'No Title',

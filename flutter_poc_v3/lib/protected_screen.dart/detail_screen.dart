@@ -6,7 +6,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class DetailScreen extends StatefulWidget {
   final Map<String, dynamic> item;
 
@@ -18,16 +17,12 @@ class DetailScreen extends StatefulWidget {
 
 class _DetailScreenState extends State<DetailScreen> {
   final Map<String, TextEditingController> controllers = {
-    
-
     'brand': TextEditingController(),
     'ownership': TextEditingController(), // Initialize here!
   };
- 
-  
+
   final _formKey = GlobalKey<FormState>();
 
-  
   // String? selectedBrand;
 
   @override
@@ -42,64 +37,60 @@ class _DetailScreenState extends State<DetailScreen> {
     super.dispose();
   }
 
+  void _showOwnershipSnackBar(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Text(
+                    " Number of Owners",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blue[900],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  _buildOwnershipTile(context, " First", setState),
+                  _buildOwnershipTile(context, " Second", setState),
+                  _buildOwnershipTile(context, " Third", setState),
+                  _buildOwnershipTile(context, " Fourth", setState),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
-
-void _showOwnershipSnackBar(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    builder: (BuildContext context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return Container(
-            padding: EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(" Number of Owners",
-                 style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue[900],
-                                      ),
-                ),
-                SizedBox(height: 16),
-                _buildOwnershipTile(context, " First", setState),
-                _buildOwnershipTile(context, " Second", setState),
-                _buildOwnershipTile(context, " Third", setState),
-                _buildOwnershipTile(context, " Fourth", setState),
-            
-                SizedBox(height: 16),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: Text("Cancel",style:TextStyle(color:Colors.red)),
-                ),
-              ],
-            ),
-          );
-        },
-      );
-    },
-  );
-}
-
-Widget _buildOwnershipTile(BuildContext context, String ownership, StateSetter setState) {
-  return ListTile(
-    title: Text(ownership),
-    trailing: Icon(Icons.arrow_forward_ios),
-    onTap: () {
-      setState(() {
-        controllers['ownership']?.text = ownership; // Use the null-aware operator ?.
-      });
-      Navigator.pop(context);
-    },
-  );
-}
-
-
-
-
+  Widget _buildOwnershipTile(
+      BuildContext context, String ownership, StateSetter setState) {
+    return ListTile(
+      title: Text(ownership),
+      trailing: Icon(Icons.arrow_forward_ios),
+      onTap: () {
+        setState(() {
+          controllers['ownership']?.text =
+              ownership; // Use the null-aware operator ?.
+        });
+        Navigator.pop(context);
+      },
+    );
+  }
 
   List<Widget> _buildBrandSection(dynamic brands,
       {required Function(String) onBrandSelected}) {
@@ -214,7 +205,7 @@ Widget _buildOwnershipTile(BuildContext context, String ownership, StateSetter s
       };
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/adposts'),
+        Uri.parse('http://192.168.0.167:8080/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -821,18 +812,18 @@ Widget _buildOwnershipTile(BuildContext context, String ownership, StateSetter s
         //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         // ),
         SizedBox(height: 10),
-     TextFormField(
-    controller: controllers['ownership'],
-    decoration: InputDecoration(
-      labelText: 'ownership',
-      border: OutlineInputBorder(),
-    ),
-    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-    onTap: () {
-      _showOwnershipSnackBar(context); // Call the bottom sheet function
-    },
-    readOnly: true, // Prevent direct text input
-  ),
+        TextFormField(
+          controller: controllers['ownership'],
+          decoration: InputDecoration(
+            labelText: 'ownership',
+            border: OutlineInputBorder(),
+          ),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+          onTap: () {
+            _showOwnershipSnackBar(context); // Call the bottom sheet function
+          },
+          readOnly: true, // Prevent direct text input
+        ),
       ],
     );
   }

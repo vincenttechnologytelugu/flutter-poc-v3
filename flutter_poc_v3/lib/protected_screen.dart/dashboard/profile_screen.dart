@@ -90,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       // Make API call to get user details
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/authentication/auth_user'),
+        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlueAccent,
+      backgroundColor: const Color.fromARGB(255, 177, 193, 200),
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [

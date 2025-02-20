@@ -30,7 +30,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
       // First check conversations to see if one exists
       final conversationsResponse = await http.get(
-        Uri.parse('http://192.168.0.170:8080/chat/conversations'),
+        Uri.parse('http://192.168.0.167:8080/chat/conversations'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -56,7 +56,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         } else {
           // Initiate new chat
           final initiateResponse = await http.post(
-            Uri.parse('http://192.168.0.170:8080/chat/initiate'),
+            Uri.parse('http://192.168.0.167:8080/chat/initiate'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -80,7 +80,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         // Load messages for the conversation
         if (conversationId != null) {
           final messagesResponse = await http.post(
-            Uri.parse('http://192.168.0.170:8080/chat/messages'),
+            Uri.parse('http://192.168.0.167:8080/chat/messages'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -139,8 +139,9 @@ class _ProductDetailsState extends State<ProductDetails> {
         return _buildCarDetails();
       case 'properties':
         return _buildPropertiesDetails();
-      case 'electronics':
-        return _buildElectronicsDetails();
+      case 'services':
+        return _buildServicesForm();
+
       case 'mobiles':
         return _buildMobilesDetails();
       case 'jobs':
@@ -172,16 +173,17 @@ class _ProductDetailsState extends State<ProductDetails> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            const Color.fromARGB(255, 129, 115, 115),
-            const Color.fromARGB(255, 159, 142, 142),
+            const Color.fromARGB(255, 193, 191, 193),
+            const Color.fromARGB(255, 184, 181, 181),
           ],
         ),
         borderRadius: BorderRadius.circular(15),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 147, 133, 230).withOpacity(0.1),
+            color: const Color.fromARGB(255, 3, 1, 15)
+                .withAlpha((0.9 * 255).round()),
             spreadRadius: 2,
-            blurRadius: 15,
+            blurRadius: 4,
             offset: const Offset(0, 3),
           ),
         ],
@@ -192,6 +194,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           _buildSectionHeader('Vehicle Information'),
           _buildInfoCard([
             _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
             _buildInfoRow('City', widget.productModel.city),
             _buildInfoRow('Category', widget.productModel.category),
           ]),
@@ -237,7 +240,7 @@ class _ProductDetailsState extends State<ProductDetails> {
             style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Colors.black87,
+              color: Color.fromARGB(221, 242, 6, 92),
             ),
           ),
         ],
@@ -248,13 +251,19 @@ class _ProductDetailsState extends State<ProductDetails> {
   Widget _buildInfoCard(List<Widget> children) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 247, 245, 250),
+        color: const Color.fromARGB(
+          255,
+          249,
+          248,
+          247,
+        ),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color.fromARGB(255, 251, 252, 251).withOpacity(0.05),
+            color: const Color.fromARGB(255, 251, 252, 251)
+                .withAlpha((0.9 * 255).round()),
             spreadRadius: 1,
-            blurRadius: 8,
+            blurRadius: 2,
             offset: const Offset(0, 2),
           ),
         ],
@@ -270,7 +279,8 @@ class _ProductDetailsState extends State<ProductDetails> {
                 if (index != children.length - 1)
                   Divider(
                     height: 1,
-                    color: Colors.grey.withOpacity(0.1),
+                    color: const Color.fromARGB(255, 5, 1, 17)
+                        .withAlpha((0.9 * 255).round()),
                   ),
               ],
             );
@@ -284,10 +294,10 @@ class _ProductDetailsState extends State<ProductDetails> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 237, 187, 6),
+        color: const Color.fromARGB(255, 233, 232, 216),
         border: Border(
           left: BorderSide(
-            color: const Color.fromARGB(255, 231, 236, 230),
+            color: const Color.fromARGB(255, 2, 10, 0),
             width: 0.5,
           ),
         ),
@@ -301,7 +311,7 @@ class _ProductDetailsState extends State<ProductDetails> {
               label,
               style: TextStyle(
                 fontSize: 18,
-                color: const Color.fromARGB(179, 25, 8, 8),
+                color: const Color.fromARGB(179, 13, 2, 2),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -313,8 +323,8 @@ class _ProductDetailsState extends State<ProductDetails> {
               value ?? 'N/A',
               style: const TextStyle(
                 fontSize: 18,
-                color: Colors.black87,
-                fontWeight: FontWeight.w400,
+                color: Color.fromARGB(179, 1, 1, 9),
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
@@ -342,220 +352,798 @@ class _ProductDetailsState extends State<ProductDetails> {
   //   );
   // }
 
+  // Widget _buildPropertiesDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Title', widget.productModel.title.toString()),
+  //       _buildInfoRow('Property Type', widget.productModel.propertyType),
+  //       _buildInfoRow('Bedrooms', widget.productModel.bedrooms?.toString()),
+  //       _buildInfoRow('Bathrooms', widget.productModel.bathrooms?.toString()),
+  //       _buildInfoRow('Furnished', widget.productModel.furnishing.toString()),
+  //       _buildInfoRow('Area', '${widget.productModel.area} sq. ft.'),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
+  //       _buildInfoRow(
+  //           'FloorNumber', widget.productModel.floorNumber.toString()),
+  //       _buildInfoRow(
+  //           'TotalFloors', widget.productModel.totalFloors.toString()),
+  //     ],
+  //   );
+  // }
+
   Widget _buildPropertiesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Title', widget.productModel.title.toString()),
-        _buildInfoRow('Property Type', widget.productModel.propertyType),
-        _buildInfoRow('Bedrooms', widget.productModel.bedrooms?.toString()),
-        _buildInfoRow('Bathrooms', widget.productModel.bathrooms?.toString()),
-        _buildInfoRow('Furnished', widget.productModel.furnishing.toString()),
-        _buildInfoRow('Area', '${widget.productModel.area} sq. ft.'),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
-        _buildInfoRow(
-            'FloorNumber', widget.productModel.floorNumber.toString()),
-        _buildInfoRow(
-            'TotalFloors', widget.productModel.totalFloors.toString()),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Property Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Property type', widget.productModel.propertyType),
+            _buildInfoRow('Berdrooms', widget.productModel.bedrooms),
+            _buildInfoRow('BathRooms', widget.productModel.bathrooms),
+            _buildInfoRow('Furnished', widget.productModel.furnishing),
+            _buildInfoRow('Area', widget.productModel.area),
+            _buildInfoRow('Total Floors', widget.productModel.totalFloors),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow('Floor Number', widget.productModel.floorNumber),
+            _buildInfoRow(
+                'Owner Type', widget.productModel.ownerType.toString()),
+          ]),
+        ],
+      ),
     );
   }
 
-  Widget _buildElectronicsDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Model', widget.productModel.model),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-      ],
-    );
-  }
-
-  Widget _buildMobilesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Storage', widget.productModel.storage),
-        _buildInfoRow('Operating System', widget.productModel.operatingSystem),
-        _buildInfoRow('Screen Size', widget.productModel.screenSize),
-        _buildInfoRow('Color', widget.productModel.color),
-        _buildInfoRow('Camera', widget.productModel.camera),
-        _buildInfoRow('Battery', widget.productModel.battery),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Model', widget.productModel.model),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-      ],
-    );
-  }
-
-  Widget _buildJobDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Job Type', widget.productModel.jobType),
-        _buildInfoRow('Experience', widget.productModel.experienceLevel),
-        _buildInfoRow('Qualification', widget.productModel.qualifications),
-        _buildInfoRow('Salary', widget.productModel.salary),
-        _buildInfoRow('Position', widget.productModel.position),
-        _buildInfoRow('Company', widget.productModel.company),
-      ],
-    );
-  }
-
-  Widget _buildFashionDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('location', widget.productModel.location),
-        _buildInfoRow('Product', widget.productModel.product),
-        _buildInfoRow('Fachion Category', widget.productModel.fashion_category),
-        _buildInfoRow('Size', widget.productModel.size),
-        _buildInfoRow('Color', widget.productModel.color),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Model', widget.productModel.model),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-      ],
-    );
-  }
-
-  Widget _buildBooksSportsHobbiesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('hobby_category', widget.productModel.hobby_category),
-        _buildInfoRow('Product', widget.productModel.product),
-        _buildInfoRow('Condition', widget.productModel.condition),
-      ],
-    );
-  }
-
-  Widget _buildBikesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Model', widget.productModel.model),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-        _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
-        _buildInfoRow('Transmission', widget.productModel.transmission),
-        _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
-        _buildInfoRow('Color', widget.productModel.color),
-        _buildInfoRow('Year', widget.productModel.year.toString()),
-      ],
-    );
-  }
+  // Widget _buildElectronicsDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Brand', widget.productModel.brand),
+  //       _buildInfoRow('Model', widget.productModel.model),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Warranty', widget.productModel.warranty),
+  //     ],
+  //   );
+  // }
 
   Widget _buildElectronicsAppliancesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Product', widget.productModel.product),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Electronics Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Electronics category',
+                widget.productModel.electronics_category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Brand', widget.productModel.brand),
+            _buildInfoRow('Condition', widget.productModel.condition),
+            _buildInfoRow('Product', widget.productModel.product ?? 'N/A'),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow('Warranty', widget.productModel.warranty),
+          ]),
+        ],
+      ),
     );
   }
+
+  // Widget _buildMobilesDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Storage', widget.productModel.storage),
+  //       _buildInfoRow('Operating System', widget.productModel.operatingSystem),
+  //       _buildInfoRow('Screen Size', widget.productModel.screenSize),
+  //       _buildInfoRow('Color', widget.productModel.color),
+  //       _buildInfoRow('Camera', widget.productModel.camera),
+  //       _buildInfoRow('Battery', widget.productModel.battery),
+  //       _buildInfoRow('Brand', widget.productModel.brand),
+  //       _buildInfoRow('Model', widget.productModel.model),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Warranty', widget.productModel.warranty),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildMobilesDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Mobiles Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Electronics category',
+                widget.productModel.electronics_category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Brand', widget.productModel.brand),
+            _buildInfoRow('Model', widget.productModel.model),
+            _buildInfoRow('Condition', widget.productModel.condition),
+            _buildInfoRow('Storage', widget.productModel.storage ?? 'N/A'),
+            _buildInfoRow('Operating System',
+                widget.productModel.operatingSystem ?? 'N/A'),
+            _buildInfoRow(
+                'Screen Size', widget.productModel.screenSize ?? 'N/A'),
+            _buildInfoRow('Camera', widget.productModel.camera ?? 'N/A'),
+            _buildInfoRow('Battery', widget.productModel.battery ?? 'N/A'),
+            _buildInfoRow('Color', widget.productModel.color ?? 'N/A'),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow('Warranty', widget.productModel.warranty),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildJobDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Job Type', widget.productModel.jobType),
+  //       _buildInfoRow('Experience', widget.productModel.experienceLevel),
+  //       _buildInfoRow('Qualification', widget.productModel.qualifications),
+  //       _buildInfoRow('Salary', widget.productModel.salary),
+  //       _buildInfoRow('Position', widget.productModel.position),
+  //       _buildInfoRow('Company', widget.productModel.company),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildJobDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Jobs Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Company', widget.productModel.company),
+            _buildInfoRow('Industry', widget.productModel.industry),
+            _buildInfoRow('Position', widget.productModel.position),
+            _buildInfoRow('Salary', widget.productModel.salary ?? 'N/A'),
+            _buildInfoRow('Job Type', widget.productModel.jobType ?? 'N/A'),
+            _buildInfoRow('Experiance Level',
+                widget.productModel.experienceLevel ?? 'N/A'),
+            _buildInfoRow(
+                'Qualifications', widget.productModel.qualifications ?? 'N/A'),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildFashionDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('location', widget.productModel.location),
+  //       _buildInfoRow('Product', widget.productModel.product),
+  //       _buildInfoRow('Fachion Category', widget.productModel.fashion_category),
+  //       _buildInfoRow('Size', widget.productModel.size),
+  //       _buildInfoRow('Color', widget.productModel.color),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Brand', widget.productModel.brand),
+  //       _buildInfoRow('Model', widget.productModel.model),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Warranty', widget.productModel.warranty),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildFashionDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Fashion Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Condition', widget.productModel.condition),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Product', widget.productModel.product),
+            _buildInfoRow(
+                'Fashion Category', widget.productModel.fashion_category),
+            _buildInfoRow('Size', widget.productModel.size),
+            _buildInfoRow('Brand', widget.productModel.brand ?? 'N/A'),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildBooksSportsHobbiesDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('hobby_category', widget.productModel.hobby_category),
+  //       _buildInfoRow('Product', widget.productModel.product),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildBooksSportsHobbiesDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Books,Sports&Hobbies Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Hobby category', widget.productModel.hobby_category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Product', widget.productModel.product),
+            _buildInfoRow('Condition', widget.productModel.condition),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildBikesDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Brand', widget.productModel.brand),
+  //       _buildInfoRow('Model', widget.productModel.model),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Warranty', widget.productModel.warranty),
+  //       _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
+  //       _buildInfoRow('Transmission', widget.productModel.transmission),
+  //       _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
+  //       _buildInfoRow('Color', widget.productModel.color),
+  //       _buildInfoRow('Year', widget.productModel.year.toString()),
+  //     ],
+  //   );
+  // }
+
+  Widget _buildBikesDetails() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Bikes Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Brand', widget.productModel.brand),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Model', widget.productModel.model),
+            _buildInfoRow('Year', widget.productModel.year.toString()),
+            _buildInfoRow('Mileage', widget.productModel.mileage.toString()),
+            _buildInfoRow('Condition', widget.productModel.condition ?? 'N/A'),
+            _buildInfoRow(
+                'Owner Type', widget.productModel.ownerType.toString()),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  // Widget _buildFurnitureDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Product', widget.productModel.product),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Material', widget.productModel.material),
+  //       _buildInfoRow('Dimensions', widget.productModel.dimensions.toString()),
+  //     ],
+  //   );
+  // }
 
   Widget _buildFurnitureDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Product', widget.productModel.product),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Material', widget.productModel.material),
-        _buildInfoRow('Dimensions', widget.productModel.dimensions.toString()),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Furniture Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Product', widget.productModel.product),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Material', widget.productModel.material),
+            _buildInfoRow('Condition', widget.productModel.condition),
+            _buildInfoRow(
+                'Dimensions', widget.productModel.dimensions.toString()),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
     );
   }
+
+  // Widget _buildPetsDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Breed', widget.productModel.breed),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Vaccination Type', widget.productModel.vaccinationType),
+  //       _buildInfoRow('Pet Category', widget.productModel.vaccinationType),
+  //     ],
+  //   );
+  // }
 
   Widget _buildPetsDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Breed', widget.productModel.breed),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Vaccination Type', widget.productModel.vaccinationType),
-        _buildInfoRow('Pet Category', widget.productModel.vaccinationType),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Pets Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Pet category', widget.productModel.pet_category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Breed', widget.productModel.breed),
+            _buildInfoRow('Condition', widget.productModel.condition),
+            _buildInfoRow(
+                'VaccinationType', widget.productModel.vaccinationType),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
     );
   }
 
+  // Widget _buildCommercialVehiclesSparesDetails() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _buildInfoRow('id', widget.productModel.id.toString()),
+  //       _buildInfoRow('City', widget.productModel.city),
+  //       _buildInfoRow('Category', widget.productModel.category),
+  //       _buildInfoRow('Title', widget.productModel.title),
+  //       _buildInfoRow('Price', widget.productModel.price.toString()),
+  //       _buildInfoRow('Brand', widget.productModel.brand),
+  //       _buildInfoRow('Product', widget.productModel.product),
+  //       _buildInfoRow('Condition', widget.productModel.condition),
+  //       _buildInfoRow('Warranty', widget.productModel.warranty),
+  //       _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
+  //       _buildInfoRow('Transmission', widget.productModel.transmission),
+  //       _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
+  //       _buildInfoRow('Color', widget.productModel.color),
+  //       _buildInfoRow('Year', widget.productModel.year.toString()),
+  //       _buildInfoRow('Model', widget.productModel.model),
+  //     ],
+  //   );
+  // }
+
   Widget _buildCommercialVehiclesSparesDetails() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildInfoRow('id', widget.productModel.id.toString()),
-        _buildInfoRow('City', widget.productModel.city),
-        _buildInfoRow('Category', widget.productModel.category),
-        _buildInfoRow('Title', widget.productModel.title),
-        _buildInfoRow('Price', widget.productModel.price.toString()),
-        _buildInfoRow('Brand', widget.productModel.brand),
-        _buildInfoRow('Product', widget.productModel.product),
-        _buildInfoRow('Condition', widget.productModel.condition),
-        _buildInfoRow('Warranty', widget.productModel.warranty),
-        _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
-        _buildInfoRow('Transmission', widget.productModel.transmission),
-        _buildInfoRow('OwnerType', widget.productModel.ownerType.toString()),
-        _buildInfoRow('Color', widget.productModel.color),
-        _buildInfoRow('Year', widget.productModel.year.toString()),
-        _buildInfoRow('Model', widget.productModel.model),
-      ],
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Commercial Vehicles and Spares Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+            _buildInfoRow('Mileage', widget.productModel.mileage.toString()),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Model', widget.productModel.model),
+            _buildInfoRow('Brand', widget.productModel.brand),
+            _buildInfoRow('Warranty', widget.productModel.warranty),
+            _buildInfoRow(
+                'Transmission Type', widget.productModel.transmission ?? 'N/A'),
+            _buildInfoRow('Color', widget.productModel.color ?? 'N/A'),
+            _buildInfoRow('Year', widget.productModel.year.toString()),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServicesForm() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 129, 115, 115),
+            const Color.fromARGB(255, 159, 142, 142),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: const Color.fromARGB(255, 147, 133, 230)
+                .withAlpha((0.9 * 255).round()),
+            spreadRadius: 2,
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionHeader('Services Information'),
+          _buildInfoCard([
+            _buildInfoRow('ID', widget.productModel.id.toString()),
+            _buildInfoRow('State', widget.productModel.state),
+            _buildInfoRow('City', widget.productModel.city),
+            _buildInfoRow('Category', widget.productModel.category),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Technical Details'),
+          _buildInfoCard([
+            _buildInfoRow('Type', widget.productModel.type),
+          ]),
+          const SizedBox(height: 20),
+          _buildSectionHeader('Additional Information'),
+          _buildInfoCard([
+            _buildInfoRow(
+                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+          ]),
+        ],
+      ),
     );
   }
 
@@ -599,9 +1187,10 @@ class _ProductDetailsState extends State<ProductDetails> {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey.withValues(),
-                    spreadRadius: 2,
-                    blurRadius: 2,
+                    color:
+                        const Color.fromARGB(255, 188, 177, 177).withValues(),
+                    spreadRadius: 0,
+                    blurRadius: 0,
                     offset: const Offset(0, 3),
                   ),
                 ],
@@ -632,7 +1221,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                           color: Colors.grey[200],
                           child: const Icon(
                             Icons.image_not_supported,
-                            size: 180,
+                            size: 140,
                             color: Colors.red,
                           ),
                         ),
@@ -664,26 +1253,48 @@ class _ProductDetailsState extends State<ProductDetails> {
                   _buildInfoRow('Location', widget.productModel.location),
                   const Divider(height: 32),
                   _buildProductSpecificDetails(),
+                  const Divider(height: 22),
+                  Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(221, 242, 6, 92),
+                    ),
+                  ),
                   if (widget.productModel.description != null)
-                    Card(
-                          color: const Color.fromARGB(255, 237, 187, 6),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: const Color.fromARGB(255, 248, 4, 4).withOpacity(0.2),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            const Color.fromARGB(255, 193, 177, 177),
+                            const Color.fromARGB(255, 206, 190, 190),
+                          ],
                         ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          widget.productModel.description!,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            height: 1.6,
-                            color: Color.fromARGB(179, 14, 4, 4),
-                            letterSpacing: 0.3,
-                            fontWeight: FontWeight.w400,
+                      child: Card(
+                        // color: const Color.fromARGB(255, 155, 152, 156),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: const Color.fromARGB(255, 19, 6, 6)
+                                .withAlpha((0.9 * 255).round()),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            widget.productModel.description!,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              height: 1.6,
+                              color: Color.fromARGB(221, 14, 1, 1),
+                              letterSpacing: 0.3,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),

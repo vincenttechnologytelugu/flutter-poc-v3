@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
@@ -53,7 +52,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/authentication/auth_user'),
+        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -61,7 +60,6 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
         body: jsonEncode({
           'first_name': firstNameController.text,
           'last_name': lastNameController.text,
-        
         }),
       );
 
@@ -72,7 +70,6 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
         await prefs.setString('first_name', firstNameController.text);
         await prefs.setString('last_name', lastNameController.text);
         await prefs.setString('email', emailController.text);
-     
 
         // Navigate back to ProfileScreen with updated data
         if (!mounted) return;
@@ -80,15 +77,11 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
           'firstName': firstNameController.text,
           'lastName': lastNameController.text,
           'email': emailController.text,
-        
-      
-          
         });
       } else {
         log('Failed to update profile: ${response.body}');
         if (!mounted) return;
         showDialog(
-          
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Error'),
@@ -140,8 +133,6 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
                 decoration: const InputDecoration(labelText: 'Last Name'),
               ),
               const SizedBox(height: 8),
-              
-        
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: updateProfileDetails,

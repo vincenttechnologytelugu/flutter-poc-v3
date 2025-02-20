@@ -1,15 +1,17 @@
-
+// In location_screen.dart
 
 import 'package:flutter/material.dart';
-
-import 'package:flutter_poc_v3/services/location_service.dart';
+import 'package:flutter_poc_v3/controllers/location_controller.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/state_screen.dart';
 import 'package:geolocator/geolocator.dart';
-
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:geocoding/geocoding.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationScreen extends StatefulWidget {
   const LocationScreen({super.key});
@@ -19,336 +21,139 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  TextEditingController searchController = TextEditingController();
-  final LocationService _locationService = LocationService();
-  List<String> searchResults = [];
-  List<String> allCities = [""]; // Add this line to store all cities
-  String? locationError;
+  GoogleMapController? mapController;
+  final TextEditingController searchController = TextEditingController();
+  final TextEditingController selectedLocationText = TextEditingController();
+  Set<Marker> markers = {};
+  List<Map<String, dynamic>> searchResults = [];
+  String selectedLocation = '';
+  String selectedAddress = '';
 
-  Position? currentPosition;
-  List<String> states = [];
-  List<String> cities = [];
-  String? selectedState;
-  String? selectedCity;
-  bool isLoading = true; // Add this with other variables
-
+  LatLng position =
+      const LatLng(20.5937, 78.9629); // Default to center of India
   @override
   void initState() {
     super.initState();
-
     _getCurrentLocation();
-    _fetchAllCities(); // Add this line to fetch cities on init
-    _initializeLocation();
   }
 
-  Future<void> _initializeLocation() async {
-    try {
-      // Check if location service is enabled
-      bool serviceEnabled = await _locationService.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        _showLocationServiceDialog();
-        return;
-      }
-
-      // Check and request permissions
-      LocationPermission permission = await _locationService.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await _locationService.requestPermission();
-        if (permission == LocationPermission.denied) {
-          setState(() {
-            locationError = 'Location permission denied';
-          });
-          return;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        setState(() {
-          locationError = 'Location permissions are permanently denied';
-        });
-        _showPermissionDeniedDialog();
-        return;
-      }
-
-      // Get current position
-      Position? position = await _locationService.getCurrentPosition();
-      if (position != null) {
-        setState(() {
-          currentPosition = position;
-          locationError = null;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        locationError = e.toString();
-      });
-    }
-  }
-
-// Show dialog when permissions are permanently denied
-  void _showPermissionDeniedDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Location Permission Required'),
-          content: const Text(
-              'Location permissions are permanently denied. Please enable them in your device settings.'),
-          actions: <Widget>[
-         
-            TextButton(
-              child: const Text('Open Settings'),
-              
-              onPressed: () async {
-           
-                await Geolocator.openAppSettings();
-
-            
-            
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-// Show dialog when location service is disabled
-  void _showLocationServiceDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Location Services Disabled'),
-          content: const Text(
-              'Please enable location services to use this feature.'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Open Settings'),
-              onPressed: () async {
-                await Geolocator.openLocationSettings();
-             
 
 
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: const Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-// Add this method to fetch all cities initially
-  Future<void> _fetchAllCities() async {
+  void _handleNoAddressFound() {
     setState(() {
-      isLoading = true; // Set loading to true before fetching
+      selectedLocationText.text = "Address not found";
+      selectedAddress = "";
     });
-    try {
-      final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/cities'),
-      );
 
-      if (response.statusCode == 200) {
-        final List<dynamic> citiesData = json.decode(response.body);
-        setState(() {
-          allCities = citiesData.map((city) => city.toString()).toList();
-          cities = allCities; // Initialize cities with all cities
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching all cities: $e');
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  void _performSearch(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        searchResults.clear();
-      });
-      return;
-    }
-
-    setState(() {
-      searchResults = [
-        ...states.where(
-            (state) => state.toLowerCase().contains(query.toLowerCase())),
-        ...cities
-            .where((city) => city.toLowerCase().contains(query.toLowerCase())),
-      ].toList();
-    });
-  }
-
-  Future<void> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return;
-        }
-      }
-
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-      setState(() {
-        currentPosition = position;
-      });
-    } catch (e) {
-      debugPrint('Error getting location: $e');
-    }
-  }
-
-  // Modify the _fetchCities method for state-specific cities
-  Future<void> _fetchCities(String state) async {
-    try {
-      final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/cities?state=$state'),
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> citiesData = json.decode(response.body);
-        setState(() {
-          cities = citiesData.map((city) => city.toString()).toList();
-        });
-      }
-    } catch (e) {
-      debugPrint('Error fetching cities for state: $e');
-    }
-  }
-
-  Future<void> _updateLocation(String city) async {
-    try {
-      final response = await http
-          .get(Uri.parse('http://192.168.0.170:8080/adposts?city=$city'));
-
-      if (response.statusCode == 200) {
-        if (mounted) {
-          // Format the location string properly, removing any null values
-          String locationString =
-              selectedState != null && selectedState!.isNotEmpty
-                  ? '$selectedState, $city'
-                  : city;
-
-          // Trim any extra spaces and remove any null text
-          locationString = locationString.replaceAll('null', '').trim();
-          // Remove any consecutive commas that might appear
-          locationString = locationString.replaceAll(RegExp(r',+'), ',');
-          // Remove comma if it's at the start or end
-          locationString = locationString.replaceAll(RegExp(r'^,|,$,{}'), '');
-
-          Navigator.pop(context, locationString);
-        }
-      } else {
-        debugPrint('Error updating location: ${response.statusCode}');
-      }
-    } catch (e) {
-      debugPrint('Error updating location: $e');
-    }
-  }
-
-
- 
-
-
-  @override
-  void dispose() {
-    searchController.dispose();
-    super.dispose();
-  }
-
-  void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Error API call"),
-        backgroundColor: Colors.red,
-      ),
+      const SnackBar(content: Text("Could not determine address")),
     );
   }
 
-  void showSuccess(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text("Success"),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
-  // Add this method to get address from coordinates
-  Future<String> _getAddressFromCoordinates(Position position) async {
+  Future<void> _fetchAddress(LatLng position) async {
     try {
-      List<Placemark> placemarks = await placemarkFromCoordinates(
+      List<Placemark> placeMarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
+      if (placeMarks.isNotEmpty) {
+        Placemark placeMark = placeMarks[0];
+        String city = placeMark.subLocality?.isNotEmpty == true
+            ? placeMark.subLocality!
+            : placeMark.locality ?? '';
+        String state = placeMark.administrativeArea ?? '';
 
-      if (placemarks.isNotEmpty) {
-        Placemark place = placemarks[0];
-        return '${place.locality ?? ''}, ${place.administrativeArea ?? ''}';
+        setState(() {
+          selectedLocationText.text = "$city, $state";
+          selectedAddress = "$city, $state";
+        });
+
+        // Store in SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('city', city);
+        await prefs.setString('state', state);
+      } else {
+        _handleNoAddressFound();
       }
-      return 'Current Location';
     } catch (e) {
-      debugPrint('Error getting address: $e');
-      return 'Current Location';
+      debugPrint('Error fetching address: $e');
+      _handleNoAddressFound();
     }
   }
 
-  Future<void> _handleCurrentLocationSelection() async {
-    if (currentPosition != null) {
-      try {
-        // Show loading indicator
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (BuildContext context) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        );
+  // Future<void> _initializeWithCurrentLocation() async {
+  //   try {
+  //     Position? position = await Geolocator.getCurrentPosition();
+  //     List<Placemark> placemarks = await placemarkFromCoordinates(
+  //       position.latitude,
+  //       position.longitude,
+  //     );
 
-        // Get address from coordinates
-        String address = await _getAddressFromCoordinates(currentPosition!);
+  //     if (placemarks.isNotEmpty) {
+  //       Placemark place = placemarks[0];
+  //       String address =
+  //           '${place.locality ?? ''}, ${place.administrativeArea ?? ''}';
+  //       setState(() {
+  //         selectedLocation = address;
+  //         searchController.text = address;
+  //       });
 
-        // Remove loading indicator and return the formatted address
-        if (mounted) {
-          Navigator.pop(context); // Remove loading dialog
-          // Format the address string and remove any special characters
-          String formattedAddress = address
-              .replaceAll(RegExp(r'[{}()]'), '')
-              .replaceAll(RegExp(r',+'), ',')
-              .trim();
-          // Remove any leading or trailing commas
-          formattedAddress = formattedAddress.replaceAll(RegExp(r'^,|,$'), '');
+  //       _moveToLocation(address);
+  //     }
+  //   } catch (e) {
+  //     debugPrint('Error initializing location: $e');
+  //   }
+  // }
 
-          Navigator.pop(context, formattedAddress);
-        }
-      } catch (e) {
-        // Remove loading indicator
-        if (mounted) {
-          Navigator.pop(context); // Remove loading dialog
-        }
-        _showError('Failed to get location: $e');
+  // Future<void> _getCurrentLocation() async {
+  //   try {
+  //     Position currentPosition = await Geolocator.getCurrentPosition(
+  //         desiredAccuracy: LocationAccuracy.high);
+  //     setState(() {
+  //       position = LatLng(currentPosition.latitude, currentPosition.longitude);
+  //     });
+  //     _fetchAddress(position);
+  //   } catch (e) {
+  //     debugPrint('Error getting current location: $e');
+  //     _fetchAddress(
+  //         position); // Use default position if cannot get current location
+  //   }
+  // }
+
+  Future<void> _getCurrentLocation() async {
+    try {
+      Position currentPosition = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high);
+      setState(() {
+        position = LatLng(currentPosition.latitude, currentPosition.longitude);
+      });
+
+      // Update search bar and selectedAddress with current location
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+          currentPosition.latitude, currentPosition.longitude);
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String address =
+            '${place.locality ?? ''}, ${place.administrativeArea ?? ''}';
+        setState(() {
+          searchController.text = address;
+          selectedLocation = address;
+          selectedAddress = address; // Add this line to update selectedAddress
+        });
       }
+
+      // Update map camera position
+      mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: position,
+            zoom: 15,
+          ),
+        ),
+      );
+    } catch (e) {
+      debugPrint('Error getting location: $e');
     }
   }
 
@@ -358,166 +163,239 @@ class _LocationScreenState extends State<LocationScreen> {
       appBar: AppBar(
         title: const Text('Select Location'),
       ),
-      // body: allCities.isEmpty
-      //     ? const Center(
-      //         child: CircularProgressIndicator()) // Show loading indicator
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Add search bar
-                    TextField(
-                      controller: searchController,
-                      decoration: InputDecoration(
-                        labelText: 'Search city, area, or neighbourhood',
-                        hintText: 'Enter location to search',
-                        prefixIcon: const Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                      ),
-                      onChanged: _performSearch,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Show search results if any
-                    if (searchResults.isNotEmpty) ...[
-                      const Text(
-                        'Search Results',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: searchResults.length,
-                        itemBuilder: (context, index) {
-                          final result = searchResults[index];
-                          return ListTile(
-                            title: Text(result),
-                            onTap: () {
-                              if (states.contains(result)) {
-                                setState(() {
-                                  selectedState = result;
-                                  selectedCity = null;
-                                  searchController.clear();
-                                  searchResults.clear();
-                                });
-                                _fetchCities(result);
-                              } else {
-                                setState(() {
-                                  selectedCity = result;
-                                  searchController.clear();
-                                  searchResults.clear();
-                                });
-                                _updateLocation(result);
-                              }
-                            },
-                          );
+      body: Column(
+        children: [
+          // Search Bar
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              controller: searchController,
+              decoration: InputDecoration(
+                hintText: 'Search location in India',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear),
+                        onPressed: () {
+                          searchController.clear();
+                          setState(() {
+                            searchResults.clear();
+                          });
                         },
-                      ),
-                      const SizedBox(height: 20),
-                    ],
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              onChanged: (value) {
+                if (value.isNotEmpty) {
+                  searchPlaces(value);
+                } else {
+                  setState(() {
+                    searchResults.clear();
+                  });
+                }
+              },
+            ),
+          ),
 
-                    // Show error if any
-                    if (locationError != null)
-                      Card(
-                        color: Colors.red[100],
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.error, color: Colors.red),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  locationError!,
-                                  style: const TextStyle(color: Colors.red),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    // Current location card
-                    if (currentPosition != null)
-                      Card(
-                        child: ListTile(
-                          leading: const Icon(Icons.my_location),
-                          title: const Text('Use Current Location'),
-                          subtitle: Text(
-                            'Lat: ${currentPosition!.latitude}, Long: ${currentPosition!.longitude}',
-                          ),
-                          onTap: _handleCurrentLocationSelection,
-                        ),
-                      ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Select State',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          // Search Results
+          if (searchResults.isNotEmpty)
+            Expanded(
+              child: ListView.builder(
+                itemCount: searchResults.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(searchResults[index]['description'] ?? ''),
+                    onTap: () async {
+                      final place = searchResults[index];
+                      searchController.text = place['description'] ?? '';
+                      setState(() {
+                        selectedLocation = place['description'] ?? '';
+                        selectedAddress =
+                            place['description'] ?? ''; // Add this line
+                        searchResults.clear();
+                      });
+                      await _moveToLocation(place['description'] ?? '');
+                    },
+                  );
+                },
+              ),
+            ),
+
+          // Map with reduced height
+          if (searchResults.isEmpty)
+            SizedBox(
+              height: MediaQuery.of(context).size.height *
+                  0.3, // Adjust map height to 60% of screen
+              child: GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: position,
+                  // target: _initialPosition,
+                  zoom: 15,
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  setState(() {
+                    mapController = controller;
+                  });
+                  // mapController = controller;
+                },
+                markers: {
+                  Marker(
+                    markerId: const MarkerId('current_location'),
+                    position: position,
+                    infoWindow: InfoWindow(title: selectedLocation),
+                  ),
+                },
+                myLocationEnabled: true,
+                myLocationButtonEnabled: true,
+                mapType: MapType.normal,
+              ),
+            ),
+
+          // Confirm Button
+          if (searchResults.isEmpty && selectedLocation.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    if (selectedAddress.isNotEmpty) {
+                      final prefs = await SharedPreferences.getInstance();
+                      String city = prefs.getString('city') ?? '';
+                      String state = prefs.getString('state') ?? '';
+
+                      // Create location data object
+                      Map<String, String> locationData = {
+                        'city': city,
+                        'state': state,
+                      };
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                            content: Text("Location Confirmed: $city, $state")),
+                      );
+
+                      Navigator.pop(context, locationData);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("No location selected")),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    const SizedBox(height: 10),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: states.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(states[index]),
-                          selected: selectedState == states[index],
-                          onTap: () {
-                            setState(() {
-                              selectedState = states[index];
-                              selectedCity = null;
-                            });
-                            _fetchCities(states[index]);
-                          },
-                        );
-                      },
+                  ),
+                  child: const Text(
+                    'Confirm Location',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
                     ),
-                    if (cities.isNotEmpty) ...[
-                      const SizedBox(height: 20),
-                      const Text(
-                        // 'Select City',
-                        "Select Location",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: cities.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(cities[index]),
-                            selected: selectedCity == cities[index],
-                            onTap: () {
-                              setState(() {
-                                selectedCity = cities[index];
-                              });
-                              _updateLocation(cities[index]);
-                            },
-                          );
-                        },
-                      ),
-                    ],
-                  ],
+                  ),
                 ),
               ),
             ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const StateScreen()),
+              );
+            },
+            child: Text(
+              'Choose Location in India',
+              style: TextStyle(fontSize: 18),
+            ),
+          )
+        ],
+      ),
     );
   }
+
+  // Rest of your existing methods remain the same
+  Future<void> searchPlaces(String query) async {
+    if (query.isEmpty) return;
+
+    try {
+      final response = await http.get(
+        Uri.parse('https://maps.googleapis.com/maps/api/place/autocomplete/json'
+            '?input=$query'
+            '&components=country:in'
+            '&key=AIzaSyAQDoRVBeKnpSEC63iRXgJcaiMMDyy9gOk' // Replace with your API key
+            ),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK') {
+          setState(() {
+            searchResults = (data['predictions'] as List)
+                .map((prediction) => {
+                      'description': prediction['description'],
+                      'place_id': prediction['place_id'],
+                    })
+                .toList();
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint('Error searching places: $e');
+    }
+  }
+
+  Future<void> _moveToLocation(String address) async {
+    try {
+      List<Location> locations = await locationFromAddress(address);
+      if (locations.isNotEmpty) {
+        final LatLng latLng = LatLng(
+          locations.first.latitude,
+          locations.first.longitude,
+        );
+
+        setState(() {
+          markers = {
+            Marker(
+              markerId: const MarkerId('selected_location'),
+              position: latLng,
+              infoWindow: InfoWindow(title: address),
+            ),
+          };
+          selectedAddress = address; // Add this line
+        });
+
+        mapController?.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(
+              target: latLng,
+              zoom: 15,
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Error moving to location: $e');
+    }
+  }
 }
+
+
+
+
+
+
+

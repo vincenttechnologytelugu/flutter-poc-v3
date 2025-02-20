@@ -241,14 +241,14 @@ body: Column(
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                               colors: [
-                                _getCategoryColor(category.key).withOpacity(0.8),
+                                _getCategoryColor(category.key).withAlpha((0.9 * 255).round()),
                                 _getCategoryColor(category.key),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: _getCategoryColor(category.key).withOpacity(0.2),
+                                color: _getCategoryColor(category.key).withAlpha((0.9 * 255).round()),
                                 blurRadius: 8,
                                 offset: const Offset(0, 4),
                               ),
@@ -276,13 +276,13 @@ body: Column(
                                     Container(
                                       padding: const EdgeInsets.all(12),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
+                                        color: Colors.white.withAlpha((0.9 * 255).round()),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Icon(
                                         _getCategoryIcon(category.key),
                                         size: 32,
-                                        color: Colors.white,
+                                        color: Colors.orange,
                                       ),
                                     ),
                                     const SizedBox(height: 12),

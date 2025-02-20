@@ -8,16 +8,14 @@ import '../models/product_model.dart';
 
 class CategoryBasedPostsController extends GetxController {
   List<ProductModel> posts = [];
-   List<String> categoriesList = [];
-   List<ProductModel> productModelList = [];
+  List<String> categoriesList = [];
+  List<ProductModel> productModelList = [];
   bool isLoading = false;
   bool hasMoreData = true;
   int currentPage = 1;
   final String category;
-  
-  CategoryBasedPostsController({required this.category});
 
-  
+  CategoryBasedPostsController({required this.category});
 
   Future<void> getPosts({bool isLoadMore = false}) async {
     if (!isLoadMore) {
@@ -33,20 +31,21 @@ class CategoryBasedPostsController extends GetxController {
 
       final encodedCategory = Uri.encodeComponent(category);
       final response = await http.get(
-         Uri.parse('http://192.168.0.170:8080/adposts?category=$encodedCategory&page=$currentPage'),
-       //   Uri.parse('https://jsonplaceholder.typicode.com/posts?category=$encodedCategory&page=$currentPage'),
+        Uri.parse(
+            'http://192.168.0.167:8080/adposts?category=$encodedCategory&page=$currentPage'),
+        //   Uri.parse('https://jsonplaceholder.typicode.com/posts?category=$encodedCategory&page=$currentPage'),
       );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        
+
         if (data['data'] != null) {
           final List<ProductModel> newPosts = (data['data'] as List)
               .map((item) => ProductModel.fromJson(item))
               .toList();
 
           posts.addAll(newPosts);
-          
+
           if (newPosts.isEmpty) {
             hasMoreData = false;
           } else {
@@ -62,34 +61,28 @@ class CategoryBasedPostsController extends GetxController {
     }
   }
 
-
-
-  
-
-
-getProductsByCategory(String categories) async {
+  getProductsByCategory(String categories) async {
     try {
       isLoading = true;
       update();
       productModelList.clear();
-      
+
       // Updated URL to fetch all categories
-      http.Response response = await http
-          .get(
-             Uri.parse("http://192.168.0.170:8080/adposts/category/$categories")
-            //  Uri.parse("https://jsonplaceholder.typicode.com/posts/category/$categories")
-            );
-      
+      http.Response response = await http.get(
+          Uri.parse("http://192.168.0.167:8080/adposts/category/$categories")
+          //  Uri.parse("https://jsonplaceholder.typicode.com/posts/category/$categories")
+          );
+
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body);
-        
+
         // If the response is paginated
         if (data is Map<String, dynamic> && data.containsKey('data')) {
           var products = data['data'];
           for (var item in products) {
             productModelList.add(ProductModel.fromJson(item));
           }
-        } 
+        }
         // If the response is a direct array
         else if (data is List) {
           for (var item in data) {
@@ -105,7 +98,7 @@ getProductsByCategory(String categories) async {
           }
         }
         categoriesList = uniqueCategories.toList();
-        
+
         log('Categories found: ${categoriesList.length}');
         log('Categories: $categoriesList');
       }
@@ -115,5 +108,5 @@ getProductsByCategory(String categories) async {
       isLoading = false;
       update();
     }
-}
+  }
 }

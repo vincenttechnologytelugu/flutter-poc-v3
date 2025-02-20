@@ -1,4 +1,3 @@
-
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -11,9 +10,8 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 class CartController extends GetxController {
   List<ProductModel> cartList = [];
   List<String> favouriteIds = [];
-  
 
-    // Check server-side favorites and load saved favorites
+  // Check server-side favorites and load saved favorites
   Future<void> loadFavorites() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -21,7 +19,7 @@ class CartController extends GetxController {
 
       // First check server favorites
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/favourites'),
+        Uri.parse('http://192.168.0.167:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -33,7 +31,7 @@ class CartController extends GetxController {
         favouriteIds = serverFavorites
             .map((item) => item['adpost_id'].toString())
             .toList();
-        
+
         update(); // Update UI with server favorites first
         log('Server favorites loaded: $favouriteIds');
 
@@ -49,7 +47,7 @@ class CartController extends GetxController {
           update();
           log('Combined with local favorites: $favouriteIds');
         }
-        
+
         // Save complete list back to SharedPreferences
         await prefs.setStringList('favoriteAdposts', favouriteIds);
       }
@@ -81,7 +79,7 @@ class CartController extends GetxController {
 
   //     // Then fetch from server to sync
   //     final response = await http.get(
-  //       Uri.parse('http://192.168.0.170:8080/favourite_adposts'),
+  //       Uri.parse('http://192.168.0.167:8080/favourite_adposts'),
   //       headers: {
   //         'Authorization': 'Bearer $token',
   //         'Content-Type': 'application/json',
@@ -91,10 +89,10 @@ class CartController extends GetxController {
   //     if (response.statusCode == 200) {
   //       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
   //       final List<dynamic> data = jsonResponse['data'] ?? [];
-        
+
   //       // Update favorites list with server data
   //       favouriteIds = data.map((item) => item['id'].toString()).toList();
-        
+
   //       // Save updated list to SharedPreferences
   //       await prefs.setStringList('favoriteAdposts', favouriteIds);
   //       update();
@@ -109,11 +107,12 @@ class CartController extends GetxController {
   Future<void> addToFavourite(BuildContext context, String adpostId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-       favouriteIds = prefs.getStringList('favoriteAdposts') ?? [];  // Get latest list
+      favouriteIds =
+          prefs.getStringList('favoriteAdposts') ?? []; // Get latest list
       final token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/add_to_favourite'),
+        Uri.parse('http://192.168.0.167:8080/add_to_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -123,16 +122,15 @@ class CartController extends GetxController {
 
       if (response.statusCode == 200) {
         if (!favouriteIds.contains(adpostId)) {
-
           favouriteIds.add(adpostId);
-           await prefs.setStringList('favoriteAdposts', favouriteIds);
+          await prefs.setStringList('favoriteAdposts', favouriteIds);
           update();
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Added to Favourites")),
         );
-      } else if(response.statusCode == 400){
+      } else if (response.statusCode == 400) {
         // If already in favorites, make sure it's in our local list
         if (!favouriteIds.contains(adpostId)) {
           favouriteIds.add(adpostId);
@@ -150,14 +148,14 @@ class CartController extends GetxController {
     }
   }
 
-   // Get Favourites List
+  // Get Favourites List
   Future<void> getFavouritesList() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/favourites'),
+        Uri.parse('http://192.168.0.167:8080/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -169,34 +167,36 @@ class CartController extends GetxController {
         log('Fetched favourite ids: $favouriteIds'); // Debug log
         update();
       }
-
     } catch (e) {
       log("Error fetching favourites: $e");
     }
   }
-   // Check if post is favourite
+
+  // Check if post is favourite
   bool isFavourite(String adpostId) {
     return favouriteIds.contains(adpostId);
   }
+
   @override
   void onInit() async {
     super.onInit();
-   loadFavorites();
-  final prefs = await SharedPreferences.getInstance();
-  favouriteIds = prefs.getStringList('favoriteAdposts') ?? [];
+    loadFavorites();
+    final prefs = await SharedPreferences.getInstance();
+    favouriteIds = prefs.getStringList('favoriteAdposts') ?? [];
     //  loadSavedFavorites(); // Load favorites when controller initializes
     getFavouritesList();
     update();
   }
 
   // Remove from Favourite
-  Future<void> removeFromFavourite(BuildContext context, String adpostId) async {
+  Future<void> removeFromFavourite(
+      BuildContext context, String adpostId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-  log('Removing post with ID: $adpostId'); // Debug log
+      log('Removing post with ID: $adpostId'); // Debug log
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/remove_from_favourite'),
+        Uri.parse('http://192.168.0.167:8080/remove_from_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ class CartController extends GetxController {
 
       if (response.statusCode == 200) {
         favouriteIds.remove(adpostId);
-          await prefs.setStringList('favoriteAdposts', favouriteIds);
+        await prefs.setStringList('favoriteAdposts', favouriteIds);
         update();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Removed from Favourites")),
@@ -222,10 +222,6 @@ class CartController extends GetxController {
       );
     }
   }
-
-
-
-  
 }
 
 

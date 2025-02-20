@@ -7,12 +7,11 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class PackageController extends GetxController {
   List<ProductModel> packages = [];
   bool isLoading = false;
   String? error;
-   ProductModel? selectedPackage;
+  ProductModel? selectedPackage;
 
   @override
   void onInit() {
@@ -35,7 +34,7 @@ class PackageController extends GetxController {
       }
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/packages'),
+        Uri.parse('http://192.168.0.167:8080/packages'),
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $token',
@@ -44,9 +43,9 @@ class PackageController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-        
+
         packages.clear();
-        
+
         if (data is List) {
           for (var item in data) {
             packages.add(ProductModel.fromJson(item));
@@ -57,7 +56,7 @@ class PackageController extends GetxController {
             packages.add(ProductModel.fromJson(item));
           }
         }
-        
+
         log('Packages loaded: ${packages.length}');
       } else {
         error = 'Failed to load packages: ${response.statusCode}';
@@ -71,5 +70,4 @@ class PackageController extends GetxController {
       update();
     }
   }
-  
 }

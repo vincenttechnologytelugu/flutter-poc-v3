@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:video_player/video_player.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 class SellSubcategoryDetailsFormScreen extends StatefulWidget {
   final String category;
   final String subcategory;
@@ -31,6 +34,14 @@ class _SellSubcategoryDetailsFormScreenState
   String selectedPeriod='Salary Period';
   String selectedPosition='Position Type';
 
+
+  final ImagePicker _picker = ImagePicker();
+List<File> _images = [];
+File? _video;
+VideoPlayerController? _videoController;
+static const int maxImages = 5; // Maximum number of images allowed
+
+
  
 
   //  final Map<String, TextEditingController> controllers = {
@@ -45,6 +56,143 @@ class _SellSubcategoryDetailsFormScreenState
    
   //    // Initialize here!
   // };
+
+
+Widget _buildMediaUploadSection() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      const Divider(height: 20),
+      Text(
+        'Add Photos and Video',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+          color: Colors.blue[900],
+        ),
+      ),
+      const SizedBox(height: 10),
+      
+      // Image preview grid
+      if (_images.isNotEmpty)
+        Container(
+          height: 120,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: _images.length,
+            itemBuilder: (context, index) {
+              return Stack(
+                children: [
+                  Container(
+                    margin: EdgeInsets.all(5),
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.file(
+                        _images[index],
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: IconButton(
+                      icon: Icon(Icons.remove_circle, color: Colors.red),
+                      onPressed: () {
+                        setState(() {
+                          _images.removeAt(index);
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+
+      // Image upload button
+      ElevatedButton.icon(
+        onPressed: _images.length >= maxImages ? null : _pickImages,
+        icon: Icon(Icons.add_photo_alternate),
+        label: Text('Add Photos (${_images.length}/$maxImages)'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+      ),
+
+      const SizedBox(height: 10),
+
+      // Video preview and upload
+      if (_video != null) ...[
+        Container(
+          height: 100,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              _videoController != null && _videoController!.value.isInitialized
+                  ? AspectRatio(
+                      aspectRatio: _videoController!.value.aspectRatio,
+                      child: VideoPlayer(_videoController!),
+
+                    )
+                  : Container(
+                      color: Colors.grey[200],
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+              IconButton(
+                icon: Icon(
+
+                  _videoController?.value.isPlaying ?? false
+                      ? Icons.pause
+                      : Icons.play_arrow,
+                  size: 50,
+                  color: Colors.white,
+                ),
+                onPressed: _toggleVideo,
+              ),
+              Positioned(
+                right: 0,
+                top: 0,
+                child: IconButton(
+                  icon: Icon(Icons.remove_circle, color: Colors.red),
+                  onPressed: _removeVideo,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 10),
+      ],
+
+      ElevatedButton.icon(
+        onPressed: _video == null ? _pickVideo : null,
+        icon: Icon(Icons.videocam),
+        label: Text(_video == null ? 'Add Video' : 'Video Added'),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.blue,
+          foregroundColor: Colors.white,
+        ),
+      ),
+    ],
+  );
+}
+
+
+
+
+
+
+
+
+
 
   List<Widget> _buildBrandSection(dynamic brands,
       {required Function(String) onBrandSelected}) {
@@ -137,9 +285,70 @@ Widget _buildOwnershipTile(BuildContext context, String ownerType, StateSetter s
   );
 }
 
+Future<void> _pickImages() async {
+  try {
+    final List<XFile> pickedFiles = await _picker.pickMultiImage();
+    if (pickedFiles.isNotEmpty) {
+      setState(() {
+        _images.addAll(
+          pickedFiles.map((file) => File(file.path)).toList(),
+        );
+        if (_images.length > maxImages) {
+          _images = _images.sublist(0, maxImages);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Maximum $maxImages images allowed')),
+          );
+        }
+      });
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error picking images: $e')),
+    );
+  }
+}
+Future<void> _pickVideo() async {
+  try {
+    final XFile? pickedVideo = await _picker.pickVideo(
+      source: ImageSource.gallery,
+      maxDuration: const Duration(minutes: 5),
+    );
+    if (pickedVideo != null) {
+      _video = File(pickedVideo.path);
+      _videoController = VideoPlayerController.file(_video!)
+        ..initialize().then((_) {
+          setState(() {});
+        });
+      setState(() {});
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error picking video: $e')),
+    );
+  }
+}
+void _toggleVideo() {
+  if (_videoController != null) {
+    setState(() {
+      _videoController!.value.isPlaying
+          ? _videoController!.pause()
+          : _videoController!.play();
+    });
+  }
+}
+
+void _removeVideo() {
+  setState(() {
+    _video = null;
+    _videoController?.dispose();
+    _videoController = null;
+  });
+}
+
  @override
   void dispose() {
     controllers.forEach((_, controller) => controller.dispose());
+     _videoController?.dispose();
     super.dispose();
   }
 @override
@@ -242,7 +451,7 @@ void _submitForm() async {
       }
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.170:8080/adposts'),
+        Uri.parse('http://192.168.0.167:8080/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -287,6 +496,8 @@ void _submitForm() async {
               // Add form fields based on category and subcategory
               _buildFormFields(),
               SizedBox(height: 20),
+               _buildMediaUploadSection(),
+                 SizedBox(height: 20),
               ElevatedButton(
   onPressed: _submitForm,
   style: ElevatedButton.styleFrom(
@@ -1705,6 +1916,27 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
           TextFormField(
+          decoration: InputDecoration(labelText: 'city',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'state',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'Type',
+
+          ),
+        ),
+        TextFormField(
+          decoration: InputDecoration(labelText: 'location',
+
+          ),
+        ),
+
+          TextFormField(
           decoration: InputDecoration(labelText: 'Categoty'),
         ),
         TextFormField(
@@ -2241,101 +2473,87 @@ TextFormField(
   Widget _buildPetsForm(){
     return Column(
       children: [
+          TextFormField(
+            controller: controllers['city'],
+     
+            decoration: InputDecoration(
+              labelText: 'City', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+
+          ),
+          SizedBox(height: 10),
+        
         TextFormField(
-          controller: controllers['petName'],
+            controller: controllers['state'],
+        
+            decoration: InputDecoration(
+              labelText: 'State', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+
+          ),
+          SizedBox(height: 10),
+         
+        
+        TextFormField(
+            controller: controllers['vaccinationType'],
+
+            decoration: InputDecoration(
+              labelText: 'Vaccination Type', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+
+          ),
+          SizedBox(height: 10),
+         
+        
+        TextFormField(
+            controller: controllers['location'],
+
+  decoration: InputDecoration(
+              labelText: 'Location', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+          ),
+          
+        
+        
+      
+      
+       
+      
+       
+        SizedBox(height: 10),
+        TextFormField(
+          controller: controllers['category'],
           decoration: InputDecoration(
-              labelText: 'Pet Name', border: OutlineInputBorder()),
+              labelText: 'Category', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         TextFormField(
-          controller: controllers['petAge'],
+          controller: controllers['breed'],
           decoration: InputDecoration(
-              labelText: 'Pet Age', border: OutlineInputBorder()),
-          keyboardType: TextInputType.number,
+              labelText: 'Breed', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
+
+       
+       
+      
+      
         SizedBox(height: 10),
         TextFormField(
-          controller: controllers['petBreed'],
+          controller: controllers['description'],
+          maxLines: 3,
           decoration: InputDecoration(
-              labelText: 'Pet Breed', border: OutlineInputBorder()),
+              labelText: 'Description', 
+              
+              
+              border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petWeight'],
-          decoration: InputDecoration(
-              labelText: 'Pet Weight', border: OutlineInputBorder()),
-          keyboardType: TextInputType.number,
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petHeight'],
-          decoration: InputDecoration(
-              labelText: 'Pet Height', border: OutlineInputBorder()),
-          keyboardType: TextInputType.number,
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petColor'],
-          decoration: InputDecoration(
-              labelText: 'Pet Color', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petGender'],
-          decoration: InputDecoration(
-              labelText: 'Pet Gender', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petVaccination'],
-          decoration: InputDecoration(
-              labelText: 'Pet Vaccination', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petDeworming'],
-          decoration: InputDecoration(
-              labelText: 'Pet Deworming', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petMicrochip'],
-          decoration: InputDecoration(
-              labelText: 'Pet Microchip', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petNeutered'],
-          decoration: InputDecoration(
-              labelText: 'Pet Neutered', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petHealth'],
-          decoration: InputDecoration(
-              labelText: 'Pet Health', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-        TextFormField(
-          controller: controllers['petOther'],
-          decoration: InputDecoration(
-              labelText: 'Pet Other', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
-      ],
+    
+  
+
+      ]
     );
   }
 

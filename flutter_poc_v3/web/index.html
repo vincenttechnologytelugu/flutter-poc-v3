@@ -19,6 +19,8 @@
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="A new Flutter project.">
+  <meta name="mobile-web-app-capable" content="yes">
+
 
   <!-- iOS meta tags & icons -->
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -30,6 +32,7 @@
   <meta name="Access-Control-Allow-Headers" content="Origin, X-Requested-With, Content-Type, Accept">
   <meta name="Content-Security-Policy" content="default-src * self blob: data: gap:; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;">
 
+  <!-- <meta name="permissions-policy" content="geolocation=*"> -->
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
@@ -37,6 +40,9 @@
 
   <title>flutter_poc_v3</title>
   <link rel="manifest" href="manifest.json">
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQDoRVBeKnpSEC63iRXgJcaiMMDyy9gOk"></script>
+
+
   
 </head>
 <body>
@@ -61,7 +67,16 @@
       });
     });
   </script>
-  
+  <script>
+    // Check if we're running in a browser that supports geolocation
+    if (navigator.geolocation) {
+      console.log("Geolocation is supported");
+    } else {
+      console.log("Geolocation is not supported");
+    }
+  </script>
+ <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAQDoRVBeKnpSEC63iRXgJcaiMMDyy9gOk"></script>
+ <script src="main.dart.js" type="application/javascript"></script> -->
   <!-- <script>
     // Add this script to enable cross-origin isolation
     window.addEventListener('load', function(ev) {

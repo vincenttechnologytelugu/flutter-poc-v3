@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
+import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
@@ -62,6 +64,49 @@ class _RegisterScreenState extends State<RegisterScreen> {
   //   }
   // }
 
+  Future<bool> handleLocationPermission(BuildContext context) async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'Location services are disabled. Please enable the services')));
+      return false;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location permissions are denied')));
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Location permissions are permanently denied')));
+      return false;
+    }
+
+    return true;
+  }
+
+  Future<Position?> getCurrentLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      return position;
+    } catch (e) {
+      log('Error getting location: $e');
+      return null;
+    }
+  }
+
   bool isLoading = false;
 // function to register to user
   Future<void> registerUser(
@@ -80,7 +125,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://192.168.0.170:8080/authentication/register"),
+        Uri.parse("http://192.168.0.167:8080/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -108,6 +153,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Initialize prefs before using it
         final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+// Before navigating to home screen, check location permission
+        final hasPermission = await handleLocationPermission(context);
+        if (!hasPermission) {
+          Fluttertoast.showToast(
+            msg: "Location permission is required to continue",
+            backgroundColor: Colors.red,
+          );
+          return;
+        }
+
+        // Get current location
+        final position = await getCurrentLocation();
+        if (position == null) {
+          Fluttertoast.showToast(
+            msg: "Failed to get location. Please try again.",
+            backgroundColor: Colors.red,
+          );
+          return;
+        }
+
+        // Save location to SharedPreferences
+        // final prefs = await SharedPreferences.getInstance();
+        await prefs.setDouble('latitude', position.latitude);
+        await prefs.setDouble('longitude', position.longitude);
 
         // Save user data immediately after successful registration
         await prefs.setString('first_name', firstNameController.text.trim());
@@ -168,13 +238,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             if (!mounted) return;
             Navigator.pushAndRemoveUntil(
               context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()),
+              MaterialPageRoute(builder: (context) => const SplashScreen()),
               (route) => false, // This removes all previous routes
             );
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(builder: (context) => const HomeScreen()),
-            // );
           }
         } else {
           throw Exception('Session token not received from server');
@@ -277,402 +343,396 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // ),
       body: Stack(
         children: [
+          // Background image
           Container(
-            width: double.infinity,
-            height: double.infinity,
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  // Color(0xffb81736), // Blue shade
-                  // Color(0xff281537), // Lighter blue shade
-                  Color.fromARGB(255, 129, 209, 201), // Blue shade
-                  Color.fromARGB(255, 139, 1, 245), // Lighter blue shade
-                ],
+              image: DecorationImage(
+                image: AssetImage("assets/images/bg1.png"),
+                fit: BoxFit.cover,
               ),
             ),
-            child: SingleChildScrollView(
-              child: Form(
-                key: _formKey,
-                child: Container(
-                  padding: const EdgeInsets.all(30.0),
-                  child: Column(
-                    children: [
-                      // Image.asset(
-                      //   "assets/images/Register.jpg",
-                      //   width: 250,
-                      // ),
-                      // CachedNetworkImage(
-                      //   height: 150,
-                      //   imageUrl:
-                      //       "https://img.favpng.com/4/22/14/logo-brand-button-icon-png-favpng-6vjJ5T7t7zrXkhnpPQ80mB7mt.jpg",
-                      //   placeholder: (context, url) => CircularProgressIndicator(),
-                      //   errorWidget: (context, url, error) => Icon(Icons.error),
-                      // ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 60, left: 20),
-                        child: Text("Welcome\nCreate your Account",
-                            style:
-                                TextStyle(fontSize: 30, color: Colors.white)),
-                      ),
-                      textFieldDefaultGap,
-                      textFieldDefaultGap,
-                      TextFormField(
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () {
-                          FocusScope.of(context).nextFocus();
-                        },
-                        controller: firstNameController,
-                        onChanged: (value) {
-                          log("value:$value");
-                          _formKey.currentState!.validate();
-                        },
-                        maxLength: 100,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter your first name";
-                          } else if (value.length < 2) {
-                            return 'First name must be at least 2 characters';
-                          }
+          ),
+          SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Container(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  children: [
+                    // Image.asset(
+                    //   "assets/images/Register.jpg",
+                    //   width: 250,
+                    // ),
+                    // CachedNetworkImage(
+                    //   height: 150,
+                    //   imageUrl:
+                    //       "https://img.favpng.com/4/22/14/logo-brand-button-icon-png-favpng-6vjJ5T7t7zrXkhnpPQ80mB7mt.jpg",
+                    //   placeholder: (context, url) => CircularProgressIndicator(),
+                    //   errorWidget: (context, url, error) => Icon(Icons.error),
+                    // ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 60, left: 20),
+                      child: Text("Welcome\nCreate your Account",
+                          style: TextStyle(fontSize: 30, color: Colors.white)),
+                    ),
+                    textFieldDefaultGap,
+                    textFieldDefaultGap,
+                    TextFormField(
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      controller: firstNameController,
+                      onChanged: (value) {
+                        log("value:$value");
+                        _formKey.currentState!.validate();
+                      },
+                      maxLength: 100,
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Enter your first name";
+                        } else if (value.length < 2) {
+                          return 'First name must be at least 2 characters';
+                        }
 
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: "First_name",
-                          hintStyle: TextStyle(color: Colors.white),
-                          labelStyle: TextStyle(color: Colors.white),
-                          label: Text(
-                            "First_name",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.person_2_outlined,
-                            color: Colors.white,
-                          ),
-                          counterText: "",
-                          border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                          ),
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "First_name",
+                        hintStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.white),
+                        label: Text(
+                          "First_name",
+                          style: TextStyle(color: Colors.white),
                         ),
-                        style: TextStyle(color: Colors.white),
-                        cursorColor: Colors.white,
-                        cursorHeight: 20,
-                        cursorWidth: 2,
-                        cursorRadius: Radius.circular(10),
-                      ),
-                      textFieldDefaultGap,
-                      TextFormField(
-                        style: TextStyle(color: Colors.white),
-                        cursorColor: Colors.white,
-                        cursorHeight: 20,
-                        cursorWidth: 2,
-                        cursorRadius: Radius.circular(10),
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () {
-                          FocusScope.of(context).nextFocus();
-                        },
-                        controller: lastNameController,
-                        onChanged: (value) {
-                          log("value:$value");
-                          _formKey.currentState!.validate();
-                        },
-                        maxLength: 100,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Enter your last name";
-                          } else if (value.length < 2) {
-                            return 'Last name must be at least 2 characters';
-                          }
-
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: "Last_name",
-                          label: Text(
-                            "Last_name",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.person_2_outlined,
-                            color: Colors.white,
-                          ),
-                          counterText: "",
-                          border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.white, width: 2),
-                            borderRadius: BorderRadius.all(Radius.circular(15)),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                        prefixIcon: Icon(
+                          Icons.person_2_outlined,
+                          color: Colors.white,
+                        ),
+                        counterText: "",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
                       ),
-                      textFieldDefaultGap,
-                      TextFormField(
-                        style: TextStyle(color: Colors.white),
-                        cursorColor: Colors.white,
-                        cursorHeight: 20,
-                        cursorWidth: 2,
-                        cursorRadius: Radius.circular(10),
-                        textInputAction: TextInputAction.next,
-                        onEditingComplete: () {
-                          FocusScope.of(context).nextFocus();
-                        },
-                        controller: emailController,
-                        onChanged: (value) {
-                          log("value:$value");
-                          _formKey.currentState!.validate();
-                        },
-                        maxLength: 100,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          final bool emailValid = RegExp(
-                                  r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                              .hasMatch(value ?? "");
-                          log("emailValid $emailValid");
-                          if (value == null || value.isEmpty) {
-                            return "Please enter email address";
-                          } else if (!emailValid) {
-                            return "Please enter valid email address";
-                          }
-                          return null;
-                        },
-                        decoration: const InputDecoration(
-                          hintText: "Enter Email",
-                          hintStyle: TextStyle(color: Colors.white),
-                          labelStyle: TextStyle(color: Colors.white),
-                          label: Text(
-                            "Email",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          prefixIcon: Icon(
-                            Icons.email_outlined,
-                            color: Colors.white,
-                          ),
-                          counterText: "",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          focusedBorder: OutlineInputBorder(
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
+                      cursorHeight: 20,
+                      cursorWidth: 2,
+                      cursorRadius: Radius.circular(10),
+                    ),
+                    textFieldDefaultGap,
+                    TextFormField(
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
+                      cursorHeight: 20,
+                      cursorWidth: 2,
+                      cursorRadius: Radius.circular(10),
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      controller: lastNameController,
+                      onChanged: (value) {
+                        log("value:$value");
+                        _formKey.currentState!.validate();
+                      },
+                      maxLength: 100,
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return "Enter your last name";
+                        } else if (value.length < 2) {
+                          return 'Last name must be at least 2 characters';
+                        }
+
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Last_name",
+                        label: Text(
+                          "Last_name",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.person_2_outlined,
+                          color: Colors.white,
+                        ),
+                        counterText: "",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 2),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderRadius: BorderRadius.all(Radius.circular(15)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
                             borderSide:
                                 BorderSide(color: Colors.white, width: 2),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          errorBorder: OutlineInputBorder(
-                              // Add this for error state
-                              borderSide: BorderSide(
-                                  color: Color.fromARGB(255, 244, 242, 248),
-                                  width: 1.0),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          focusedErrorBorder: OutlineInputBorder(
-                            // Add this for focused error state
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                      ),
+                    ),
+                    textFieldDefaultGap,
+                    TextFormField(
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
+                      cursorHeight: 20,
+                      cursorWidth: 2,
+                      cursorRadius: Radius.circular(10),
+                      textInputAction: TextInputAction.next,
+                      onEditingComplete: () {
+                        FocusScope.of(context).nextFocus();
+                      },
+                      controller: emailController,
+                      onChanged: (value) {
+                        log("value:$value");
+                        _formKey.currentState!.validate();
+                      },
+                      maxLength: 100,
+                      keyboardType: TextInputType.text,
+                      validator: (value) {
+                        final bool emailValid = RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                            .hasMatch(value ?? "");
+                        log("emailValid $emailValid");
+                        if (value == null || value.isEmpty) {
+                          return "Please enter email address";
+                        } else if (!emailValid) {
+                          return "Please enter valid email address";
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        hintText: "Enter Email",
+                        hintStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Colors.white),
+                        label: Text(
+                          "Email",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.email_outlined,
+                          color: Colors.white,
+                        ),
+                        counterText: "",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white, width: 2),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        errorBorder: OutlineInputBorder(
+                            // Add this for error state
                             borderSide: BorderSide(
-                                color: Color.fromARGB(255, 239, 239, 244),
-                                width: 2.0),
-                          ),
-                          // errorStyle: TextStyle(
-                          //     color: Color.fromARGB(255, 255, 255, 255)
-                          //     ),
+                                color: Color.fromARGB(255, 244, 242, 248),
+                                width: 1.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        focusedErrorBorder: OutlineInputBorder(
+                          // Add this for focused error state
+                          borderSide: BorderSide(
+                              color: Color.fromARGB(255, 239, 239, 244),
+                              width: 2.0),
                         ),
+                        // errorStyle: TextStyle(
+                        //     color: Color.fromARGB(255, 255, 255, 255)
+                        //     ),
                       ),
-                      textFieldDefaultGap,
-                      TextFormField(
-                        style: TextStyle(color: Colors.white),
-                        cursorColor: Colors.white,
-                        cursorHeight: 20,
-                        cursorWidth: 2,
-                        cursorRadius: Radius.circular(10),
-                        textInputAction: TextInputAction.done,
-                        onEditingComplete: () {
-                          FocusScope.of(context).unfocus();
-                        },
-                        controller: passwordController,
-                        onChanged: (value) {
-                          log("value:$value");
-                          _formKey.currentState!.validate();
-                        },
-                        validator: (value) {
-                          bool validateStructure(String value) {
-                            String pattern =
-                                r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
-                            RegExp regExp = RegExp(pattern);
-                            return regExp.hasMatch(value);
-                          }
+                    ),
+                    textFieldDefaultGap,
+                    TextFormField(
+                      style: TextStyle(color: Colors.white),
+                      cursorColor: Colors.white,
+                      cursorHeight: 20,
+                      cursorWidth: 2,
+                      cursorRadius: Radius.circular(10),
+                      textInputAction: TextInputAction.done,
+                      onEditingComplete: () {
+                        FocusScope.of(context).unfocus();
+                      },
+                      controller: passwordController,
+                      onChanged: (value) {
+                        log("value:$value");
+                        _formKey.currentState!.validate();
+                      },
+                      validator: (value) {
+                        bool validateStructure(String value) {
+                          String pattern =
+                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+                          RegExp regExp = RegExp(pattern);
+                          return regExp.hasMatch(value);
+                        }
 
-                          if (value == null || value.isEmpty) {
-                            return "Please enter password";
-                          } else if (value.length < 8) {
-                            return "Password must be at least 8 characters";
-                          } else if (!validateStructure(value)) {
-                            return """Password must contain:
-                          • At least one uppercase letter
-                          • At least one lowercase letter  
-                          • At least one number
-                          • At least one special character (!@#\$&*~)
-                          • Minimum 8 characters""";
-                          }
-                          return null;
-                        },
-                        maxLength: 100,
-                        keyboardType: TextInputType.text,
-                        obscureText: vissiblePassword,
-                        decoration: InputDecoration(
-                          hintText: "Enter Password",
-                          hintStyle: TextStyle(
-                            color: Colors.white,
-                          ),
-                          label: const Text(
-                            "Password",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          labelStyle: TextStyle(color: Colors.white),
-                          prefixIcon: const Icon(
-                            Icons.password_outlined,
-                            color: Colors.white,
-                          ),
-                          suffixIcon: GestureDetector(
-                              onTap: () {
-                                vissiblePassword = !vissiblePassword;
-                                setState(() {});
-                              },
-                              child: Icon(
-                                vissiblePassword
-                                    ? Icons.visibility_off_outlined
-                                    : Icons.visibility_outlined,
-                                color: Colors.white,
-                              )),
-                          counterText: "",
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.white, width: 2),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          errorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color:
-                                      const Color.fromARGB(255, 250, 248, 248),
-                                  width: 1.0),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
-                          focusedErrorBorder: OutlineInputBorder(
-                              borderSide: BorderSide(
-                                  color:
-                                      const Color.fromARGB(255, 245, 242, 242),
-                                  width: 2.0),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(15))),
+                        if (value == null || value.isEmpty) {
+                          return "Please enter password";
+                        } else if (value.length < 8) {
+                          return "Password must be at least 8 characters";
+                        } else if (!validateStructure(value)) {
+                          return """Password must contain:
+                        • At least one uppercase letter
+                        • At least one lowercase letter  
+                        • At least one number
+                        • At least one special character (!@#\$&*~)
+                        • Minimum 8 characters""";
+                        }
+                        return null;
+                      },
+                      maxLength: 100,
+                      keyboardType: TextInputType.text,
+                      obscureText: vissiblePassword,
+                      decoration: InputDecoration(
+                        hintText: "Enter Password",
+                        hintStyle: TextStyle(
+                          color: Colors.white,
                         ),
-                      ),
-                      textFieldDefaultGap,
-
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (ctx) => const LoginScreen()));
+                        label: const Text(
+                          "Password",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        labelStyle: TextStyle(color: Colors.white),
+                        prefixIcon: const Icon(
+                          Icons.password_outlined,
+                          color: Colors.white,
+                        ),
+                        suffixIcon: GestureDetector(
+                            onTap: () {
+                              vissiblePassword = !vissiblePassword;
+                              setState(() {});
                             },
-                            child: const Text(
-                              "Already have an Account",
-                              style: TextStyle(
-                                  color: Color.fromARGB(255, 8, 19, 238)),
+                            child: Icon(
+                              vissiblePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: Colors.white,
                             )),
+                        counterText: "",
+                        border: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.white),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.white, width: 2),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: const Color.fromARGB(255, 250, 248, 248),
+                                width: 1.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                                color: const Color.fromARGB(255, 245, 242, 242),
+                                width: 2.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
                       ),
-                      textFieldDefaultGap,
+                    ),
+                    textFieldDefaultGap,
 
-                      //                   ElevatedButton(
-                      //                     style: ElevatedButton.styleFrom(
-                      //                         backgroundColor:
-                      //                             const Color.fromARGB(255, 219, 9, 205),
-                      //                         shape: RoundedRectangleBorder(
-                      //                             borderRadius: BorderRadius.circular(15))),
-                      //                     onPressed: () {
-                      //                       // Comment out your API call logic
-                      //                       /*
-                      // Your existing API call code here
-                      // */
-
-                      //                       // Call dummy register instead
-                      //                       handleDummyRegister();
-                      //                     },
-                      //                     child: const Text("Register"),
-                      //                   ),
-
-                      ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 219, 9, 205),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15))),
-                          onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
-                              final firstName = firstNameController.text.trim();
-                              final lastName = lastNameController.text.trim();
-                              final email = emailController.text.trim();
-                              final password = passwordController.text;
-
-                              // Call the API
-                              log('first_name: $firstName');
-                              log('last_name: $lastName');
-                              log('email: $email');
-                              log('password: $password');
-                              await registerUser(
-                                  firstName, lastName, email, password);
-                            }
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (ctx) => const LoginScreen()));
                           },
                           child: const Text(
-                            "Register",
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            "Already have an Account",
+                            style: TextStyle(
+                                color: Color.fromARGB(255, 8, 19, 238)),
                           )),
-                    ],
-                  ),
+                    ),
+                    textFieldDefaultGap,
+
+                    //                   ElevatedButton(
+                    //                     style: ElevatedButton.styleFrom(
+                    //                         backgroundColor:
+                    //                             const Color.fromARGB(255, 219, 9, 205),
+                    //                         shape: RoundedRectangleBorder(
+                    //                             borderRadius: BorderRadius.circular(15))),
+                    //                     onPressed: () {
+                    //                       // Comment out your API call logic
+                    //                       /*
+                    // Your existing API call code here
+                    // */
+
+                    //                       // Call dummy register instead
+                    //                       handleDummyRegister();
+                    //                     },
+                    //                     child: const Text("Register"),
+                    //                   ),
+
+                    ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 219, 9, 205),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15))),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            final firstName = firstNameController.text.trim();
+                            final lastName = lastNameController.text.trim();
+                            final email = emailController.text.trim();
+                            final password = passwordController.text;
+
+                            // Call the API
+                            log('first_name: $firstName');
+                            log('last_name: $lastName');
+                            log('email: $email');
+                            log('password: $password');
+                            await registerUser(
+                                firstName, lastName, email, password);
+                          }
+                        },
+                        child: const Text(
+                          "Register",
+                          style: TextStyle(color: Colors.white, fontSize: 20),
+                        )),
+                  ],
                 ),
               ),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 580),
+            padding: const EdgeInsets.only(top: 630),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topRight: Radius.circular(40),
                     topLeft: Radius.circular(40)),
-                color: Colors.white,
+                color: Colors.white70,
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color.fromARGB(255, 246, 241, 242)
+                        .withOpacity(0.5),
+                    spreadRadius: 5,
+                    blurRadius: 7,
+                    offset: Offset(0, 3),
+                  ),
+                ],
               ),
               height: double.infinity,
               width: double.infinity,

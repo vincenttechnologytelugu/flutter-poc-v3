@@ -34,7 +34,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       log('Fetching with token: $token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.170:8080/favourite_adposts'),
+        Uri.parse('http://192.168.0.167:8080/favourite_adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -120,7 +120,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        // Navigator.pop(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pink,
@@ -177,7 +177,8 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(8),
                                     border: Border.all(
-                                      color: const Color.fromARGB(255, 187, 186, 186),
+                                      color: const Color.fromARGB(
+                                          255, 187, 186, 186),
                                       width: 1,
                                     ),
                                   ),
@@ -260,7 +261,6 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                                 },
                               ),
                             ],
-                            
                           ),
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -270,9 +270,9 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                             borderRadius: BorderRadius.circular(14),
                           ),
                           tileColor: const Color.fromARGB(255, 239, 238, 243),
-                          selectedTileColor: const Color.fromARGB(255, 11, 2, 2),
+                          selectedTileColor:
+                              const Color.fromARGB(255, 11, 2, 2),
                         ),
-
                       ),
                     );
                   },

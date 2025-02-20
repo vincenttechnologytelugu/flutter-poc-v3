@@ -1,5 +1,8 @@
 // import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/controllers/location_controller.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
+
 
 
 
@@ -10,20 +13,27 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPreferences;
 void main() async {
-  
+   WidgetsFlutterBinding.ensureInitialized();
+  Get.put(LocationController());
+  Get.put(ProductsController());
  
   runApp(const MyApp());
   sharedPreferences = await SharedPreferences.getInstance();
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-        title: 'Flutter Demo',
+        title: 'Flutter POC v3',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           // This is the theme of your application.flutter pub global activate devtools

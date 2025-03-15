@@ -35,10 +35,10 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
    
   final pageController = PageController();
-  final Color selectedColor = Color.fromARGB(255, 152, 10, 247);
+  final Color selectedColor =  Color.fromARGB(255, 240, 107, 31);
   
-final Color unselectedColor = Color.fromARGB(255, 152, 10, 247);
-final Color backgroundColor = Color.fromARGB(255, 233, 233, 238);
+final Color unselectedColor = Color.fromARGB(255, 250, 247, 252);
+final Color backgroundColor = Color.fromARGB(255, 240, 107, 31);
 
   // Add this helper method in your widget class
 Color getIconColor(int index) {
@@ -50,15 +50,15 @@ Widget _buildNavItem(IconData icon, String label, int index) {
     margin: EdgeInsets.only(top: 10),
     height: 50,  // Fixed height for the container
     child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      // mainAxisAlignment: MainAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
-          size: 24,
+          size: 23,
           color: isSelected ? const Color.fromARGB(255, 244, 246, 245) : unselectedColor, // White when selected
         ),
-        SizedBox(height: 2), // Small spacing between icon and text
+        // SizedBox(height: 2), // Small spacing between icon and text
         Text(
           label,
           style: TextStyle(
@@ -73,31 +73,7 @@ Widget _buildNavItem(IconData icon, String label, int index) {
 }
 
 
-// // Helper method to build each navigation item
-// Widget _buildNavItem(IconData icon, String label, int index) {
-//   bool isSelected = currentIndex == index;
-//   return Container(
-//     margin: EdgeInsets.only(top: 10),
-//     child: Column(
-//       mainAxisSize: MainAxisSize.min, // Important for correct sizing
-//       children: [
-//         Icon(
-//           icon,
-//           size: 25,
-//           color: isSelected ? selectedColor : unselectedColor,
-//         ),
-//         Text(
-//           label,
-//           style: TextStyle(
-//             fontSize: 14, // Adjust font size as needed
-//             color: isSelected ? selectedColor : unselectedColor,
-//           ),
-//         ),
-//       ],
-//     ),
-//   );
-// }
-// Add this line to define _locationService
+
 
   String? userName;
   int currentIndex = 0;
@@ -273,7 +249,7 @@ PreferredSizeWidget _buildAppBar() {
     return PreferredSize(
       preferredSize: const Size.fromHeight(60),
       child: HomeappbarScreen(
-        location: selectedLocation,
+        location: selectedLocation ?? "",
         onLocationTap: () async {
           final result = await Navigator.push(
             context,
@@ -334,48 +310,7 @@ PreferredSizeWidget _buildAppBar() {
   }
 }
 
-  // PreferredSizeWidget _buildAppBar() {
-  //   if (currentIndex == 0) {
-  //     return PreferredSize(
-  //       preferredSize: const Size.fromHeight(60),
-  //       child: HomeappbarScreen(
-  //         location: selectedLocation,
-  //         onLocationTap: () async {
-  //           final result = await Navigator.push(
-  //             context,
-  //             MaterialPageRoute(builder: (context) => const LocationScreen()),
-  //           );
-  //           if (result != null && result is String) {
-  //             setState(() {
-  //               selectedLocation = result;
-  //               // Cancel location updates when manual location is selected
-  //               _locationSubscription?.cancel();
-  //             });
-  //           }
-  //         },
-  //       ),
-  //     );
-  //   } else {
-  //     return AppBar(
-  //       elevation: 0.0,
-  //       // backgroundColor: Color.fromARGB(255, 152, 10, 247),
-  //       backgroundColor: Colors.white70,
-  //       // leading:  Image.asset("assets/images/homelogo.jpg",
-  //       //       width: 300,
-  //       //       height: 100,
-  //       //       ),
-  //       // title: const Text(
-  //       //   "U Sales",
-  //       //   style: TextStyle(
-  //       //     fontSize: 30,
-  //       //     fontWeight: FontWeight.w600,
-  //       //     color: Color.fromARGB(255, 242, 241, 240),
-  //       //   ),
-  //       // ),
-  //       // centerTitle: true,
-  //     );
-  //   }
-  // }
+ 
 
   Future<void> loadUserData() async {
     final prefs = await SharedPreferences.getInstance();
@@ -525,8 +460,8 @@ PreferredSizeWidget _buildAppBar() {
         index: currentIndex,
         items: <Widget>[
           _buildNavItem(Icons.home, "Home", 0),
-          _buildNavItem(Icons.chat, "Converse", 1),
-          _buildNavItem(Icons.add_circle_outline, "Trade", 2),
+          _buildNavItem(Icons.chat, "Chats", 1),
+          _buildNavItem(Icons.add_circle_outline, "Selling", 2),
           _buildNavItem(Icons.favorite_rounded, "Favourite", 3),
           _buildNavItem(Icons.person, "Account", 4),
         ],
@@ -537,105 +472,11 @@ PreferredSizeWidget _buildAppBar() {
         },
       ),
 
-// bottomNavigationBar: CurvedNavigationBar(
-//   backgroundColor: Colors.transparent,
-//   color: backgroundColor,
-//   buttonBackgroundColor: selectedColor,
-//   height: 75, // Increased height to accommodate text
-//   animationDuration: Duration(milliseconds: 300),
-//   animationCurve: Curves.easeInOutCubic,
-//   index: currentIndex,
-//   items: <Widget>[
-//     _buildNavItem(Icons.home, "Home", 0),
-//     _buildNavItem(Icons.chat, "Chat", 1),
-//     _buildNavItem(Icons.add_circle_outline, "Sell", 2),
-//     _buildNavItem(Icons.favorite_rounded, "Favourite", 3),
-//     _buildNavItem(Icons.person, "Account", 4),
-//   ],
-//   onTap: (index) {
-//     setState(() {
-//       currentIndex = index;
-//     });
-//   },
-// ),
 
-// bottomNavigationBar: CurvedNavigationBar(
-//     backgroundColor: Colors.transparent,
-//     color: backgroundColor,
-//     buttonBackgroundColor: selectedColor,
-//     height: 60,
-//     animationDuration: Duration(milliseconds: 300),
-//     animationCurve: Curves.easeInOut,
-//     index: currentIndex,
-//     items: <Widget>[
-//       Icon(Icons.home, size: 25,semanticLabel: "Home", color: _getIconColor(0)),
-//       Icon(Icons.chat, size: 25, color: _getIconColor(1)),
-//       Icon(Icons.add_circle_outline, size: 25, color: _getIconColor(2)),
-//       Icon(Icons.favorite_rounded, size: 25, color: _getIconColor(3)),
-//       Icon(Icons.person, size: 25, color: _getIconColor(4)),
-//     ],
-//     onTap: (index) {
-//       setState(() {
-//         currentIndex = index;
-//       });
-//     },
-// ),
-
-
-
-
-
-
-
-
-
-
-
-      
-      // bottomNavigationBar: BottomNavigationBar(
-      //   selectedFontSize: 20,
-      //   iconSize: 25,
-      //   backgroundColor: const Color.fromARGB(255, 233, 212, 118),
-      //   currentIndex: currentIndex,
-      
-      //   showUnselectedLabels: true,
-       
-      //   showSelectedLabels: true,
-
-       
-      //   onTap: (index) {
-      //     setState(() {
-      //       currentIndex = index;
-      //     });
-      //   },
-      //   items: const [
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home, color: Color.fromARGB(255, 171, 5, 189)),
-      //       label: "Home",
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.chat, color: Color.fromARGB(255, 171, 5, 189)),
-      //       label: "Chat",
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.add_circle_outline, color:  Color.fromARGB(255, 171, 5, 189)),
-      //       label: "Sell",
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.favorite_rounded, color: Color.fromARGB(255, 171, 5, 189)),
-      //       label: "My Ads",
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.person, color: Color.fromARGB(255, 171, 5, 189)),
-      //       label: "Profile",
-      //     ),
-      //   ],
-      //   type: BottomNavigationBarType.fixed,
-     
-      //   selectedItemColor: const Color.fromARGB(255, 1, 168, 51),
-      //   unselectedItemColor: const Color.fromARGB(179, 22, 1, 1),
-      // ),
-      body: _screens[currentIndex],
+     body: IndexedStack(  // Replace direct array access with IndexedStack
+        index: currentIndex,
+        children: _screens,
+      ),
     );
   }
 }

@@ -43,7 +43,7 @@ class CategoryController extends GetxController {
     update();
     http.Response response =
         // await http.get(Uri.parse("https://fakestoreapi.com/products"));
-        await http.get(Uri.parse("http://192.168.0.167:8080/categories"));
+        await http.get(Uri.parse("http://13.200.179.78/categories"));
     var data = jsonDecode(response.body);
     // parsing
     for (var item in data) {

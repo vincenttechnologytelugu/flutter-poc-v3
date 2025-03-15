@@ -147,14 +147,14 @@ class _SplashScreenState extends State<SplashScreen> {
                 child: AnimatedOpacity(
                   duration: const Duration(seconds: 1),
                   opacity: 1,
-                  child: const Text(
-                    "Welcome to App",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                    ),
-                  ),
+                  // child: const Text(
+                  //   "Welcome to App",
+                  //   style: TextStyle(
+                  //     fontSize: 28,
+                  //     fontWeight: FontWeight.bold,
+                  //     letterSpacing: 1.2,
+                  //   ),
+                  // ),
                 ),
               ),
               

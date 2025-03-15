@@ -64,7 +64,7 @@ class _IntroductionScreenState extends State<IntroductionScreen> {
               context,
               MaterialPageRoute(builder: (context) => const NotificationsScreen()),
             );
-        /// TODO: Go to desire page like login or home
+     
       },
     );
   }

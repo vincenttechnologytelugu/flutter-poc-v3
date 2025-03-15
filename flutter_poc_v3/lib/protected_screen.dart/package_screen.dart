@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_category_screen.dart';
 
@@ -11,20 +12,54 @@ class PackageScreen extends StatefulWidget {
 
 class _PackageScreenState extends State<PackageScreen> {
   String selectedCategory = 'Select Category'; // To store selected category
+  String location = "Select Location";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(130), // Adjust height as needed
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Added this to minimize height
+            children: [
+              HomeappbarScreen(
+                location: location,
+                onLocationTap: () async {
+                  // Handle location tap if needed
+                },
+              ), // Add HomeAppBar here
+              AppBar(
+                centerTitle: true,
+                // leading: IconButton(
+                //   icon: const Icon(Icons.arrow_back),
+                //   onPressed: () {
+                //     // Navigator.pop(context);
+                //   },
+                // ),
+                title: const Text('Buy Packages'),
+                 automaticallyImplyLeading: false,  // Add this line to remove b
+                // title: Text('${widget.category} - ${widget.subCategory}'),
+
+                elevation: 0,
+
+                backgroundColor: Colors
+                    .transparent, // Make it transparent to avoid double background
+              ),
+            ],
+          ),
         ),
-        title: const Text('Buy Packages'),
-        centerTitle: true,
       ),
+      // appBar: AppBar(
+      //   leading: IconButton(
+      //     icon: const Icon(Icons.arrow_back),
+      //     onPressed: () {
+      //       Navigator.pop(context);
+      //     },
+      //   ),
+      //   title: const Text('Buy Packages'),
+      //   centerTitle: true,
+      // ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -63,29 +98,29 @@ class _PackageScreenState extends State<PackageScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Card(
-                elevation: 4,
-                child: ListTile(
-                  leading: const Icon(Icons.location_on, color: Colors.blue),
-                  title: const Text('Location'),
-                  subtitle: const Text('Current Location'),
-                  trailing: const Icon(Icons.arrow_forward_ios),
-                  onTap: () {
-                    // Handle location selection
-                  },
-                ),
-              ),
+              // Card(
+              //   elevation: 4,
+              //   child: ListTile(
+              //     leading: const Icon(Icons.location_on, color: Colors.blue),
+              //     title: const Text('Location'),
+              //     subtitle: const Text('Current Location'),
+              //     trailing: const Icon(Icons.arrow_forward_ios),
+              //     onTap: () {
+              //       // Handle location selection
+              //     },
+              //   ),
+              // ),
               const SizedBox(height: 24),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
                     Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const OfferPackageScreen(),
-          ),
-        );
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const OfferPackageScreen(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 15),

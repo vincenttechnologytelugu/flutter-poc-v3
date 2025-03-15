@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SubCategoryPostsScreen extends StatefulWidget {
   final String category;
@@ -30,6 +32,8 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
   int currentPage = 0;
   bool isLoading = false;
   bool hasMore = true;
+  final CartController cartController = Get.put(CartController());
+  String location = "Select Location";
 
   @override
   void initState() {
@@ -47,6 +51,94 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
     }
   }
 
+  // Future<void> fetchPosts() async {
+  //   if (isLoading) return;
+
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   try {
+  //     final encodedCategory =
+  //         Uri.encodeComponent(widget.category.toLowerCase());
+  //     final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
+
+  //     final url =
+  //         'http://13.200.179.78/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
+  //     log('Fetching URL: $url');
+
+  //     final response = await http.get(Uri.parse(url));
+  //     log('Response Status: ${response.statusCode}');
+  //     log('Response Body: ${response.body}');
+
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       if (data['data'] != null && data['data'] is List) {
+  //         final List<dynamic> jsonList = data['data'];
+
+  //         final List<ProductModel> newPosts = jsonList
+  //             .map((item) => ProductModel(
+  //                   id: item['_id']?.toString(), // Add this line
+  //                   icon: item['icon'] ??
+  //                       '', // Add null check with default empty string
+  //                   title: item['title']?.toString() ?? 'No Title',
+  //                   description: item['description']?.toString() ?? '',
+  //                   price: double.tryParse(item['price']?.toString() ?? '0'),
+  //                   location: item['location']?.toString() ?? '',
+  //                   city: item['city']?.toString() ?? '',
+  //                   category: item['category']?.toString() ?? '',
+  //                   thumb: item['thumb']?.toString() ?? '',
+  //                   posted_at: item['posted_at']?.toString() ?? '',
+  //                   brand: item['brand']?.toString() ?? '',
+  //                   warranty: item['warranty']?.toString() ?? '',
+  //                   condition: item['condition']?.toString() ?? '',
+  //                   // Real Estate
+  //                   bedrooms: item['bedrooms']?.toString() ?? '',
+  //                   bathrooms: item['bathrooms']?.toString() ?? '',
+  //                   area: item['area']?.toString() ?? '',
+  //                   furnishing: item['furnishing']?.toString() ?? '',
+  //                   // Vehicles
+  //                   year: int.tryParse(item['year']?.toString() ?? '0'),
+  //                   kilometers:
+  //                       int.tryParse(item['kilometers']?.toString() ?? '0'),
+  //                   fuelType: item['fuel_type']?.toString() ?? '',
+  //                   transmission: item['transmission']?.toString() ?? '',
+  //                   // Electronics
+  //                   model: item['model']?.toString() ?? '',
+  //                   storage: item['storage']?.toString() ?? '',
+  //                   ram: item['ram']?.toString() ?? '',
+  //                   // Furniture
+  //                   material: item['material']?.toString() ?? '',
+  //                 ))
+  //             .toList();
+
+  //         setState(() {
+  //           posts.addAll(newPosts);
+  //           currentPage++;
+  //           hasMore = newPosts.length == 50;
+  //         });
+
+  //         log('Loaded ${newPosts.length} new posts');
+  //       } else {
+  //         setState(() {
+  //           hasMore = false;
+  //         });
+  //         log('No data in response or invalid format');
+  //       }
+  //     }
+  //   } catch (e, stackTrace) {
+  //     log('Error fetching posts: $e');
+  //     log('Stack trace: $stackTrace'); // Added stack trace for better debugging
+  //     setState(() {
+  //       hasMore = false;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
   Future<void> fetchPosts() async {
     if (isLoading) return;
 
@@ -55,12 +147,24 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
     });
 
     try {
+      // Get current location from shared preferences
+      final prefs = await SharedPreferences.getInstance();
+      final currentCity = prefs.getString('city') ?? '';
+      final currentState = prefs.getString('state') ?? '';
+
       final encodedCategory =
           Uri.encodeComponent(widget.category.toLowerCase());
       final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
 
-      final url =
-          'http://192.168.0.167:8080/adposts?category=$encodedCategory&page=$currentPage&psize=50&findkey=$encodedSubCategory';
+      // Add location parameters to the URL
+      final url = 'http://13.200.179.78/adposts?'
+          'category=$encodedCategory'
+          '&page=$currentPage'
+          '&psize=50'
+          '&findkey=$encodedSubCategory'
+          '&city=${Uri.encodeComponent(currentCity)}'
+          '&state=${Uri.encodeComponent(currentState)}';
+
       log('Fetching URL: $url');
 
       final response = await http.get(Uri.parse(url));
@@ -71,47 +175,10 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
         final data = json.decode(response.body);
         if (data['data'] != null && data['data'] is List) {
           final List<dynamic> jsonList = data['data'];
-          // final List<ProductModel> newPosts = jsonList
-          //     .map((item) => ProductModel(
-          //       icon: item['icon'],
-
-          //           title: item['title']?.toString(),
-          //           description: item['description']?.toString(),
-          //           price: double.tryParse(item['price']?.toString() ?? '0'),
-          //           location: item['location']?.toString(),
-          //           city: item['city']?.toString(),
-          //           category: item['category']?.toString(),
-          //           thumb: item['thumb']?.toString(),
-          //           posted_at: item['posted_at']?.toString(),
-          //           brand: item['brand']?.toString(),
-          //           warranty: item['warranty']?.toString(),
-          //           condition: item['condition']?.toString(),
-          //           // Real Estate
-          //           bedrooms: item['bedrooms']?.toString(),
-          //           bathrooms: item['bathrooms']?.toString(),
-          //           area: item['area']?.toString(),
-          //           furnishing: item['furnishing']?.toString(),
-          //           // Vehicles
-          //           year: int.tryParse(item['year']?.toString() ?? '0'),
-          //           kilometers:
-          //               int.tryParse(item['kilometers']?.toString() ?? '0'),
-          //           fuelType: item['fuel_type']?.toString(),
-          //           transmission: item['transmission']?.toString(),
-          //           // Electronics
-          //           model: item['model']?.toString(),
-          //           storage: item['storage']?.toString(),
-          //           ram: item['ram']?.toString(),
-          //           // Furniture
-          //           material: item['material']?.toString(),
-          //           //  dimensions: item['dimensions']?.toString(),
-
-          //         ))
-          //     .toList();
           final List<ProductModel> newPosts = jsonList
               .map((item) => ProductModel(
-                    id: item['_id']?.toString(), // Add this line
-                    icon: item['icon'] ??
-                        '', // Add null check with default empty string
+                    id: item['_id']?.toString(),
+                    icon: item['icon'] ?? '',
                     title: item['title']?.toString() ?? 'No Title',
                     description: item['description']?.toString() ?? '',
                     price: double.tryParse(item['price']?.toString() ?? '0'),
@@ -123,22 +190,18 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                     brand: item['brand']?.toString() ?? '',
                     warranty: item['warranty']?.toString() ?? '',
                     condition: item['condition']?.toString() ?? '',
-                    // Real Estate
                     bedrooms: item['bedrooms']?.toString() ?? '',
                     bathrooms: item['bathrooms']?.toString() ?? '',
                     area: item['area']?.toString() ?? '',
                     furnishing: item['furnishing']?.toString() ?? '',
-                    // Vehicles
                     year: int.tryParse(item['year']?.toString() ?? '0'),
                     kilometers:
                         int.tryParse(item['kilometers']?.toString() ?? '0'),
                     fuelType: item['fuel_type']?.toString() ?? '',
                     transmission: item['transmission']?.toString() ?? '',
-                    // Electronics
                     model: item['model']?.toString() ?? '',
                     storage: item['storage']?.toString() ?? '',
                     ram: item['ram']?.toString() ?? '',
-                    // Furniture
                     material: item['material']?.toString() ?? '',
                   ))
               .toList();
@@ -159,7 +222,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
       }
     } catch (e, stackTrace) {
       log('Error fetching posts: $e');
-      log('Stack trace: $stackTrace'); // Added stack trace for better debugging
+      log('Stack trace: $stackTrace');
       setState(() {
         hasMore = false;
       });
@@ -173,46 +236,113 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.category} - ${widget.subCategory}'),
-        actions: [
-          GetBuilder<CartController>(builder: (cartController) {
-            return Stack(
-              children: [
-                Container(
-                  margin: EdgeInsets.only(top: 15),
-                  child: IconButton(
-                      onPressed: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (builder) => const FavouriteScreen()));
-                      },
-                      icon: Icon(
-                        size: 30,
-                        Icons.favorite_rounded,
-                        color: cartController.favouriteIds.isNotEmpty
-                            ? Colors.pink
-                            : Color.fromARGB(255, 141, 138, 128),
-                      )),
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 15, left: 30),
-                  child: CircleAvatar(
-                    radius: 12,
-                    backgroundColor: const Color.fromARGB(255, 81, 7, 255),
-                    child: Container(
-                        alignment: Alignment.center,
-                        padding: const EdgeInsets.all(2),
-                        margin: const EdgeInsets.all(1),
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle, color: Colors.white),
-                        child: Text("${cartController.favouriteIds.length}")),
-                  ),
-                )
-              ],
-            );
-          })
-        ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(130), // Adjust height as needed
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Added this to minimize height
+            children: [
+              HomeappbarScreen(
+                location: location,
+                onLocationTap: () async {
+                  // Handle location tap if needed
+                },
+              ), // Add HomeAppBar here
+              AppBar(
+                centerTitle: true,
+
+                automaticallyImplyLeading: false, // Add this line to remove b
+                title: Text('${widget.category} - ${widget.subCategory}'),
+                actions: [
+                  GetBuilder<CartController>(builder: (cartController) {
+                    return Stack(
+                      children: [
+                        Container(
+                          margin: EdgeInsets.only(top: 15),
+                          child: IconButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (builder) =>
+                                        const FavouriteScreen()));
+                              },
+                              icon: Icon(
+                                size: 30,
+                                Icons.favorite_rounded,
+                                color: cartController.favouriteIds.isNotEmpty
+                                    ? Colors.pink
+                                    : Color.fromARGB(255, 141, 138, 128),
+                              )),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 15, left: 30),
+                          child: CircleAvatar(
+                            radius: 12,
+                            backgroundColor:
+                                const Color.fromARGB(255, 81, 7, 255),
+                            child: Container(
+                                alignment: Alignment.center,
+                                padding: const EdgeInsets.all(2),
+                                margin: const EdgeInsets.all(1),
+                                decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white),
+                                child: Text(
+                                    "${cartController.favouriteIds.length}")),
+                          ),
+                        )
+                      ],
+                    );
+                  })
+                ],
+                elevation: 0,
+
+                backgroundColor: Colors
+                    .transparent, // Make it transparent to avoid double background
+              ),
+            ],
+          ),
+        ),
       ),
+      // appBar: AppBar(
+      //   title: Text('${widget.category} - ${widget.subCategory}'),
+      //   actions: [
+      //     GetBuilder<CartController>(builder: (cartController) {
+      //       return Stack(
+      //         children: [
+      //           Container(
+      //             margin: EdgeInsets.only(top: 15),
+      //             child: IconButton(
+      //                 onPressed: () {
+      //                   Navigator.of(context).push(MaterialPageRoute(
+      //                       builder: (builder) => const FavouriteScreen()));
+      //                 },
+      //                 icon: Icon(
+      //                   size: 30,
+      //                   Icons.favorite_rounded,
+      //                   color: cartController.favouriteIds.isNotEmpty
+      //                       ? Colors.pink
+      //                       : Color.fromARGB(255, 141, 138, 128),
+      //                 )),
+      //           ),
+      //           Container(
+      //             margin: EdgeInsets.only(top: 15, left: 30),
+      //             child: CircleAvatar(
+      //               radius: 12,
+      //               backgroundColor: const Color.fromARGB(255, 81, 7, 255),
+      //               child: Container(
+      //                   alignment: Alignment.center,
+      //                   padding: const EdgeInsets.all(2),
+      //                   margin: const EdgeInsets.all(1),
+      //                   decoration: const BoxDecoration(
+      //                       shape: BoxShape.circle, color: Colors.white),
+      //                   child: Text("${cartController.favouriteIds.length}")),
+      //             ),
+      //           )
+      //         ],
+      //       );
+      //     })
+      //   ],
+      // ),
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {

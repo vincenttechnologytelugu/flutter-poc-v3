@@ -78,7 +78,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
       final currentUserId = prefs.getString('userId');
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/chat/messages'),
+        Uri.parse('http://13.200.179.78/chat/messages'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -141,7 +141,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
       });
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/chat/send'),
+        Uri.parse('http://13.200.179.78/chat/send'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

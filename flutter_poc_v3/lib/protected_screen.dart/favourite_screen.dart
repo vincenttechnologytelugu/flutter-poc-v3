@@ -34,7 +34,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       log('Fetching with token: $token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourite_adposts'),
+        Uri.parse('http://13.200.179.78/favourite_adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

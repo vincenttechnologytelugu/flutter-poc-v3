@@ -2,12 +2,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/deactivate_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/edit_my_ad_screen.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
+
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 
@@ -102,74 +101,79 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
     );
   }
 
-  
-
   // Update the _showOptionsDialog method
-void _showOptionsDialog(Map<String, dynamic> ad) {
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      title: Text('Options'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (ad['action_flags']['edit'])
-            ListTile(
-              leading: Icon(Icons.edit,
-               color: ad['action_flags']['edit'] ? Colors.blue : Colors.grey,
-              
-              ),
-              title: Text('Edit',
-              style: TextStyle(
-                  color: ad['action_flags']['edit'] ? Colors.black : Colors.grey,
+  void _showOptionsDialog(Map<String, dynamic> ad) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Options'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (ad['action_flags']['edit'])
+              ListTile(
+                leading: Icon(
+                  Icons.edit,
+                  color: ad['action_flags']['edit'] ? Colors.blue : Colors.grey,
                 ),
-              ),
+                title: Text(
+                  'Edit',
+                  style: TextStyle(
+                    color:
+                        ad['action_flags']['edit'] ? Colors.black : Colors.grey,
+                  ),
+                ),
                 onTap: ad['action_flags']['edit']
-                ? () {
-                    Navigator.pop(context);
-                    _navigateToEditScreen(ad);
-                  }
-                : null,
-              // onTap: () {
-              //   Navigator.pop(context);
-              //   _navigateToEditScreen(ad);
-              // },
-            ),
-          if (ad['action_flags']['mark_as_inactive'])
-            ListTile(
-              leading: Icon(Icons.pause_circle_outline),
-              title: Text('Deactivate'),
-              onTap: () {
-                Navigator.pop(context);
-                _deactivateAd(ad['_id']);
-              },
-            ),
-          if (ad['action_flags']['remove'])
-            ListTile(
-              leading: Icon(Icons.delete_outline,
-               color: ad['action_flags']['remove'] ? Colors.red : Colors.grey,
+                    ? () {
+                        Navigator.pop(context);
+                        _navigateToEditScreen(ad);
+                      }
+                    : null,
+                // onTap: () {
+                //   Navigator.pop(context);
+                //   _navigateToEditScreen(ad);
+                // },
               ),
-              title: Text('Remove',
-               style: TextStyle(
-                  color: ad['action_flags']['remove'] ? Colors.black : Colors.grey,
+            if (ad['action_flags']['mark_as_inactive'])
+              ListTile(
+                leading: Icon(Icons.pause_circle_outline),
+                title: Text('Deactivate'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _deactivateAd(ad['_id']);
+                },
+              ),
+            if (ad['action_flags']['remove'])
+              ListTile(
+                leading: Icon(
+                  Icons.delete_outline,
+                  color:
+                      ad['action_flags']['remove'] ? Colors.red : Colors.grey,
                 ),
+                title: Text(
+                  'Remove',
+                  style: TextStyle(
+                    color: ad['action_flags']['remove']
+                        ? Colors.black
+                        : Colors.grey,
+                  ),
+                ),
+                onTap: ad['action_flags']['remove']
+                    ? () {
+                        Navigator.pop(context);
+                        _showRemoveConfirmation(ad['_id']);
+                      }
+                    : null,
+                // onTap: () {
+                //   Navigator.pop(context);
+                //   _showRemoveConfirmation(ad['_id']);
+                // },
               ),
-                 onTap: ad['action_flags']['remove']
-                ? () {
-                    Navigator.pop(context);
-                    _showRemoveConfirmation(ad['_id']);
-                  }
-                : null,
-              // onTap: () {
-              //   Navigator.pop(context);
-              //   _showRemoveConfirmation(ad['_id']);
-              // },
-            ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Future<void> _removeAd(String adId) async {
     try {
@@ -189,8 +193,6 @@ void _showOptionsDialog(Map<String, dynamic> ad) {
     }
   }
 
-  
-
   Future<void> _deactivateAd(String adId) async {
     try {
       final updatedAd = await _myAdsService.markAsInactive(adId);
@@ -200,7 +202,7 @@ void _showOptionsDialog(Map<String, dynamic> ad) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Ad marked as inactive successfully')),
         );
-    _loadMyAds(); // Reload to update UI with new action flags
+        _loadMyAds(); // Reload to update UI with new action flags
         // Navigate to DeactivateScreen
         if (updatedAd != null) {
           Navigator.push(
@@ -221,41 +223,75 @@ void _showOptionsDialog(Map<String, dynamic> ad) {
     }
   }
 
-  // Update the _markAsSold method
-Future<void> _markAsSold(String adId) async {
-  try {
-    await _myAdsService.markAsSold(adId);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Ad marked as sold successfully')),
-      );
-      // Reload ads to update UI with new action flags
-      _loadMyAds();
+  bool _isFeaturedEnabled(Map<String, dynamic> ad) {
+    // Check if all action flags are true
+    if (!ad['isActive'] ||
+        !ad['action_flags']['edit'] ||
+        !ad['action_flags']['remove'] ||
+        !ad['action_flags']['mark_as_sold'] ||
+        !ad['action_flags']['mark_as_inactive']) {
+      return false;
     }
-  } catch (e) {
-    if (mounted) {
+
+    // Check if ad is still valid
+    final validTill = DateTime.parse(ad['valid_till']);
+    if (DateTime.now().isAfter(validTill)) {
+      return false;
+    }
+
+    // Check if manual boost is allowed based on package interval
+    final lastFeaturedAt =
+        ad['featured_at'] != null ? DateTime.parse(ad['featured_at']) : null;
+    final manualBoostInterval =
+        ad['manual_boost_interval'] ?? 15; // Default to silver package
+
+    if (lastFeaturedAt == null) return true;
+
+    final nextAllowedDate =
+        lastFeaturedAt.add(Duration(days: manualBoostInterval));
+    return DateTime.now().isAfter(nextAllowedDate);
+  }
+
+  Future<void> _makeFeatured(String adId) async {
+    try {
+      final success = await _myAdsService.makeFeatured(adId);
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ad featured successfully')),
+        );
+        // Reload ads to update the featured status
+        await _loadMyAds();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to feature ad')),
+        );
+      }
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to mark ad as sold')),
+        SnackBar(content: Text('Failed to feature ad: $e')),
       );
     }
   }
-}
 
-  // Future<void> _markAsSold(String adId) async {
-  //   try {
-  //     final result = await _myAdsService.markAsSold(adId);
-  //     if (result['data'] != null) {
-  //       await _loadMyAds();
-  //       ScaffoldMessenger.of(context).showSnackBar(
-  //         SnackBar(content: Text('Ad marked as sold successfully')),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       SnackBar(content: Text('Failed to mark ad as sold: $e')),
-  //     );
-  //   }
-  // }
+  // Update the _markAsSold method
+  Future<void> _markAsSold(String adId) async {
+    try {
+      await _myAdsService.markAsSold(adId);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ad marked as sold successfully')),
+        );
+        // Reload ads to update UI with new action flags
+        _loadMyAds();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to mark ad as sold')),
+        );
+      }
+    }
+  }
 
   void _navigateToEditScreen(Map<String, dynamic> ad) {
     Navigator.push(
@@ -296,7 +332,6 @@ Future<void> _markAsSold(String adId) async {
                   ),
                 )
               ])),
-
       body: TabBarView(
         controller: tabController,
         children: [
@@ -307,45 +342,77 @@ Future<void> _markAsSold(String adId) async {
                   itemBuilder: (context, index) {
                     final ad = myAds[index];
                     return Card(
-                      margin: EdgeInsets.all(8),
+                      margin: EdgeInsets.all(2),
                       child: Column(
                         children: [
                           ListTile(
                             leading: Opacity(
-                                opacity: ad['action_flags']['mark_as_sold'] ? 1.0 : 0.5, // Dim thumb if sold
+                              opacity: ad['action_flags']['mark_as_sold']
+                                  ? 1.0
+                                  : 0.5, // Dim thumb if sold
                               child: Image.network(
                                 ad['thumb'] ?? '',
-                                width: 150,
-                                height: 150,
+                                width: 100,
+                                height: 100,
                                 fit: BoxFit.cover,
                                 errorBuilder: (context, error, stackTrace) =>
-                                    Icon(Icons.image_not_supported),
+                                    Icon(
+                                  Icons.image_not_supported,
+                                  size: 110,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ),
-                              title: Text(
-              ad['title'] ?? '',
-              style: TextStyle(
-                color: ad['action_flags']['mark_as_sold'] ? Colors.black : Colors.grey,
-              ),
-            ),
-                            // title: Text(ad['title'] ?? ''),
-                            subtitle: Text('\$${ad['price'] ?? ''
-                           
-                            
-                            }',
-                             style: TextStyle(
-                              color: ad['action_flags']['mark_as_sold'] ? Colors.black : Colors.grey,
+                            title: Text(
+                              ad['title'] ?? '',
+                              style: TextStyle(
+                                color: ad['action_flags']['mark_as_sold']
+                                    ? Colors.black
+                                    : Colors.grey,
+                              ),
                             ),
-                            
+                            // title: Text(ad['title'] ?? ''),
+                            subtitle: Text(
+                              '₹${ad['price'] ?? ''}',
+                              style: TextStyle(
+                                color: ad['action_flags']['mark_as_sold']
+                                    ? Colors.black
+                                    : Colors.grey,
+                              ),
                             ),
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(
-                                  Icons.circle,
-                                  color:
-                                      ad['isActive'] ? Colors.red : Colors.grey,
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Active",
+                                      style: TextStyle(
+                                        color: ad['isActive']
+                                            ? Colors.green
+                                            : Colors.red,
+                                      ),
+                                    ),
+                                    SizedBox(
+                                        width:
+                                            4), // Space between text and icon
+                                    Icon(
+                                      ad['isActive']
+                                          ? Icons.check_circle
+                                          : Icons.cancel,
+                                      color: ad['isActive']
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ],
                                 ),
+
+                                // Text("Active",
+                                // style: TextStyle(
+                                //   color: ad['isActive'] ? Colors.green : Colors.red,
+                                // ),
+                                // ),
+
                                 IconButton(
                                   icon: Icon(Icons.more_vert),
                                   onPressed: () => _showOptionsDialog(ad),
@@ -356,23 +423,53 @@ Future<void> _markAsSold(String adId) async {
                           ButtonBar(
                             children: [
                               if (ad['action_flags']['mark_as_sold'])
-                               TextButton(
-                  onPressed: ad['action_flags']['mark_as_sold'] 
-                    ? () => _showSoldConfirmation(ad['_id']) 
-                    : null,
-                  child: Text(
-                    'MARK AS SOLD',
-                    style: TextStyle(
-                      color: ad['action_flags']['mark_as_sold'] 
-                        ? Colors.blue 
-                        : Colors.grey,
-                    ),
-                  ),
-                ),
-                                // TextButton(
-                                //   onPressed: () => _showSoldConfirmation(ad['_id']),
-                                //   child: Text('MARK AS SOLD'),
-                                // ),
+                                TextButton(
+                                  onPressed: ad['action_flags']['mark_as_sold']
+                                      ? () => _showSoldConfirmation(ad['_id'])
+                                      : null,
+                                  child: Text(
+                                    'MARK AS SOLD',
+                                    style: TextStyle(
+                                      color: ad['action_flags']['mark_as_sold']
+                                          ? Colors.blue
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              // TextButton(
+                              //   onPressed: _isFeaturedEnabled(ad)
+                              //       ? () => _makeFeatured(ad['_id'])
+                              //       : null,
+                              //   child: Text(
+                              //     'FEATURED',
+                              //     style: TextStyle(
+                              //       color: _isFeaturedEnabled(ad)
+                              //           ? Colors.blue
+                              //           : Colors.red,
+                              //     ),
+                              //   ),
+                              // ),
+                              TextButton(
+                                onPressed: _isFeaturedEnabled(ad)
+                                    ? () => _makeFeatured(ad['_id'])
+                                    : null,
+                                child: Text(
+                                  'FEATURED',
+                                  style: TextStyle(
+                                    color: (!ad['isActive'] ||
+                                            !ad['action_flags']['edit'] ||
+                                            !ad['action_flags']['remove'] ||
+                                            !ad['action_flags']
+                                                ['mark_as_sold'] ||
+                                            !ad['action_flags']
+                                                ['mark_as_inactive'])
+                                        ? Colors.red
+                                        : _isFeaturedEnabled(ad)
+                                            ? Colors.blue
+                                            : Colors.grey,
+                                  ),
+                                ),
+                              ),
                               if (!ad['isActive'] &&
                                   ad['action_flags']['publish'])
                                 TextButton(
@@ -419,158 +516,6 @@ Future<void> _markAsSold(String adId) async {
           FavouriteScreen(),
         ],
       ),
-      // body: TabBarView(controller: tabController, children: [
-
-      //   SingleChildScrollView(
-      //     padding: const EdgeInsets.all(16),
-      //     child: Column(
-      //       crossAxisAlignment: CrossAxisAlignment.stretch,
-      //       children: [
-      //         // Promotion Card
-      //         Container(
-      //           padding: const EdgeInsets.all(20),
-      //           decoration: BoxDecoration(
-      //             color: Theme.of(context).colorScheme.primaryContainer,
-      //             borderRadius: BorderRadius.circular(16),
-      //           ),
-      //           child: Column(
-      //             children: [
-      //               Text(
-      //                 "Want to reach more buyers?",
-      //                 style:
-      //                     Theme.of(context).textTheme.headlineSmall?.copyWith(
-      //                           fontWeight: FontWeight.bold,
-      //                           color: Theme.of(context)
-      //                               .colorScheme
-      //                               .onPrimaryContainer,
-      //                         ),
-      //               ),
-      //               const SizedBox(height: 8),
-      //               Text(
-      //                 "Post more ads for less. Affordable packages to boost your sales.",
-      //                 textAlign: TextAlign.center,
-      //                 style: TextStyle(
-      //                   color: Theme.of(context)
-      //                       .colorScheme
-      //                       .onPrimaryContainer
-      //                         .withAlpha((0.9 * 255).round()),
-      //                 ),
-      //               ),
-      //               const SizedBox(height: 16),
-      //               ElevatedButton(
-      //                 onPressed: () {
-      //                   Navigator.of(context).push(
-      //                     MaterialPageRoute(
-      //                         builder: (context) => const PackageScreen()),
-      //                   );
-      //                 },
-      //                 style: FilledButton.styleFrom(
-      //                   shape: RoundedRectangleBorder(
-      //                     borderRadius: BorderRadius.circular(20),
-      //                   ),
-      //                 ),
-      //                 child: Text(
-      //                   "Check out our packages",
-      //                   style: TextStyle(
-      //                       color: Colors.red,
-      //                       fontWeight: FontWeight.w900,
-      //                       fontSize: 20),
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-
-      //         const SizedBox(height: 32),
-
-      //         // Empty State
-      //         Column(
-      //           children: [
-      //             Stack(
-      //               children: [
-
-      //                 Image.asset(
-      //                   "assets/images/alltypes.jpg",
-      //                   width: double.infinity,
-      //                   height: 200,
-      //                   fit: BoxFit.cover,
-      //                   errorBuilder: (context, error, stackTrace) {
-      //                     log(
-      //                         'Error details: $error'); // This will print the error in debug console
-      //                     return Container(
-      //                       width: double.infinity,
-      //                       height: 200,
-      //                       color: Colors.grey[200],
-      //                       child: const Center(
-      //                         child: Column(
-      //                           mainAxisSize: MainAxisSize.min,
-      //                           children: [
-      //                             Icon(Icons.broken_image, size: 50),
-      //                             SizedBox(height: 8),
-      //                             Text('Image not found: alltypes.jpg'),
-      //                           ],
-      //                         ),
-      //                       ),
-      //                     );
-      //                   },
-      //                 ),
-      //               ],
-      //             ),
-
-      //             // Icon(
-      //             //   Icons.inventory_2_outlined,
-      //             //   size: 64,
-      //             //   color: Theme.of(context).colorScheme.outline,
-      //             // ),
-      //             const SizedBox(height: 16),
-      //             Text(
-      //               "No listings yet?",
-      //               style: Theme.of(context).textTheme.titleLarge,
-      //             ),
-      //             const SizedBox(height: 8),
-      //             Text(
-      //               "Turn your unused items into cash!",
-      //               style: TextStyle(
-      //                 color: Theme.of(context).colorScheme.outline,
-      //               ),
-      //             ),
-      //             const SizedBox(height: 24),
-      //             FilledButton(
-      //               onPressed: () {
-      //                 Navigator.of(context).push(
-      //                   MaterialPageRoute(
-      //                       builder: (context) => const SellScreen()),
-      //                 );
-      //               },
-      //               style: FilledButton.styleFrom(
-      //                 padding: const EdgeInsets.symmetric(
-      //                     vertical: 16, horizontal: 32),
-      //                 shape: RoundedRectangleBorder(
-      //                   borderRadius: BorderRadius.circular(24),
-      //                 ),
-      //               ),
-      //               child: const Row(
-      //                 mainAxisSize: MainAxisSize.min,
-      //                 children: [
-      //                   Icon(Icons.add),
-      //                   SizedBox(width: 8),
-      //                   Text("Post a New Ad",
-      //                       style: TextStyle(
-      //                           fontSize: 16,
-      //                           fontWeight: FontWeight.w900,
-      //                           color: Colors.white70)),
-      //                 ],
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ],
-      //     ),
-      //   ),
-      //   // Center(child: Text('My Adds')), // First tab content
-      //   FavouriteScreen(),
-      //   // Center(child: Text('Content 2')), // Second tab content
-      // ]),
     );
   }
 }

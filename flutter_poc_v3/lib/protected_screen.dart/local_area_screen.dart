@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -6,7 +5,6 @@ import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalAreaScreen extends StatefulWidget {
   final String selectedState;
@@ -38,137 +36,342 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
   List<String> getAreasForCity(String city) {
     // Add your area data here based on the city
     switch (city) {
-
       case 'Mumbai':
-        return ['Andheri', 'Bandra', 'Colaba', 'Dadar'];
+        return [
+          'Andheri',
+          'Bandra',
+          'Colaba',
+          'Dadar',
+          'Dombivali',
+          'Ghatkopar',
+          'Jogeshwari',
+          'Kandivali',
+          'Khar',
+          'Mira Bhayandar',
+          'Mulund',
+          'Pandavpura',
+          'Thane',
+          'Ulhasnagar',
+          'Vasai',
+          'Vikhroli',
+          'Worli'
+        ];
 
-        case 'Chennai':
-        return ['Anna Nagar', 'Tambaram', 'Adyar', 'Velachery'];
-        case 'Kolkata':
-        return ['New Town', 'Salt Lake City', 'Howrah', 'Dum Dum'];
-        case 'Hyderabad':
-        return ['Secunderabad', 'Kukatpally', 'Gachibowli', 'Madhapur'];
-        case 'Pune':
-        return ['Aundh', 'Baner', 'Kothrud', 'Shivajinagar'];
-        case 'Ahmedabad':
-        return ['Navrangpura', 'Sarkhej', 'Gandhinagar', 'Bhavnagar'];
-        case 'Jaipur':
-        return ['Mansarovar', 'Malviya Nagar', 'C Scheme', 'Jawahar Nagar'];
-        
-        case 'Lucknow':
-        return ['Gomti Nagar', 'Hazratganj', 'Barabanki', 'Lakhnawala'];
-        case 'Kanpur':
-        return ['Kanpur Nagar', 'Agra', 'Lucknow', 'Farrukhabad'];
-        
-        case 'Noida':
+      case 'Chennai':
+        return [
+          'Anna Nagar',
+          'Tambaram',
+          'Adyar',
+          'Velachery',
+          'Pallavaram',
+          'Kilpauk',
+          'Chetpet',
+          'Koyambedu',
+          'Chennai Central',
+          'Perambur',
+          'Vadapalani',
+          'Tambaram',
+          'Pallavaram',
+          'Kilpauk',
+          'Chetpet',
+          'Koyambedu',
+          'Chennai Central',
+          'Perambur',
+          'Vadapalani',
+          'Tambaram',
+          'Pallavaram',
+          'Kilpauk',
+          'Chetpet',
+          'Koyambedu',
+          'Chennai Central',
+          'Perambur',
+          'Vadapalani',
+          'Tambaram',
+          'Pallavaram',
+          'Kilpauk',
+          'Chetpet',
+          'Koyambedu',
+          'Chennai Central',
+          'Perambur',
+          'Vadapalani',
+        ];
+      case 'Kolkata':
+        return [
+          'New Town',
+          'Salt Lake City',
+          'Howrah',
+          'Dum Dum',
+          'Kolkata',
+          'Howrah',
+          'Dum Dum',
+          'Kolkata',
+          'Howrah',
+          'Dum Dum',
+        ];
+      case 'Hyderabad':
+        return [
+          'Secunderabad',
+          'Kukatpally',
+          'Gachibowli',
+          'Madhapur',
+          'Hitech City',
+          'Banjara Hills',
+          'Ameerpet',
+          'Koti',
+          'LB Nagar',
+          'Himayatnagar',
+        ];
+      case 'Pune':
+        return [
+          'Aundh',
+          'Baner',
+          'Kothrud',
+          'Shivajinagar',
+          'Bavdhan',
+          'Dehu Road',
+          'Kondhwa',
+          'Wakad',
+          'Bhosari',
+          'Bhawani Peth',
+        ];
+      case 'Ahmedabad':
+        return [
+          'Navrangpura',
+          'Sarkhej',
+          'Gandhinagar',
+          'Bhavnagar',
+          'Vadodara',
+          'Rajkot',
+          'Surat',
+          'Gandhinagar',
+          'Bhavnagar',
+          'Vadodara',
+          'Rajkot',
+          'Surat',
+          'Gandhinagar',
+          'Bhavnagar',
+          'Vadodara',
+          'Rajkot',
+          'Surat',
+        ];
+      case 'Jaipur':
+        return [
+          'Mansarovar',
+          'Malviya Nagar',
+          'C Scheme',
+          'Jawahar Nagar',
+          'Malviya Nagar',
+          'C Scheme',
+          'Jawahar Nagar',
+          'Malviya Nagar',
+          'C Scheme',
+          'Jawahar Nagar',
+        ];
+
+      case 'Lucknow':
+        return [
+          'Gomti Nagar',
+          'Hazratganj',
+          'Barabanki',
+          'Lakhnawala',
+          'Gomti Nagar',
+          'Hazratganj',
+          'Barabanki',
+          'Lakhnawala',
+          'Gomti Nagar',
+          'Hazratganj',
+          'Barabanki',
+          'Lakhnawala',
+        ];
+      case 'Kanpur':
+        return [
+          'Kanpur Nagar',
+          'Agra',
+          'Lucknow',
+          'Farrukhabad',
+          'Kanpur Nagar',
+          'Agra',
+          'Lucknow',
+          'Farrukhabad',
+          'Kanpur Nagar',
+          'Agra',
+          'Lucknow',
+          'Farrukhabad',
+        ];
+
+      case 'Noida':
         return ['Sector 62', 'Sector 63', 'Sector 64', 'Sector 65'];
       case 'Bangalore':
-        return ['Whitefield', 'Koramangala', 'Indiranagar'];
-        case 'Bihar':
-        return ['Patna', 'Gaya', 'Bhagalpur', 'Munger'];
-        
-        case 'Jharkhand':
-        return ['Ranchi', 'Dhanbad', 'Jamshedpur', 'Bokaro'];
-        
-        case 'Odisha':
-        return ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Berhampur'];
-        case 'West Bengal':
+        return [
+          'Whitefield',
+          'Koramangala',
+          'Indiranagar',
+        ];
+      case 'Bihar':
+        return [
+          'Patna',
+          'Gaya',
+          'Bhagalpur',
+          'Munger',
+          'Darbhanga',
+          'Bihar Sharif',
+          'Muzaffarpur',
+          'Buxar',
+          'Nalanda',
+          'Purnia',
+        ];
+
+      case 'Jharkhand':
+        return [
+          'Ranchi',
+          'Dhanbad',
+          'Jamshedpur',
+          'Bokaro',
+          'Ranchi',
+          'Dhanbad',
+          'Jamshedpur',
+          'Bokaro',
+          'Ranchi',
+          'Dhanbad',
+          'Jamshedpur',
+          'Bokaro',
+        ];
+
+      case 'Odisha':
+        return [
+          'Bhubaneswar',
+          'Cuttack',
+          'Rourkela',
+          'Berhampur',
+        ];
+      case 'West Bengal':
         return ['Kolkata', 'Howrah', 'Dum Dum', 'Siliguri'];
-        
-        case 'Uttar Pradesh':
+
+      case 'Uttar Pradesh':
         return ['Agra', 'Lucknow', 'Varanasi', 'Prayagraj'];
-        
-        case 'Maharashtra':
+
+      case 'Maharashtra':
         return ['Mumbai', 'Pune', 'Nagpur', 'Nashik'];
-        case 'Gujarat':
+      case 'Gujarat':
         return ['Ahmedabad', 'Surat', 'Vadodara', 'Rajkot'];
-        
-        case 'Rajasthan':
+
+      case 'Rajasthan':
         return ['Jaipur', 'Udaipur', 'Jodhpur', 'Kota'];
-        
-        case 'Tamil Nadu':
+
+      case 'Tamil Nadu':
         return ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli'];
-        case 'Telangana':
+      case 'Telangana':
         return ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar'];
-        case 'Karnataka':
+      case 'Karnataka':
         return ['Bangalore', 'Mysore', 'Hubli-Dharwad', 'Mangalore'];
-        
-        case 'Andhra Pradesh':
+
+      case 'Andhra Pradesh':
         return ['Vizag', 'Tirupati', 'Kurnool', 'Anantapur'];
-        
-        case 'Assam':
+
+      case 'Assam':
         return ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat'];
-        case 'Haryana':
+      case 'Haryana':
         return ['Faridabad', 'Gurgaon', 'Panipat', 'Ambala'];
-        
-        case 'Chhattisgarh':
+
+      case 'Chhattisgarh':
         return ['Raipur', 'Bilaspur', 'Korba', 'Durg'];
-        
-        case 'Himachal Pradesh':
+
+      case 'Himachal Pradesh':
         return ['Shimla', 'Manali', 'Dharamshala', 'Kullu'];
-        case 'Madhya Pradesh':
+      case 'Madhya Pradesh':
         return ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior'];
-        
-        case 'Manipur':
+
+      case 'Manipur':
         return ['Imphal', 'Thoubal', 'Bishnupur', 'Churachandpur'];
-        
-        case 'Meghalaya':
+
+      case 'Meghalaya':
         return ['Shillong', 'Tura', 'Jowai', 'Nongpoh'];
-        case 'Nagaland':
+      case 'Nagaland':
         return ['Kohima', 'Dimapur', 'Mokokchung', 'Tuensang'];
-        
-        case 'Sikkim':
+
+      case 'Sikkim':
         return ['Gangtok', 'Namchi', 'Mangan', 'Ravangla'];
-        
-        case 'Tripura':
+
+      case 'Tripura':
         return ['Agartala', 'Udaipur', 'Dharmanagar', 'Kailashahar'];
-        case 'Uttarakhand':
+      case 'Uttarakhand':
         return ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani'];
-        
-        case 'Goa':
+
+      case 'Goa':
         return ['Panjim', 'Margao', 'Vasco Da Gama', 'Mapusa'];
-        
-        case 'Arunachal Pradesh':
+
+      case 'Arunachal Pradesh':
         return ['Itanagar', 'Tawang', 'Bomdila', 'Pasighat'];
-        case 'Jammu and Kashmir':
+      case 'Jammu and Kashmir':
         return ['Srinagar', 'Jammu', 'Anantnag', 'Baramulla'];
-        
-        case 'Ladakh':
+
+      case 'Ladakh':
         return ['Kargil', 'Leh', 'Zanskar', 'Pangong'];
-        
-        case 'Punjab':
+
+      case 'Punjab':
         return ['Chandigarh', 'Ludhiana', 'Amritsar', 'Jalandhar'];
-        case 'Uttaranchal':
+      case 'Uttaranchal':
         return ['Dehradun', 'Haridwar', 'Roorkee', 'Haldwani'];
-        
-        case 'Andaman and Nicobar Islands':
-        return ['Port Blair', 'Car Nicobar', 'Mayabunder', 'North and Middle Andaman'];
-        
-        case 'Dadra and Nagar Haveli and Daman and Diu':
+
+      case 'Andaman and Nicobar Islands':
+        return [
+          'Port Blair',
+          'Car Nicobar',
+          'Mayabunder',
+          'North and Middle Andaman'
+        ];
+
+      case 'Dadra and Nagar Haveli and Daman and Diu':
         return ['Daman', 'Diu', 'Dadra and Nagar Haveli', 'Silvassa'];
-        case 'Delhi':
+      case 'Delhi':
         return ['New Delhi', 'Gurgaon', 'Noida', 'Faridabad'];
-        
-        case 'Lakshadweep':
+
+      case 'Lakshadweep':
         return ['Kavaratti', 'Minicoy', 'Agatti', 'Androth'];
-        
-        case 'Puducherry':
+
+      case 'Puducherry':
         return ['Pondicherry', 'Karaikal', 'Mahe', 'Yanam'];
-        case 'Chandigarh':
+      case 'Chandigarh':
         return ['Chandigarh', 'Ambala', 'Karnal', 'Zirakpur'];
-        
-        case 'Daman and Diu':
+
+      case 'Daman and Diu':
         return ['Daman', 'Diu', 'Dadra and Nagar Haveli', 'Silvassa'];
-        case 'Vijayawada':
-        return ['AshokNagar','Sing Nagar','Auto Nagar'];
-        
+      case 'Vijayawada':
+        return ['AshokNagar', 'Sing Nagar', 'Auto Nagar'];
+      case 'Bhopal':
+        return ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior'];
+      case 'Indore':
+        return ['Indore', 'Bhopal', 'Jabalpur', 'Gwalior'];
+      case 'Jabalpur':
+        return ['Jabalpur', 'Bhopal', 'Indore', 'Gwalior'];
+      case 'Gwalior':
+        return ['Gwalior', 'Bhopal', 'Indore', 'Jabalpur'];
 
+      case 'Udaipur':
+        return ['Udaipur', 'Jaipur', 'Jodhpur', 'Kota'];
+      case 'Jodhpur':
+        return ['Jodhpur', 'Udaipur', 'Jaipur', 'Kota'];
 
-       
+      case 'Kota':
+        return ['Kota', 'Udaipur', 'Jaipur', 'Jodhpur'];
+
       default:
         return ['Area 1', 'Area 2', 'Area 3'];
     }
   }
+
+// // local_area_screen.dart
+// void onLocationSelected(String city, String state) {
+//   final LocationController locationController = Get.find();
+//   locationController.setManualLocation(city, state);
+//   Get.back(); // Navigate back after selection
+// }
+
+// void onCurrentLocationPressed() async {
+//   final LocationController locationController = Get.find();
+//   await locationController.updateToCurrentLocation();
+//   Get.back(); // Navigate back after updating
+// }
 
   void _filterAreas() {
     setState(() {
@@ -180,24 +383,18 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
   }
 
   void _updateLocation(String area) async {
-    final location = '$area, ${widget.selectedCity}, ${widget.selectedState}';
-
-    // First update the location
     final locationController = Get.find<LocationController>();
-    locationController.updateLocation(
-      location: area,
-      city: widget.selectedCity,
-      state: widget.selectedState,
-    );
 
-    // Then fetch new ads
+    // Fix: Pass both city and state as positional arguments
+    locationController.setManualLocation(
+        widget.selectedCity, widget.selectedState);
+
     try {
       final response = await http.get(
         Uri.parse(
-          'http://192.168.0.167:8080/adposts?location=$area&city=${widget.selectedCity}&state=${widget.selectedState}',
+          'http://13.200.179.78/adposts?location=$area&city=${widget.selectedCity}&state=${widget.selectedState}',
         ),
       );
-      log('Response status code: ${response.statusCode}');
 
       if (response.statusCode == 200) {
         final productsController = Get.find<ProductsController>();
@@ -207,12 +404,8 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
       log('Error fetching ads: $e');
     }
 
-    // Navigate back to home
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {

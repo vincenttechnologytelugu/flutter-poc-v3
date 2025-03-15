@@ -30,7 +30,7 @@ class _AccentCitiesScreenState extends State<AccentCitiesScreen> {
   Future<void> fetchAccentCities() async {
     try {
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/location'),
+        Uri.parse('http://13.200.179.78/location'),
       );
 
       if (response.statusCode == 200) {
@@ -50,7 +50,7 @@ class _AccentCitiesScreenState extends State<AccentCitiesScreen> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://192.168.0.167:8080/adposts?city=${widget.selectedCity}&state=${widget.selectedState}'),
+            'http://13.200.179.78/adposts?city=${widget.selectedCity}&state=${widget.selectedState}'),
       );
 
       if (mounted && response.statusCode == 200) {

@@ -4,9 +4,8 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class AuthService {
-  static const String baseUrl = 'http://192.168.0.167:8080';
+  static const String baseUrl = 'http://13.200.179.78';
   static Future<bool> isLoggedIn() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -31,6 +30,11 @@ class AuthService {
     await prefs.setString('first_name', userData['firstName'] ?? '');
     await prefs.setString('last_name', userData['lastName'] ?? '');
     await prefs.setString('email', userData['email'] ?? '');
+      // Save active subscription rules
+  if (userData['active_subscription_rules'] != null) {
+    await prefs.setString('active_subscription_rules', json.encode(userData['active_subscription_rules']));
+    log('Saved active subscription rules: ${userData['active_subscription_rules']}');
+  }
   }
 
   Future<bool> validateAndUpdateAuthUser(String token) async {
@@ -56,4 +60,6 @@ class AuthService {
       return false;
     }
   }
+
+  
 }

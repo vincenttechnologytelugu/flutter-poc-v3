@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter_poc_v3/protected_screen.dart/invoice_billing_screen.dart';
@@ -22,10 +23,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  Timer? _refreshTimer;
   String firstName = '';
   String lastName = '';
   String email = '';
   bool isLoading = true;
+  bool _mounted = true; // Track mounted state
   late ProfileDetails profileDetails;
 
   ProfileResponseModel profileData = ProfileResponseModel();
@@ -34,6 +37,86 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     refreshUserDataFromApi();
+    // Set up periodic refresh
+    _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
+      if (mounted) {
+        // Check if widget is still mounted
+        refreshUserData();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _mounted = false; // Update mounted state
+    _refreshTimer?.cancel(); // Cancel timer
+    super.dispose();
+  }
+
+  Future<void> refreshUserData() async {
+    if (!_mounted) return; // Check if still mounted
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null || !_mounted) return;
+
+      final response = await http.get(
+        Uri.parse('http://13.200.179.78/profile'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (!_mounted) return; // Check again after async operation
+
+      if (response.statusCode == 200) {
+        final userData = json.decode(response.body);
+        if (_mounted) {
+          // Final check before setState
+          setState(() {
+            // Update your state here
+          });
+        }
+      }
+    } catch (e) {
+      if (_mounted) {
+        log('Error refreshing user data: $e');
+      }
+    }
+  }
+
+  Widget _buildActionButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        elevation: 2,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> loadUserData() async {
@@ -90,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       // Make API call to get user details
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
+        Uri.parse('http://13.200.179.78/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -121,7 +204,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 177, 193, 200),
+      backgroundColor: const Color.fromARGB(255, 242, 245, 247),
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
@@ -135,269 +218,211 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
               onRefresh: loadUserData,
-              // onRefresh: refreshUserDataFromApi,
-
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Card(
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Center(
-                            child: Stack(
-                              children: [
-                                pickedXFile != null
-                                    ? CircleAvatar(
-                                        radius: 60,
-                                        backgroundImage:
-                                            FileImage(File(pickedXFile!.path)))
-                                    : CircleAvatar(
-                                        radius: 60,
-                                        backgroundColor: Colors.grey,
-                                        child: Icon(Icons.person, size: 50),
-                                        // backgroundImage:FileImage(File(pickedXFile!.path))
+                  child: Column(
+                    children: [
+                      // Profile Card
+                      Card(
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            children: [
+                              // Profile Image Section
+                              Stack(
+                                children: [
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      border: Border.all(
+                                        color: Colors.blue,
+                                        width: 3,
                                       ),
-                                // CircleAvatar(
-                                //   backgroundColor: Colors.grey,
-                                //   radius: 60,
-                                //   backgroundImage: pickedXFile != null
-                                //       ? FileImage(
-                                //           File(pickedXFile!.path),
-                                //         )
-                                //       : null,
-                                //   // child: Icon(Icons.person, size: 50),
-                                // ),
-                                // Positioned(
-                                //   bottom: 0,
-                                //   right: 10,
-                                //   child: Icon(
-                                //     Icons.photo_camera
-                                //     )
-                                //     )
-                                Positioned(
-                                  bottom: 0,
-                                  right: 0,
-                                  child: CircleAvatar(
-                                    radius: 20,
-                                    backgroundColor: Colors.white,
-                                    child: InkWell(
-                                        onTap: () async {
-                                          // Handle camera icon tap
+                                    ),
+                                    child: pickedXFile != null
+                                        ? CircleAvatar(
+                                            radius: 60,
+                                            backgroundImage: FileImage(
+                                                File(pickedXFile!.path)),
+                                          )
+                                        : const CircleAvatar(
+                                            radius: 60,
+                                            backgroundColor: Colors.blue,
+                                            child: Icon(
+                                              Icons.person,
+                                              size: 50,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    right: 0,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.camera_alt,
+                                          color: Colors.white,
+                                          size: 20,
+                                        ),
+                                        onPressed: () async {
                                           final ImagePicker imagePicker =
                                               ImagePicker();
                                           pickedXFile =
                                               await imagePicker.pickImage(
                                             source: ImageSource.camera,
                                             imageQuality: 30,
-                                            // maxHeight: 500,
                                             preferredCameraDevice:
                                                 CameraDevice.rear,
-                                            // maxWidth: 500,
                                           );
-
                                           if (pickedXFile != null) {
-                                            log("Image Picked: ${pickedXFile!.path}");
-                                            setState(() {
-                                              pickedXFile = pickedXFile;
-                                            });
-                                          } else {
-                                            log("Image not Picked");
+                                            setState(() {});
                                           }
-                                          //     .then((value) {
-                                          //   if (value != null) {
-                                          //     // Handle the picked image
-                                          //     // You can update the profile image here
-                                          //     // For example, you can save the image to SharedPreferences
-                                          //     // and update the UI accordingly
-                                          //   }
-                                          // });
-                                          // ImagePickerService.pickImage(
-                                          //     context, (image) {
-                                          //   // Handle the picked image
-                                          //   // You can update the profile image here
-                                          //   // For example, you can save the image to SharedPreferences
-                                          //   // and update the UI accordingly
-                                          // });
                                         },
-                                        child:
-                                            Icon(Icons.photo_camera, size: 20)),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          Center(
-                            child: Text(
-                              'Welcome, ${profileData.firstName ?? ""} ${profileData.lastName ?? ""}',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          const SizedBox(height: 8),
-                          Text(
-                            'Email: ${profileData.email ?? ""}',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 16),
-
-                          // Add these buttons after the email Text widget in the Column
-                          const SizedBox(height: 20),
-                          // In your ProfileScreen where you navigate to UpdateProfileScreen
-                          // In ProfileScreen
-                          Center(
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                // Navigate to UpdateProfileScreen and pass the current profile data
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => UpdateProfileScreen(
-                                      firstName: profileData.firstName ?? '',
-                                      lastName: profileData.lastName ?? '',
-                                      email: profileData.email ?? '',
+                                      ),
                                     ),
                                   ),
-                                );
-                                // Check if updated details are returned
-                                if (result != null &&
-                                    result is Map<String, String>) {
-                                  await loadUserData(); // Refresh data from SharedPreferences
-                                }
-                                // Check if we got updated data back
-                                if (result != null &&
-                                    result is Map<String, String>) {
-                                  setState(() {
-                                    profileData.firstName = result['firstName'];
-                                    profileData.lastName = result['lastName'];
-                                    profileData.email = result['email'];
-                                  });
+                                ],
+                              ),
+                              const SizedBox(height: 20),
 
-                                  // Optionally save updated data to SharedPreferences or refresh from API
+                              // User Info Section
+                              Text(
+                                '${profileData.firstName ?? ""} ${profileData.lastName ?? ""}',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const Icon(Icons.email, color: Colors.blue),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      profileData.email ?? "",
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Actions Card
+                      Card(
+                        elevation: 8,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _buildActionButton(
+                                icon: Icons.edit,
+                                label: 'Update Profile',
+                                color: Colors.blue,
+                                onPressed: () async {
+                                  final result = await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => UpdateProfileScreen(
+                                        firstName: profileData.firstName ?? '',
+                                        lastName: profileData.lastName ?? '',
+                                        email: profileData.email ?? '',
+                                      ),
+                                    ),
+                                  );
+                                  if (result != null &&
+                                      result is Map<String, String>) {
+                                    await loadUserData();
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildActionButton(
+                                icon: Icons.lock_reset,
+                                label: 'Reset Password',
+                                color: Colors.green,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const ResetPasswordScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildActionButton(
+                                icon: Icons.shopping_cart,
+                                label: 'Buy Packages',
+                                color: Colors.purple,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const InvoiceBillingScreen(),
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(height: 12),
+                              _buildActionButton(
+                                icon: Icons.logout,
+                                label: 'Logout',
+                                color: Colors.red,
+                                onPressed: () async {
                                   final prefs =
                                       await SharedPreferences.getInstance();
-
-                                  await prefs.setString('first_name',
-                                      profileData.firstName ?? '');
-                                  await prefs.setString(
-                                      'last_name', profileData.lastName ?? '');
-                                  await prefs.setString(
-                                      'email', profileData.email ?? '');
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(10),
-                                // const EdgeInsets.symmetric(vertical: 15),
-                                backgroundColor: const Color.fromARGB(255, 93,
-                                    93, 132), // You can customize the color
+                                  await prefs.clear();
+                                  await AuthService.logout();
+                                  Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginScreen(),
+                                    ),
+                                  );
+                                },
                               ),
-                              child: const Text(
-                                "Update Profile",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            ),
+                            ],
                           ),
-
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ResetPasswordScreen(),
-                                  ),
-                                );
-                                // Add reset password navigation/logic here
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                backgroundColor:
-                                    Colors.green, // You can customize the color
-                              ),
-                              child: const Text(
-                                'Reset Password',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          // After Reset Password button, add this:
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        const InvoiceBillingScreen(),
-                                  ),
-                                );
-                                // Add reset password navigation/logic here
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                backgroundColor: const Color.fromARGB(255, 239,
-                                    7, 170), // You can customize the color
-                              ),
-                              child: const Text(
-                                'Buy Packages',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    color: Color.fromARGB(255, 255, 255, 255)),
-                              ),
-                            ),
-                          ),
-                          SizedBox(
-                            height: 12,
-                          ),
-                          SizedBox(
-                            width: double.parse("100"),
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                final prefs =
-                                    await SharedPreferences.getInstance();
-
-                                await prefs.clear(); // Clear all stored data
-
-                                await prefs.remove('token');
-                                await AuthService.logout();
-
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginScreen(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                backgroundColor:
-                                    Colors.red, // You can customize the color
-                              ),
-                              child: const Text(
-                                'Logout',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),

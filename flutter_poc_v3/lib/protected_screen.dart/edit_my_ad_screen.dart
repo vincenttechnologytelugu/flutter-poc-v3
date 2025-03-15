@@ -6,7 +6,7 @@ import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 class EditMyAdScreen extends StatefulWidget {
   final Map<String, dynamic> ad;
 
-  EditMyAdScreen({Key? key, required this.ad}) : super(key: key);
+   EditMyAdScreen({Key? key, required this.ad}) : super(key: key);
 
   @override
   _EditMyAdScreenState createState() => _EditMyAdScreenState();
@@ -45,6 +45,29 @@ class _EditMyAdScreenState extends State<EditMyAdScreen> {
 
   Widget _buildFormField(String fieldName, dynamic value) {
     if (restrictedFields.contains(fieldName)) return SizedBox.shrink();
+    // Check if the field is 'action_flags'
+    if (fieldName == 'action_flags') {
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: TextFormField(
+          initialValue: value?.toString() ?? '',
+          readOnly: true,
+          // enabled: false,
+          decoration: InputDecoration(
+            labelText: fieldName.replaceAll('_', ' ').toUpperCase(),
+            border: OutlineInputBorder(),
+            filled: true,
+            fillColor: Colors.grey[200],
+            disabledBorder: OutlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey),
+            ),
+          ),
+          style: TextStyle(
+            color: Colors.grey[700],
+          ),
+        ),
+      );
+    }
 
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8),

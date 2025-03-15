@@ -52,7 +52,7 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
+        Uri.parse('http://13.200.179.78/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

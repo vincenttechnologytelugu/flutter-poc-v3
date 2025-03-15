@@ -19,7 +19,7 @@ class CartController extends GetxController {
 
       // First check server favorites
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourites'),
+        Uri.parse('http://13.200.179.78/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -79,7 +79,7 @@ class CartController extends GetxController {
 
   //     // Then fetch from server to sync
   //     final response = await http.get(
-  //       Uri.parse('http://192.168.0.167:8080/favourite_adposts'),
+  //       Uri.parse('http://13.200.179.78/favourite_adposts'),
   //       headers: {
   //         'Authorization': 'Bearer $token',
   //         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/add_to_favourite'),
+        Uri.parse('http://13.200.179.78/add_to_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -128,7 +128,26 @@ class CartController extends GetxController {
         }
 
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Added to Favourites")),
+          SnackBar(
+              content: Center(
+            child: Container(
+              alignment: Alignment.center,
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.green,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                "Added to Favourites",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Poppins',
+                ),
+              ),
+            ),
+          )),
         );
       } else if (response.statusCode == 400) {
         // If already in favorites, make sure it's in our local list
@@ -155,7 +174,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/favourites'),
+        Uri.parse('http://13.200.179.78/favourites'),
         headers: {
           'Authorization': 'Bearer $token',
         },
@@ -196,7 +215,7 @@ class CartController extends GetxController {
       final token = prefs.getString('token');
       log('Removing post with ID: $adpostId'); // Debug log
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/remove_from_favourite'),
+        Uri.parse('http://13.200.179.78/remove_from_favourite'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',

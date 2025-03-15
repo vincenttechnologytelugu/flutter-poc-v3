@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -9,6 +11,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/user_chat_screen.dart';
 import 'package:get/get.dart'; // Make sure this import is correct
 import 'package:http/http.dart' as http;
+import 'package:video_player/video_player.dart';
+import 'package:chewie/chewie.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
 
 class ProductDetails extends StatefulWidget {
   final ProductModel productModel;
@@ -30,7 +36,7 @@ class _ProductDetailsState extends State<ProductDetails> {
 
       // First check conversations to see if one exists
       final conversationsResponse = await http.get(
-        Uri.parse('http://192.168.0.167:8080/chat/conversations'),
+        Uri.parse('http://13.200.179.78/chat/conversations'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -56,7 +62,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         } else {
           // Initiate new chat
           final initiateResponse = await http.post(
-            Uri.parse('http://192.168.0.167:8080/chat/initiate'),
+            Uri.parse('http://13.200.179.78/chat/initiate'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -80,7 +86,7 @@ class _ProductDetailsState extends State<ProductDetails> {
         // Load messages for the conversation
         if (conversationId != null) {
           final messagesResponse = await http.post(
-            Uri.parse('http://192.168.0.167:8080/chat/messages'),
+            Uri.parse('http://13.200.179.78/chat/messages'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',
@@ -1181,6 +1187,54 @@ class _ProductDetailsState extends State<ProductDetails> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Image
+            // Container(
+            //   margin: const EdgeInsets.all(30.0),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(10),
+            //     boxShadow: [
+            //       BoxShadow(
+            //         color:
+            //             const Color.fromARGB(255, 188, 177, 177).withValues(),
+            //         spreadRadius: 0,
+            //         blurRadius: 0,
+            //         offset: const Offset(0, 3),
+            //       ),
+            //     ],
+            //   ),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(12),
+            //     child: SizedBox(
+            //       height: 270,
+            //       width: double.infinity,
+            //       child: widget.productModel.thumb != null
+            //           ? Image.network(
+            //               widget.productModel.thumb!,
+            //               fit: BoxFit.cover,
+            //               loadingBuilder: (context, child, loadingProgress) {
+            //                 if (loadingProgress == null) return child;
+            //                 return Center(
+            //                   child: CircularProgressIndicator(
+            //                     value: loadingProgress.expectedTotalBytes !=
+            //                             null
+            //                         ? loadingProgress.cumulativeBytesLoaded /
+            //                             loadingProgress.expectedTotalBytes!
+            //                         : null,
+            //                   ),
+            //                 );
+            //               },
+            //             )
+            //           : Container(
+            //               color: Colors.grey[200],
+            //               child: const Icon(
+            //                 Icons.image_not_supported,
+            //                 size: 140,
+            //                 color: Colors.red,
+            //               ),
+            //             ),
+            //     ),
+            //   ),
+            // ),
+
             Container(
               margin: const EdgeInsets.all(30.0),
               decoration: BoxDecoration(
@@ -1200,34 +1254,162 @@ class _ProductDetailsState extends State<ProductDetails> {
                 child: SizedBox(
                   height: 270,
                   width: double.infinity,
-                  child: widget.productModel.thumb != null
-                      ? Image.network(
-                          widget.productModel.thumb!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
+                  // child: widget.productModel.assets != null &&
+                  //         widget.productModel.assets!.isNotEmpty
+                  //     ? ListView.builder(
+                  //         scrollDirection: Axis.horizontal,
+                  //         itemCount: widget.productModel.assets!.length,
+                  //         itemBuilder: (context, index) {
+                  //           final asset = widget.productModel.assets![index];
+                  //           if (asset['type'].toString().startsWith('image/')) {
+                  //             return SizedBox(
+                  //               width: MediaQuery.of(context).size.width - 60,
+                  //               child: Image.network(
+                  //                 'http://13.200.179.78/${asset['url']}',
+                  //                 fit: BoxFit.cover,
+                  //                 loadingBuilder:
+                  //                     (context, child, loadingProgress) {
+                  //                   if (loadingProgress == null) return child;
+                  //                   return Center(
+                  //                     child: CircularProgressIndicator(
+                  //                       value: loadingProgress
+                  //                                   .expectedTotalBytes !=
+                  //                               null
+                  //                           ? loadingProgress
+                  //                                   .cumulativeBytesLoaded /
+                  //                               loadingProgress
+                  //                                   .expectedTotalBytes!
+                  //                           : null,
+                  //                     ),
+                  //                   );
+                  //                 },
+                  //               ),
+                  //             );
+                  //           }
+                  //           else if (asset['type']
+                  //               .toString()
+                  //               .startsWith('video/')) {
+                  //             return SizedBox(
+                  //               width: MediaQuery.of(context).size.width - 60,
+                  //               child: Stack(
+                  //                 alignment: Alignment.center,
+                  //                 children: [
+                  //                   Container(
+                  //                     color: Colors.black,
+                  //                   ),
+                  //                   const Icon(
+                  //                     Icons.play_circle_fill,
+                  //                     size: 50,
+                  //                     color: Colors.white,
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             );
+                  //           }
+                  //           return Container();
+                  //         },
+                  //       )
+                  //     : widget.productModel.thumb != null
+                  //         ? Image.network(
+                  //             widget.productModel.thumb!,
+                  //             fit: BoxFit.cover,
+                  //             loadingBuilder:
+                  //                 (context, child, loadingProgress) {
+                  //               if (loadingProgress == null) return child;
+                  //               return Center(
+                  //                 child: CircularProgressIndicator(
+                  //                   value: loadingProgress.expectedTotalBytes !=
+                  //                           null
+                  //                       ? loadingProgress
+                  //                               .cumulativeBytesLoaded /
+                  //                           loadingProgress.expectedTotalBytes!
+                  //                       : null,
+                  //                 ),
+                  //               );
+                  //             },
+                  //           )
+                  //         : Container(
+                  //             color: Colors.grey[200],
+                  //             child: const Icon(
+                  //               Icons.image_not_supported,
+                  //               size: 140,
+                  //               color: Colors.red,
+                  //             ),
+                  //           ),
+                  child: widget.productModel.assets != null &&
+                          widget.productModel.assets!
+                              .where((asset) =>
+                                  asset['type'].toString().startsWith('image/'))
+                              .isNotEmpty
+                      ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: widget.productModel.assets!
+                              .where((asset) =>
+                                  asset['type'].toString().startsWith('image/'))
+                              .length,
+                          itemBuilder: (context, index) {
+                            final imageAssets = widget.productModel.assets!
+                                .where((asset) => asset['type']
+                                    .toString()
+                                    .startsWith('image/'))
+                                .toList();
+                            final asset = imageAssets[index];
+                            return SizedBox(
+                              width: MediaQuery.of(context).size.width - 60,
+                              child: Image.network(
+                                'http://13.200.179.78/${asset['url']}',
+                                fit: BoxFit.cover,
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
+                                  if (loadingProgress == null) return child;
+                                  return Center(
+                                    child: CircularProgressIndicator(
+                                      value:
+                                          loadingProgress.expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                    ),
+                                  );
+                                },
                               ),
                             );
                           },
                         )
-                      : Container(
-                          color: Colors.grey[200],
-                          child: const Icon(
-                            Icons.image_not_supported,
-                            size: 140,
-                            color: Colors.red,
-                          ),
-                        ),
+                      : widget.productModel.thumb != null
+                          ? Image.network(
+                              widget.productModel.thumb!,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                            )
+                          : Container(
+                              color: Colors.grey[200],
+                              child: const Icon(
+                                Icons.image_not_supported,
+                                size: 140,
+                                color: Colors.red,
+                              ),
+                            ),
                 ),
               ),
             ),
+
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -1254,6 +1436,70 @@ class _ProductDetailsState extends State<ProductDetails> {
                   const Divider(height: 32),
                   _buildProductSpecificDetails(),
                   const Divider(height: 22),
+
+                  if (widget.productModel.assets != null) ...[
+                    ...widget.productModel.assets!
+                        .where((asset) =>
+                            asset['type'].toString().startsWith('video/'))
+                        .map((videoAsset) {
+                      final videoUrl = Uri.encodeFull(
+                          'http://13.200.179.78/${videoAsset['url']}');
+                      developer.log('Processing video URL: $videoUrl');
+                      return VideoPlayerWidget(
+                        videoUrl: videoUrl,
+                      );
+                    }).toList(),
+                    const SizedBox(height: 16),
+                  ],
+
+                  const Divider(height: 32),
+                Column(children: [
+
+                   ...widget.productModel.getAllImageIds().asMap().entries.map(
+              (entry) => Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Text(
+                  'Image${entry.key + 1}: ${entry.value}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+            ...widget.productModel.getAllVideoIds().asMap().entries.map(
+              (entry) => Container(
+                margin: const EdgeInsets.only(right: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(4),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: Text(
+                  'Video${entry.key + 1}: ${entry.value}',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ),
+                ],),
+                  
+
                   Text(
                     "Description",
                     style: TextStyle(
@@ -1262,6 +1508,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                       color: Color.fromARGB(221, 242, 6, 92),
                     ),
                   ),
+
                   if (widget.productModel.description != null)
                     Container(
                       decoration: BoxDecoration(
@@ -1418,4 +1665,204 @@ class _ProductDetailsState extends State<ProductDetails> {
   //     ),
   //   );
   // }
+}
+
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+
+  const VideoPlayerWidget({
+    Key? key,
+    required this.videoUrl,
+  }) : super(key: key);
+
+  @override
+  _VideoPlayerWidgetState createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late VideoPlayerController _videoPlayerController;
+  ChewieController? _chewieController;
+  bool _isInitialized = false;
+  String? _errorMessage;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlayer();
+  }
+
+  Future<void> _downloadAndPlayVideo() async {
+    try {
+      // Show loading state
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+
+      // Download video
+      final response = await http.get(Uri.parse(widget.videoUrl));
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to download video: ${response.statusCode}');
+      }
+
+      // Get temporary directory
+      final directory = await getTemporaryDirectory();
+      final filePath = '${directory.path}/temp_video.mp4';
+
+      // Save video file
+      final file = File(filePath);
+      await file.writeAsBytes(response.bodyBytes);
+
+      // Initialize video player with local file
+      _videoPlayerController = VideoPlayerController.file(
+        file,
+        videoPlayerOptions: VideoPlayerOptions(
+          mixWithOthers: true,
+          allowBackgroundPlayback: false,
+        ),
+      );
+
+      await _videoPlayerController.initialize();
+
+      _chewieController = ChewieController(
+        videoPlayerController: _videoPlayerController,
+        aspectRatio: _videoPlayerController.value.aspectRatio,
+        autoPlay: false,
+        looping: false,
+        allowFullScreen: true,
+        allowMuting: true,
+        showControls: true,
+        placeholder: Container(
+          color: Colors.black,
+          child: const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        ),
+      );
+
+      if (mounted) {
+        setState(() {
+          _isInitialized = true;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      developer.log('Error in video initialization: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Error loading video. Please try again.';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _initializePlayer() async {
+    try {
+      await _downloadAndPlayVideo();
+    } catch (e) {
+      developer.log('Error in _initializePlayer: $e');
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Failed to initialize video player';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  void _retryInitialization() {
+    setState(() {
+      _isInitialized = false;
+      _errorMessage = null;
+      _isLoading = true;
+    });
+    _initializePlayer();
+  }
+
+  @override
+  void dispose() {
+    _videoPlayerController.dispose();
+    _chewieController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color.fromARGB(255, 193, 177, 177),
+            const Color.fromARGB(255, 206, 190, 190),
+          ],
+        ),
+      ),
+      child: Card(
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: BorderSide(
+            color: const Color.fromARGB(255, 19, 6, 6)
+                .withAlpha((0.9 * 255).round()),
+          ),
+        ),
+        child: Container(
+          height: 200,
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: _buildVideoWidget(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVideoWidget() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: Colors.white),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                _errorMessage!,
+                style: const TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+            ElevatedButton(
+              onPressed: _retryInitialization,
+              child: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_isInitialized && _chewieController != null) {
+      return Chewie(controller: _chewieController!);
+    }
+
+    return const Center(
+      child: CircularProgressIndicator(color: Colors.white),
+    );
+  }
 }

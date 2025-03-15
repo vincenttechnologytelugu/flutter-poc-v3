@@ -19,22 +19,45 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // Define all categories and their subcategories
   final Map<String, List<String>> categoryMap = {
-    'Cars': ['Toyota', 'Honda', 'BMW', 'Mercedes', 'Audi'],
-    'Bikes': ['Honda', 'Yamaha', 'Suzuki', 'KTM', 'Royal Enfield'],
-    'Properties': ['House', 'Apartment', 'Plot', 'Commercial', 'Rental'],
-    'Mobiles': ['iPhone', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo'],
-    'electronics & appliances': ['TV', 'Laptop', 'Camera', 'Headphones', 'Speakers'],
-    'Jobs': ['IT', 'Sales', 'Marketing', 'Finance', 'Healthcare'],
-    'Services': ['Cleaning', 'Plumbing', 'Electrical', 'Education', 'Beauty'],
-    'Pets': ['Dogs', 'Cats', 'Birds', 'Fish', 'Accessories'],
-    'Furniture': ['Sofa', 'Bed', 'Table', 'Chair', 'Wardrobe'],
+    'Cars': ['Maruti', 'Mahindra', 'Hyundai', 'Tata', 'Honda', 'Tyota', 'Honda', 'BMW', 'Mercedes',
+    'Toyota', 'Ford', 'Chevrolet', 'Nissan', 'Volkswagen', 'Mazda', 'Subaru', 'Audi', 'Ferrari', 'Lamborghini', 'Bugatti', 'Rolls-Royce',
+    'Land Rover', 'Jaguar',  'Porsche', 'Tesla', 'Kia', 'Acura', 'Maserati', 'Lexus', 'Infiniti', 'Mclaren', 'Aston Martin', 'Jaguar', 'McLaren', 'Aston Martin'
+
+    
+    ],
+    'Bikes': ['Honda', 'Yamaha', 'Suzuki', 'KTM', 'Royal Enfield',
+    'Hero', 'TVS', 'Bajaj', 'Hero', 'Royal Enfield',
+
+    ],
+    'Properties': ['House', 'Apartment', 'Plot', 'Commercial', 
+    'PG Guest', 'Farm House', 'Villa', 'Penthouse', 'Studio Apartment', 'Serviced Apartment', 'Office Space',
+
+
+    
+    ],
+    'Mobiles': ['iPhone', 'Samsung', 'Xiaomi', 'OnePlus', 'Oppo',
+    
+    ],
+    'electronics & appliances': ['TV', 'Laptop', 'Camera', 'Headphones', 'Speakers','prestige'],
+    'Jobs': ['IT', 'Sales', 'Marketing', 'Finance', 'Healthcare',
+
+    
+    ],
+    'Services': ['Cleaning', 'Plumbing', 'Electrical', 'Education', 'Beauty',],
+    'Pets': ['Dog', 'Cat', 'Birds', 'Fish', 'Accessories'],
+    'Furniture': ['Sofa', 'Bed', 'Table', 'Chair', 'Wardrobe','stool'],
     'Fashion': ['Men', 'Women', 'Kids', 'Accessories', 'Footwear'],
     // 'Books': ['Fiction', 'Non-Fiction', 'Educational', 'Comics', 'Magazines'],
     // 'Sports': ['Cricket', 'Football', 'Basketball', 'Fitness', 'Equipment'],
     'books, sports & hobbies':['Fiction', 'Non-Fiction', 'Educational', 'Comics', 'Magazines'
     'Cricket', 'Football', 'Basketball', 'Fitness', 'Equipment'
     ],
-    'commercial vehicles & spares':['TATA','HONDA','ASHOK LEYLAND']
+    'commercial vehicles & spares':[
+
+      'TATA','HONDA','ASHOK LEYLAND',
+      
+    
+    ]
   };
 
   List<MapEntry<String, List<String>>> filteredCategories = [];

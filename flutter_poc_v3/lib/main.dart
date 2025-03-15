@@ -2,22 +2,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/package_provider.dart';
 
 
 
 
 import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 
 late SharedPreferences sharedPreferences;
 void main() async {
    WidgetsFlutterBinding.ensureInitialized();
-  Get.put(LocationController());
+  Get.put(LocationController(),);
   Get.put(ProductsController());
  
-  runApp(const MyApp());
+  runApp(MultiProvider(
+     providers: [
+        ChangeNotifierProvider(create: (_) => PackageProvider()),
+      ],
+    child: const MyApp()));
   sharedPreferences = await SharedPreferences.getInstance();
 }
 

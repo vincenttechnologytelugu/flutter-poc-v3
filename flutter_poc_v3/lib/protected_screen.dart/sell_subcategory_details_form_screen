@@ -6,6 +6,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:http_parser/http_parser.dart';
+import 'package:provider/provider.dart';
+import 'package:dio/dio.dart';
+import 'package:mime/mime.dart';
+// At the top of your file, add this import
+import 'package:flutter_poc_v3/protected_screen.dart/uploading_screen.dart';
+
+
 class SellSubcategoryDetailsFormScreen extends StatefulWidget {
   final String category;
   final String subcategory;
@@ -23,9 +31,15 @@ class SellSubcategoryDetailsFormScreen extends StatefulWidget {
       _SellSubcategoryDetailsFormScreenState();
 }
 
+
+
+
+
 class _SellSubcategoryDetailsFormScreenState
     extends State<SellSubcategoryDetailsFormScreen> {
+
       late Map<String, TextEditingController> controllers;
+   
   final _formKey = GlobalKey<FormState>();
     String selectedType = 'Type'; // Add this line at the class level
   String selectedFurnishing = 'Furnishing'; // Add this variable
@@ -34,157 +48,8 @@ class _SellSubcategoryDetailsFormScreenState
   String selectedPeriod='Salary Period';
   String selectedPosition='Position Type';
 
-
-  final ImagePicker _picker = ImagePicker();
-List<File> _images = [];
-File? _video;
-VideoPlayerController? _videoController;
-static const int maxImages = 5; // Maximum number of images allowed
-
-
- 
-
-  //  final Map<String, TextEditingController> controllers = {
-    
-
-  //   'brand': TextEditingController(),
-  //   'ownership': TextEditingController(),
-  //   'fuelType': TextEditingController(),
-  //   "transmissionType":TextEditingController(),
-  
-    
-   
-  //    // Initialize here!
-  // };
-
-
-Widget _buildMediaUploadSection() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      const Divider(height: 20),
-      Text(
-        'Add Photos and Video',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.bold,
-          color: Colors.blue[900],
-        ),
-      ),
-      const SizedBox(height: 10),
-      
-      // Image preview grid
-      if (_images.isNotEmpty)
-        Container(
-          height: 120,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: _images.length,
-            itemBuilder: (context, index) {
-              return Stack(
-                children: [
-                  Container(
-                    margin: EdgeInsets.all(5),
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.file(
-                        _images[index],
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      icon: Icon(Icons.remove_circle, color: Colors.red),
-                      onPressed: () {
-                        setState(() {
-                          _images.removeAt(index);
-                        });
-                      },
-                    ),
-                  ),
-                ],
-              );
-            },
-          ),
-        ),
-
-      // Image upload button
-      ElevatedButton.icon(
-        onPressed: _images.length >= maxImages ? null : _pickImages,
-        icon: Icon(Icons.add_photo_alternate),
-        label: Text('Add Photos (${_images.length}/$maxImages)'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-        ),
-      ),
-
-      const SizedBox(height: 10),
-
-      // Video preview and upload
-      if (_video != null) ...[
-        Container(
-          height: 100,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              _videoController != null && _videoController!.value.isInitialized
-                  ? AspectRatio(
-                      aspectRatio: _videoController!.value.aspectRatio,
-                      child: VideoPlayer(_videoController!),
-
-                    )
-                  : Container(
-                      color: Colors.grey[200],
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-              IconButton(
-                icon: Icon(
-
-                  _videoController?.value.isPlaying ?? false
-                      ? Icons.pause
-                      : Icons.play_arrow,
-                  size: 50,
-                  color: Colors.white,
-                ),
-                onPressed: _toggleVideo,
-              ),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: IconButton(
-                  icon: Icon(Icons.remove_circle, color: Colors.red),
-                  onPressed: _removeVideo,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 10),
-      ],
-
-      ElevatedButton.icon(
-        onPressed: _video == null ? _pickVideo : null,
-        icon: Icon(Icons.videocam),
-        label: Text(_video == null ? 'Add Video' : 'Video Added'),
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.blue,
-          foregroundColor: Colors.white,
-        ),
-      ),
-    ],
-  );
-}
-
+bool _isFormReadOnly = false;
+bool _isSubmitDisabled = false;
 
 
 
@@ -285,75 +150,81 @@ Widget _buildOwnershipTile(BuildContext context, String ownerType, StateSetter s
   );
 }
 
-Future<void> _pickImages() async {
-  try {
-    final List<XFile> pickedFiles = await _picker.pickMultiImage();
-    if (pickedFiles.isNotEmpty) {
-      setState(() {
-        _images.addAll(
-          pickedFiles.map((file) => File(file.path)).toList(),
-        );
-        if (_images.length > maxImages) {
-          _images = _images.sublist(0, maxImages);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Maximum $maxImages images allowed')),
-          );
-        }
-      });
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error picking images: $e')),
-    );
-  }
-}
-Future<void> _pickVideo() async {
-  try {
-    final XFile? pickedVideo = await _picker.pickVideo(
-      source: ImageSource.gallery,
-      maxDuration: const Duration(minutes: 5),
-    );
-    if (pickedVideo != null) {
-      _video = File(pickedVideo.path);
-      _videoController = VideoPlayerController.file(_video!)
-        ..initialize().then((_) {
-          setState(() {});
-        });
-      setState(() {});
-    }
-  } catch (e) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error picking video: $e')),
-    );
-  }
-}
-void _toggleVideo() {
-  if (_videoController != null) {
-    setState(() {
-      _videoController!.value.isPlaying
-          ? _videoController!.pause()
-          : _videoController!.play();
-    });
-  }
-}
+// Future<void> _pickImages() async {
+//   try {
+//     final List<XFile> pickedFiles = await _picker.pickMultiImage();
+//     if (pickedFiles.isNotEmpty) {
+//       setState(() {
+//         _images.addAll(
+//           pickedFiles.map((file) => File(file.path)).toList(),
+//         );
+//         if (_images.length > maxImages) {
+//           _images = _images.sublist(0, maxImages);
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Maximum $maxImages images allowed')),
+//           );
+//         }
+//       });
+//     }
+//   } catch (e) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Error picking images: $e')),
+//     );
+//   }
+// }
 
-void _removeVideo() {
-  setState(() {
-    _video = null;
-    _videoController?.dispose();
-    _videoController = null;
-  });
-}
+
+
+// Future<void> _pickVideo() async {
+//   try {
+//     final XFile? pickedVideo = await _picker.pickVideo(
+//       source: ImageSource.gallery,
+//       maxDuration: const Duration(minutes: 5),
+//     );
+//     if (pickedVideo != null) {
+//       _video = File(pickedVideo.path);
+//       _videoController = VideoPlayerController.file(_video!)
+//         ..initialize().then((_) {
+//           setState(() {});
+//         });
+//       setState(() {});
+//     }
+//   } catch (e) {
+//     ScaffoldMessenger.of(context).showSnackBar(
+//       SnackBar(content: Text('Error picking video: $e')),
+//     );
+//   }
+// }
+
+
+// void _toggleVideo() {
+//   if (_videoController != null) {
+//     setState(() {
+//       _videoController!.value.isPlaying
+//           ? _videoController!.pause()
+//           : _videoController!.play();
+//     });
+//   }
+// }
+
+// void _removeVideo() {
+//   setState(() {
+//     _video = null;
+//     _videoController?.dispose();
+//     _videoController = null;
+//   });
+// }
 
  @override
   void dispose() {
     controllers.forEach((_, controller) => controller.dispose());
-     _videoController?.dispose();
+    //  _videoController?.dispose();
     super.dispose();
   }
 @override
 void initState() {
   super.initState();
+  
   controllers = {
     'category': TextEditingController(text: widget.category),
    
@@ -378,19 +249,37 @@ void initState() {
 
 
 
+
+
 void _submitForm() async {
-  // First unfocus any active text field
   FocusScope.of(context).unfocus();
 
   if (_formKey.currentState!.validate()) {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      
+      // Get user data and parse active subscription
+      final userData = prefs.getString('user_data');
+      if (userData != null) {
+        final userDataMap = json.decode(userData);
+        String activeSubscription = userDataMap['active_subscription'] ?? '';
+        
+        // Extract the package ID (part before ::)
+        String packageId = activeSubscription.split('::')[0];
+        
+        // Save the correct package ID instead of the default one
+        if (packageId.isNotEmpty) {
+          await prefs.setString('active_subscription', packageId);
+        } else {
+          // Only use default free package if no active subscription exists
+          await prefs.setString('active_subscription', '678f2d327f36cdf7fba13595');
+        }
+      }
 
-      // Safely parse numbers with error handling
+      // Parse price and year
       int price = 0;
       int year = 0;
-      int kmDriven = 0;
 
       try {
         price = int.parse(controllers['price']?.text ?? '0');
@@ -410,48 +299,24 @@ void _submitForm() async {
         return;
       }
 
-      try {
-        kmDriven = int.parse(controllers['kmDriven']?.text ?? '0');
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please enter valid kilometers driven')),
-        );
-        return;
-      }
-
       Map<String, dynamic> formData = {
         'title': controllers['title']?.text?.trim() ?? '',
         'city': controllers['city']?.text?.trim() ?? '',
         'category': widget.category,
-        'price': price,  // Using parsed number
+        'price': price,
         'condition': controllers['condition']?.text?.trim() ?? '',
         'thumb': 'https://loremflickr.com/500/300/fish',
         'description': controllers['description']?.text?.trim() ?? '',
         'make': controllers['brand']?.text?.trim() ?? '',
         'model': controllers['title']?.text?.trim() ?? '',
-        'year': year,  // Using parsed number
-        // 'kmDriven': kmDriven,  // Using parsed number
+        'year': year,
         'ownerType': controllers['ownerType']?.text?.trim() ?? '',
         'fuelType': controllers['fuelType']?.text?.trim() ?? '',
         'transmission': controllers['transmission']?.text?.trim() ?? '',
-        // 'subcategory': widget.subcategory,
       };
 
-      // Validate required fields
-      List<String> requiredFields = ['make', 'model', 'year', 'condition'];
-      String emptyFields = requiredFields
-          .where((field) => formData[field].toString().trim().isEmpty)
-          .join(', ');
-
-      if (emptyFields.isNotEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Please fill in: $emptyFields')),
-        );
-        return;
-      }
-
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/adposts'),
+        Uri.parse('http://13.200.179.78/adposts'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -459,32 +324,116 @@ void _submitForm() async {
         body: json.encode(formData),
       );
 
+      print('Response status: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Ad posted successfully!')),
-        );
-        Navigator.pop(context);
+        try {
+          final Map<String, dynamic> responseData = json.decode(response.body);
+          print('Parsed response data: $responseData');
+
+          // Check for adpost ID in different possible locations
+          String? adpostId;
+          if (responseData.containsKey('_id')) {
+            adpostId = responseData['_id'].toString();
+          } else if (responseData.containsKey('id')) {
+            adpostId = responseData['id'].toString();
+          } else if (responseData.containsKey('adpost_id')) {
+            adpostId = responseData['adpost_id'].toString();
+          } else if (responseData.containsKey('data') && responseData['data'] is Map) {
+            final data = responseData['data'] as Map<String, dynamic>;
+            adpostId = data['_id']?.toString() ?? data['id']?.toString();
+          }
+
+          if (adpostId != null && adpostId.isNotEmpty) {
+            // Save to SharedPreferences
+            await prefs.setString('adpostId', adpostId);
+            print('Successfully saved adpostId: $adpostId');
+ // Check if widget is still mounted
+            if (!mounted) return;
+            setState(() {
+              _isSubmitDisabled = true;
+              _isFormReadOnly = true;
+            });
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Ad posted successfully!')),
+            );
+
+            // Verify the save
+            final savedId = await prefs.getString('adpostId');
+            print('Verification - Retrieved adpostId: $savedId');
+            
+            // Navigate to UploadingScreen
+            if (!mounted) return;
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const UploadingScreen(),
+              ),
+            );
+            
+          } else {
+             // Check if widget is still mounted
+            if (!mounted) return;
+            print('Response data structure: $responseData');
+            throw Exception('Could not find adpost ID in response');
+          }
+        } catch (e) {
+           // Check if widget is still mounted
+            if (!mounted) return;
+          print('Error parsing response: $e');
+          throw Exception('Error processing server response: $e');
+        }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${response.body}')),
-        );
+ // Check if widget is still mounted
+            if (!mounted) return;
+        print('Server error response: ${response.body}');
+        // ScaffoldMessenger.of(context).showSnackBar(
+        //   SnackBar(content: Text('Error: ${response.body}')),
+        // );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+       // Check if widget is still mounted
+            if (!mounted) return;
+      print('Error in _submitForm: $e');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(content: Text('Error: $e')),
+      // );
     }
   }
 }
 
 
 
+void checkActiveSubscription() async {
+  final prefs = await SharedPreferences.getInstance();
+  final userData = prefs.getString('user_data');
+  if (userData != null) {
+    final userDataMap = json.decode(userData);
+    print('Active Subscription: ${userDataMap['active_subscription']}');
+    print('Subscription Rules: ${userDataMap['active_subscription_rules']}');
+  }
+}
+
+
+// Helper function to retrieve adpostId
+Future<String?> getAdpostId() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('adpostId');
+}
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
+      
     return Scaffold(
       appBar: AppBar(
         title: Text('Post in ${widget.subcategory}'),
+         automaticallyImplyLeading: false, // Disable back button
       ),
       body: Form(
         key: _formKey,
@@ -496,22 +445,37 @@ void _submitForm() async {
               // Add form fields based on category and subcategory
               _buildFormFields(),
               SizedBox(height: 20),
-               _buildMediaUploadSection(),
+              //  _buildMediaUploadSection(),
                  SizedBox(height: 20),
-              ElevatedButton(
-  onPressed: _submitForm,
+
+ElevatedButton(
+  // readOnly: _isSubmitDisabled,
+  onPressed: _isSubmitDisabled ? null : _submitForm,
+  child: Text('Submit'),
   style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.blue,
-    padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-  ),
-  child: Text(
-    'Submit',
-    style: TextStyle(
-      color: Colors.white,
-      fontSize: 16,
-    ),
+    backgroundColor: _isSubmitDisabled ? Colors.red : null, // Optional: visual feedback
+   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
   ),
 ),
+
+
+//               ElevatedButton(
+//   // onPressed: _submitForm,
+//   //  onPressed: _isFormReadOnly ? null : _submitForm, // Disable button if form is read-only
+//   style: ElevatedButton.styleFrom(
+//     backgroundColor: Colors.blue,
+//     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+//   ),
+//   child: Text(
+//     'Submit',
+//     style: TextStyle(
+//       color: Colors.white,
+//       fontSize: 16,
+//     ),
+//   ),
+// ),
+    // _buildMediaUploadSection(),
+
 
               // ElevatedButton(
               //   onPressed: () {
@@ -521,12 +485,23 @@ void _submitForm() async {
               //   },
               //   child: Text('Submit'),
               // ),
+              SizedBox(height: 20),
+             
+      
+
+
+
+
+
+
             ],
           ),
         ),
       ),
     );
   }
+
+
 
   Widget _buildFormFields() {
     // Return different form fields based on category and subcategory
@@ -564,6 +539,7 @@ void _submitForm() async {
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
             hintText:
                 'Mention the key features of your item (e.g. brand, model, age, type)',
@@ -578,6 +554,7 @@ void _submitForm() async {
         ),
 TextFormField(
   controller: controllers['price'],
+   readOnly: _isFormReadOnly, // Add this line
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price *',
@@ -596,6 +573,7 @@ TextFormField(
 
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'BHK'),
          
           validator: (value) {
@@ -606,6 +584,7 @@ TextFormField(
           },
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Bathrooms'),
           keyboardType: TextInputType.number,
           validator: (value) {
@@ -616,7 +595,8 @@ TextFormField(
           },
         ),
        TextFormField(
-          readOnly: true,
+         readOnly: _isFormReadOnly, // Add this line
+          // readOnly: true,
           controller: TextEditingController(text: selectedFurnishing),
           decoration: InputDecoration(
             labelText: 'Furnishing *',
@@ -697,6 +677,7 @@ TextFormField(
           },
         ),
             TextFormField(
+               readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Super Buildup area sqft *'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -706,6 +687,7 @@ TextFormField(
           },
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Carpet area sqft *'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -715,11 +697,13 @@ TextFormField(
           },
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Maintenance(Monthly)'),
         
         ),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Total Floors'),
           keyboardType: TextInputType.number,
           validator: (value) {
@@ -730,26 +714,31 @@ TextFormField(
           },
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Car Parking'),
           keyboardType: TextInputType.number,
          
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Floor Number'),
           keyboardType: TextInputType.number,
         
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Facing'),
           keyboardType: TextInputType.number,
          
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Project Name'),
          
         ),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Location'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -759,6 +748,7 @@ TextFormField(
           },
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'City'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -768,6 +758,7 @@ TextFormField(
           },
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'State'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -779,7 +770,8 @@ TextFormField(
 
 
         TextFormField(
-        readOnly: true, // Make it read-only since we'll use bottom sheet
+           readOnly: _isFormReadOnly, // Add this line
+        // readOnly: true, // Make it read-only since we'll use bottom sheet
         controller: TextEditingController(text: selectedType), // Add controller
         decoration: InputDecoration(
           labelText: 'Type *',
@@ -876,7 +868,8 @@ TextFormField(
         },
       ),
         TextFormField(
-           readOnly: true,
+           readOnly: _isFormReadOnly, // Add this line
+          //  readOnly: true,
           controller: TextEditingController(text: selectedListed),
           decoration: InputDecoration(
             labelText: 'Listed by *',
@@ -957,6 +950,7 @@ TextFormField(
           },
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -978,12 +972,14 @@ TextFormField(
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
             hintText:
                 'Mention the key features of your item (e.g. brand, model, age, type)',
           ),
         ),
   TextFormField(
+  readOnly: _isFormReadOnly, // Add this line
   controller: controllers['price'],
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
@@ -1003,7 +999,8 @@ TextFormField(
 
 
         TextFormField(
-          readOnly: true,
+           readOnly: _isFormReadOnly, // Add this line
+          // readOnly: true,
           controller: TextEditingController(text: selectedBrand),
           decoration: InputDecoration(
             labelText: 'brand *',
@@ -1274,7 +1271,7 @@ TextFormField(
         ),
         SizedBox(height: 16.0),
         TextFormField(
-      
+       readOnly: _isFormReadOnly, // Add this line
           decoration:
               InputDecoration(labelText: 'RAM', border: OutlineInputBorder()),
           validator: (value) {
@@ -1286,6 +1283,7 @@ TextFormField(
         ),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1302,7 +1300,8 @@ TextFormField(
     return Column(
       children: [
         TextFormField(
-            readOnly: true,
+           readOnly: _isFormReadOnly, // Add this line
+            // readOnly: true,
           controller: TextEditingController(text: selectedPeriod),
           decoration: InputDecoration(labelText: 'Salary Period *',
           suffixIcon: Icon(Icons.arrow_drop_down),
@@ -1405,7 +1404,8 @@ TextFormField(
           },
         ),
         TextFormField(
-           readOnly: true,
+           readOnly: _isFormReadOnly, // Add this line
+          //  readOnly: true,
           controller: TextEditingController(text: selectedPosition),
           decoration: InputDecoration(labelText: 'Position Type *',
   suffixIcon: Icon(Icons.arrow_drop_down),
@@ -1510,12 +1510,15 @@ TextFormField(
           },
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Salary From'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Salary to'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
           hintText: 'Include job title and company name',
 
@@ -1523,6 +1526,7 @@ TextFormField(
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1540,6 +1544,7 @@ TextFormField(
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
             hintText:
                 'Mention the key features of your item (e.g. brand, model, age, type)',
@@ -1552,6 +1557,10 @@ TextFormField(
           },
         ),
 TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
+
+
+
   controller: controllers['price'],
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
@@ -1571,6 +1580,7 @@ TextFormField(
 
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'KM Driven'),
           keyboardType: TextInputType.number,
           validator: (value) {
@@ -1581,6 +1591,7 @@ TextFormField(
           },
         ),
      TextFormField(
+       readOnly: _isFormReadOnly, // Add this line
   controller: controllers['year'],
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
@@ -1598,14 +1609,17 @@ TextFormField(
   },
 ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'City'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'State'),
         ),
                 TextFormField(
+                   readOnly: _isFormReadOnly, // Add this line
           controller: controllers['fuelType'],
-          readOnly: true, // Make the field read-only to prevent manual input
+          // readOnly: true, // Make the field read-only to prevent manual input
           decoration: InputDecoration(
             labelText: 'fuelType',
             hintText: 'Select Fuel Type',
@@ -1725,10 +1739,12 @@ TextFormField(
         //   decoration: InputDecoration(labelText: 'fuelType'),
         // ),
            TextFormField(
+             readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Category'),
         ),
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           ),
@@ -1747,22 +1763,27 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Prise'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'City'),
         ),
 
  TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'State'),
 
         ),
         
  TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Category'),
 
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
           hintText: 'A minimum length of Ten Charactrs required',
 
@@ -1771,6 +1792,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1787,22 +1809,27 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Prise'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'City'),
         ),
 
  TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'State'),
 
         ),
         
  TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Category'),
 
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
           hintText: 'A minimum length of Ten Charactrs required',
 
@@ -1811,6 +1838,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1825,29 +1853,37 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'category'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'location'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'city'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'state'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'prise'),
         ),
          TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Condition'),
         ),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title'),
         ),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1861,46 +1897,55 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'prise',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'category',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'city',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'state',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Condition',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'location',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'warranty',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description',
               hintText: 'Include condition, features and reason for selling',
           
@@ -1916,33 +1961,40 @@ Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
           TextFormField(
+             readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'city',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'state',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Type',
 
           ),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'location',
 
           ),
         ),
 
           TextFormField(
+             readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Categoty'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description'),
           maxLines: 3,
         ),
@@ -1956,6 +2008,7 @@ Widget _buildCommercialVehiclesSparesForm(){
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['thumb'],
           decoration:
               InputDecoration(labelText: 'thumb', border: OutlineInputBorder()),
@@ -1963,6 +2016,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['title'],
           decoration: InputDecoration(
             labelText: 'Title *',
@@ -1976,6 +2030,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['city'],
           decoration:
               InputDecoration(labelText: 'City', border: OutlineInputBorder()),
@@ -1983,6 +2038,24 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['state'],
+          decoration:
+              InputDecoration(labelText: 'State', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['location'],
+          decoration: InputDecoration(
+              labelText: 'Location', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        
+        TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['verifiedSeller'],
           decoration: InputDecoration(
               labelText: 'verifiedSeller', border: OutlineInputBorder()),
@@ -1990,6 +2063,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['category'],
           decoration: InputDecoration(
               labelText: 'category', border: OutlineInputBorder()),
@@ -1997,12 +2071,15 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
  controller: controllers['condition'],
           decoration: InputDecoration(
               labelText: 'condition', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
+        SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['description'],
           decoration: InputDecoration(
             labelText: 'Description *',
@@ -2016,6 +2093,7 @@ Widget _buildCommercialVehiclesSparesForm(){
         ),
         SizedBox(height: 10),
 TextFormField(
+   readOnly: _isFormReadOnly, // Add this line
   controller: controllers['price'],
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
@@ -2034,9 +2112,6 @@ TextFormField(
 ),
 
 
-        // SizedBox(height: 20),
-        // Text("Specifications",
-        //     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
         SizedBox(height: 10),
 
 
@@ -2046,8 +2121,9 @@ TextFormField(
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
+                 readOnly: _isFormReadOnly, // Add this line
                 controller: controllers['brand'],
-                readOnly: true,
+                // readOnly: true,
                 decoration: InputDecoration(
                   labelText: 'Brand *',
                   hintText: 'Select Car Brand',
@@ -2206,13 +2282,16 @@ TextFormField(
 
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['model'],
+          keyboardType: TextInputType.number,
           decoration:
               InputDecoration(labelText: 'Model', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
       TextFormField(
+         readOnly: _isFormReadOnly, // Add this line
   controller: controllers['year'],
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
@@ -2231,28 +2310,24 @@ TextFormField(
 ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['odoReading'],
+          keyboardType: TextInputType.number,
           decoration: InputDecoration(
               labelText: 'Odometer Reading', border: OutlineInputBorder()),
-          keyboardType: TextInputType.number,
+       
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
 
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['inWarranty'],
           decoration: InputDecoration(
               labelText: 'In Warranty', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
-        // SizedBox(height: 10),
-        // TextFormField(
-        //   controller: controllers['variant'],
-        //   decoration: InputDecoration(labelText: 'variant',
-
-        //    border: OutlineInputBorder()),
-        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        // ),
+       
         SizedBox(height: 10),
         // Replace the transmission type text field with this:
         Column(
@@ -2323,16 +2398,12 @@ TextFormField(
             ),
           ],
         ),
-        // TextFormField(
-        //   controller: controllers['transmissionType'],
-        //   decoration: InputDecoration(
-        //       labelText: 'transmissionType', border: OutlineInputBorder()),
-        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        // ),
+     
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['fuelType'],
-          readOnly: true, // Make the field read-only to prevent manual input
+          // readOnly: true, // Make the field read-only to prevent manual input
           decoration: InputDecoration(
             labelText: 'fuelType',
             border: OutlineInputBorder(),
@@ -2445,14 +2516,10 @@ TextFormField(
             );
           },
         ),
-        // TextFormField(
-        //   controller: controllers['fuelType'],
-        //   decoration: InputDecoration(
-        //       labelText: 'Fuel Type', border: OutlineInputBorder()),
-        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        // ),
+       
         SizedBox(height: 10),
      TextFormField(
+       readOnly: _isFormReadOnly, // Add this line
     controller: controllers['ownerType'],
     decoration: InputDecoration(
       labelText: 'ownerType',
@@ -2464,7 +2531,7 @@ TextFormField(
     onTap: () {
       _showOwnershipSnackBar(context); // Call the bottom sheet function
     },
-    readOnly: true, // Prevent direct text input
+    // readOnly: true, // Prevent direct text input
   ),
       ],
     ),
@@ -2474,6 +2541,7 @@ TextFormField(
     return Column(
       children: [
           TextFormField(
+             readOnly: _isFormReadOnly, // Add this line
             controller: controllers['city'],
      
             decoration: InputDecoration(
@@ -2484,6 +2552,7 @@ TextFormField(
           SizedBox(height: 10),
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
             controller: controllers['state'],
         
             decoration: InputDecoration(
@@ -2492,9 +2561,18 @@ TextFormField(
 
           ),
           SizedBox(height: 10),
+           TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['location'],
+          decoration: InputDecoration(
+              labelText: 'Location', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
          
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
             controller: controllers['vaccinationType'],
 
             decoration: InputDecoration(
@@ -2506,6 +2584,7 @@ TextFormField(
          
         
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
             controller: controllers['location'],
 
   decoration: InputDecoration(
@@ -2522,6 +2601,7 @@ TextFormField(
        
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['category'],
           decoration: InputDecoration(
               labelText: 'Category', border: OutlineInputBorder()),
@@ -2529,6 +2609,7 @@ TextFormField(
         ),
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['breed'],
           decoration: InputDecoration(
               labelText: 'Breed', border: OutlineInputBorder()),
@@ -2541,6 +2622,7 @@ TextFormField(
       
         SizedBox(height: 10),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           controller: controllers['description'],
           maxLines: 3,
           decoration: InputDecoration(
@@ -2564,9 +2646,11 @@ TextFormField(
     return Column(
       children: [
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Title'),
         ),
         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Description'),
           maxLines: 3,
         ),

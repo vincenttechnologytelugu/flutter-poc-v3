@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'city_screen.dart';
 
 class StateScreen extends StatefulWidget {
-  const StateScreen({Key? key}) : super(key: key);
+  const StateScreen({super.key});
 
   @override
   State<StateScreen> createState() => _StateScreenState();

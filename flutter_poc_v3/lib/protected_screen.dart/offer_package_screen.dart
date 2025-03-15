@@ -296,7 +296,7 @@ class _OfferPackageScreenState extends State<OfferPackageScreen> {
                                         ),
                                       ),
                                       child: const Text(
-                                        'Purchase Now',
+                                        'Buy Now',
                                         style: TextStyle(
                                           fontSize: 18,
                                           color: Colors.white,

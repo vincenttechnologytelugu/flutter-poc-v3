@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/public_screen.dart/razorpayment_gateway.dart';
@@ -17,6 +19,80 @@ class CartPackagesScreen extends StatefulWidget {
 }
 
 class _CartPackagesScreenState extends State<CartPackagesScreen> {
+
+  // void _handleProceedToPayment() {
+  //   // Determine package type and navigate to payment
+  //   double amount = widget.selectedPackage.price ?? 0.0;
+  //   String packageId = widget.selectedPackage.id ?? '';
+    
+  //   if (amount == 0.0) {
+  //     // Free Package
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => RazorpaymentGateway(
+  //           amount: 0.0,
+  //           packageId: '678f2d327f36cdf7fba13595',
+  //           isFreePlan: true,
+  //         ),
+  //       ),
+  //     );
+  //   } else if (amount == 1000.0) {
+  //     // Silver Package
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => RazorpaymentGateway(
+  //           amount: 1000.0,
+  //           packageId: '678f2d7190a04f51b9267b17',
+  //           isSilverPlan: true,
+  //         ),
+  //       ),
+  //     );
+  //   } else if (amount == 1200.0) {
+  //     // Gold Package
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //         builder: (context) => RazorpaymentGateway(
+  //           amount: 1200.0,
+  //           packageId: '678f2e2f9ccc3e56abbd8c65',
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+void _handleProceedToPayment() {
+    String packageId;
+    double amount = widget.selectedPackage.price?.toDouble() ?? 0.0;
+    
+    // Determine package ID based on amount
+    if (amount == 0) {
+      packageId = '678f2d327f36cdf7fba13595';
+    } else if (amount == 1000) {  // Changed from 499 to 1000 as per your original prices
+      packageId = '678f2d7190a04f51b9267b17';
+    } else if (amount == 1200) {  // Changed from 999 to 1200 as per your original prices
+      packageId = '678f2e2f9ccc3e56abbd8c65';
+    } else {
+      // Handle other cases or set a default value
+      packageId = 'default_package_id';
+    }
+    
+  log('Selected Package Details:');
+  log('Amount: $amount');
+  log('PackageId: $packageId');
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => RazorpaymentGateway(
+          amount: amount,
+          packageId: packageId,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,13 +172,89 @@ class _CartPackagesScreenState extends State<CartPackagesScreen> {
             ),
           ),
           // Bottom Payment Section
-          Container(
+          // Container(
+          //   padding: const EdgeInsets.all(16),
+          //   decoration: BoxDecoration(
+          //     color: Colors.white,
+          //     boxShadow: [
+          //       BoxShadow(
+          //       color: Colors.grey.withAlpha(51), // 51 is approximately equal to 20% opacity (0.2 * 255)
+          //         spreadRadius: 1,
+          //         blurRadius: 4,
+          //         offset: const Offset(0, -2),
+          //       ),
+          //     ],
+          //   ),
+          //   child: Column(
+          //     children: [
+          //       Row(
+          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //         children: [
+          //           const Text(
+          //             'Total Amount:',
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               fontWeight: FontWeight.bold,
+          //             ),
+          //           ),
+          //           Row(
+          //             children: [
+          //               const Icon(Icons.currency_rupee),
+          //               Text(
+          //                 '${widget.selectedPackage.price}',
+          //                 style: const TextStyle(
+          //                   fontSize: 18,
+          //                   fontWeight: FontWeight.bold,
+          //                 ),
+          //               ),
+          //             ],
+          //           ),
+          //         ],
+          //       ),
+          //       const SizedBox(height: 16),
+          //       SizedBox(
+          //         width: double.infinity,
+          //         child: ElevatedButton(
+          //           onPressed: () {
+          //             Navigator.push(
+          //               context,
+          //               MaterialPageRoute(
+          //                 builder: (context) => RazorpaymentGateway(
+          //                 amount: widget.selectedPackage.price ?? 0.0,
+          //                packageId: widget.selectedPackage.id ?? '',
+          //                 ),
+          //               ),
+          //             );
+
+          //             // Implement payment logic here
+          //           },
+          //           style: ElevatedButton.styleFrom(
+          //             backgroundColor: Colors.blue,
+          //             padding: const EdgeInsets.symmetric(vertical: 16),
+          //             shape: RoundedRectangleBorder(
+          //               borderRadius: BorderRadius.circular(8),
+          //             ),
+          //           ),
+          //           child: const Text(
+          //             'Proceed to Pay',
+          //             style: TextStyle(
+          //               fontSize: 18,
+          //               color: Colors.white,
+          //             ),
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+
+            Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                color: Colors.grey.withAlpha(51), // 51 is approximately equal to 20% opacity (0.2 * 255)
+                  color: Colors.grey.withAlpha(51),
                   spreadRadius: 1,
                   blurRadius: 4,
                   offset: const Offset(0, -2),
@@ -139,18 +291,7 @@ class _CartPackagesScreenState extends State<CartPackagesScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => RazorpaymentGateway(
-                       
-                          ),
-                        ),
-                      );
-
-                      // Implement payment logic here
-                    },
+                    onPressed: _handleProceedToPayment, // Updated here
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       padding: const EdgeInsets.symmetric(vertical: 16),

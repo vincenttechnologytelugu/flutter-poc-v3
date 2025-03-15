@@ -3,7 +3,9 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
+import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
@@ -17,6 +19,8 @@ class CategoryBasedPostsScreen extends StatefulWidget {
     super.key,
     required this.apiUrl,
     required this.title,
+  
+    
   });
 
   @override
@@ -27,18 +31,57 @@ class CategoryBasedPostsScreen extends StatefulWidget {
 class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
   CartController cartController = Get.put(CartController());
   final ScrollController _scrollController = ScrollController();
+  // At the top of the class, add:
+LocationController locationController = Get.find<LocationController>();
+
+ 
+
+
+
   List<ProductModel> productModel = [];
+
   bool isLoading = false;
   bool hasMore = true;
   int page = 0;
-  final int pageSize = 100;
-
-  @override
+  final int pageSize = 50;
+ String location = "Select Location"; // Add this line
+@override
   void initState() {
     super.initState();
+  
+
+
+     // Listen to location changes
+  ever(locationController.currentCity, (_) {
     _loadPosts();
+  });
+  
+  ever(locationController.currentState, (_) {
+    _loadPosts();
+  });
+   
+    _loadPosts();
+
+   
     _scrollController.addListener(_scrollListener);
   }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
@@ -75,57 +118,145 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
     }
   }
 
-  Future<void> _loadPosts() async {
-    if (isLoading) return;
+  // Future<void> _loadPosts() async {
+  //   if (isLoading) return;
 
-    setState(() {
+  //   setState(() {
+  //     isLoading = true;
+  //   });
+
+  //   try {
+  //     final Uri uri = Uri.parse(widget.apiUrl).replace(
+  //       queryParameters: {
+  //         ...Uri.parse(widget.apiUrl).queryParameters,
+  //         'page': page.toString(),
+  //         'psize': pageSize.toString(),
+          
+  //       },
+  //     );
+
+  //     log('Loading posts from: $uri');
+
+  //     final response = await http.get(uri);
+  //     log('Response status: ${response.statusCode}');
+  //     log('Response body: ${response.body}');
+
+  //     if (response.statusCode == 200) {
+  //       final Map<String, dynamic> responseData = json.decode(response.body);
+  //       final List<dynamic> data = responseData['data'] ?? [];
+
+  //       final List<ProductModel> newPosts =
+  //           data.map((json) => ProductModel.fromJson(json)).toList();
+
+  //       setState(() {
+  //         productModel.addAll(newPosts);
+  //         hasMore = newPosts.length == pageSize;
+  //         isLoading = false;
+  //       });
+
+  //       log('Number of posts loaded: ${newPosts.length}');
+  //       log('Total posts: ${productModel.length}');
+  //     } else {
+  //       log('Error: ${response.statusCode}');
+  //       setState(() {
+  //         isLoading = false;
+  //       });
+  //     }
+  //   } catch (e, stackTrace) {
+  //     log('Exception: $e');
+  //     log('Stack trace: $stackTrace');
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+
+
+
+
+
+
+
+Future<void> _loadPosts() async {
+  if (isLoading) return;
+
+  setState(() {
       isLoading = true;
+      // Clear existing posts when location changes
+      if (page == 0) {
+        productModel.clear();
+      }
     });
 
-    try {
-      final Uri uri = Uri.parse(widget.apiUrl).replace(
-        queryParameters: {
-          ...Uri.parse(widget.apiUrl).queryParameters,
-          'page': page.toString(),
-          'psize': pageSize.toString(),
-        },
-      );
+  try {
+    // Get current location details from LocationController
+    final currentCity = locationController.currentCity.value;
+    final currentState = locationController.currentState.value;
+    
+    // Create query parameters map
+    final queryParams = {
+      'page': page.toString(),
+      'psize': pageSize.toString(),
+      'city': currentCity,
+      'state': currentState,
+      // Add any other existing query parameters from the original URL
+      ...Uri.parse(widget.apiUrl).queryParameters,
+    };
 
-      log('Loading posts from: $uri');
+    // Remove null or empty values
+    queryParams.removeWhere((key, value) => value == null || value.isEmpty);
 
-      final response = await http.get(uri);
-      log('Response status: ${response.statusCode}');
-      log('Response body: ${response.body}');
+    final Uri uri = Uri.parse(widget.apiUrl).replace(
+      queryParameters: queryParams,
+    );
 
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> responseData = json.decode(response.body);
-        final List<dynamic> data = responseData['data'] ?? [];
+    log('Loading posts from: $uri');
 
-        final List<ProductModel> newPosts =
-            data.map((json) => ProductModel.fromJson(json)).toList();
+    final response = await http.get(uri);
+    log('Response status: ${response.statusCode}');
+    log('Response body: ${response.body}');
 
-        setState(() {
-          productModel.addAll(newPosts);
-          hasMore = newPosts.length == pageSize;
-          isLoading = false;
-        });
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      final List<dynamic> data = responseData['data'] ?? [];
 
-        log('Number of posts loaded: ${newPosts.length}');
-        log('Total posts: ${productModel.length}');
-      } else {
-        log('Error: ${response.statusCode}');
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e, stackTrace) {
-      log('Exception: $e');
-      log('Stack trace: $stackTrace');
+      final List<ProductModel> newPosts =
+          data.map((json) => ProductModel.fromJson(json)).toList();
+
+      setState(() {
+        productModel.addAll(newPosts);
+        hasMore = newPosts.length == pageSize;
+        isLoading = false;
+        // Update location in the UI
+        location = '$currentCity, $currentState';
+      });
+
+      log('Number of posts loaded: ${newPosts.length}');
+      log('Total posts: ${productModel.length}');
+    } else {
+      log('Error: ${response.statusCode}');
       setState(() {
         isLoading = false;
       });
     }
+  } catch (e, stackTrace) {
+    log('Exception: $e');
+    log('Stack trace: $stackTrace');
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
+
+
+
+
+
+
+  
+
 
   void _navigateToProductDetails(ProductModel product) {
     Get.to(() => ProductDetails(productModel: product));
@@ -134,10 +265,37 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: const Color.fromARGB(255, 172, 179, 180),
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+          appBar: PreferredSize(
+  preferredSize: const Size.fromHeight(130), // Adjust height as needed
+  child: SafeArea(
+    child: Column(
+      mainAxisSize: MainAxisSize.min, // Added this to minimize height
+      children: [
+         HomeappbarScreen(
+           location: location,
+          onLocationTap: () async{
+            
+            // Handle location tap if needed
+          },
+        ), // Add HomeAppBar here
+        AppBar(
+       centerTitle: true,
+
+           automaticallyImplyLeading: false,  // Add this line to remove b
+        title: Text(widget.title.toUpperCase(),style:TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold,),textAlign: TextAlign.center),
+          elevation: 0,
+          
+          backgroundColor: Colors.transparent, // Make it transparent to avoid double background
+        
+        ),
+      ],
+    ),
+  ),
+),
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   title: Text(widget.title),
+      // ),
       body: productModel.isEmpty && isLoading
           ? const Center(child: CircularProgressIndicator())
           : productModel.isEmpty
@@ -469,8 +627,9 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color: Color.fromARGB(
-                                                255, 243, 6, 176),
+                                            color:Colors.red,
+                                            // color: Color.fromARGB(
+                                            //     255, 243, 6, 176),
                                           ),
                                         ),
                                       ],
@@ -508,7 +667,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                         Icon(Icons.access_time,
                                             size: 16, color: Colors.grey[600]),
                                         const SizedBox(width: 4),
-                                        Text(
+                                              
+                                    Text(
                                           _formatDateTime(post.posted_at),
                                           style: TextStyle(
                                             color: Colors.grey[600],

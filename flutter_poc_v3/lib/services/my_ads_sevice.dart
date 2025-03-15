@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAdsService {
-  static const String baseUrl = 'http://192.168.0.167:8080';
+  static const String baseUrl = 'http://13.200.179.78';
 
   Future<String?> _getToken() async {
     final prefs = await SharedPreferences.getInstance();
@@ -56,46 +56,41 @@ class MyAdsService {
     }
   }
 
-  
+  Future<Map<String, dynamic>> markAsInactive(String adId) async {
+    try {
+      final token = await _getToken();
+      if (token == null) throw Exception('No token found');
 
-Future<Map<String, dynamic>> markAsInactive(String adId) async {
-  try {
-    final token = await _getToken();
-    if (token == null) throw Exception('No token found');
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/adposts/mark_as_inactive'),
-      headers: _getHeaders(token),
-      body: jsonEncode({'adpostId': adId}),
-    );
-
-    log("API Response: ${response.body}"); // Add this to debug
-
-    if (response.statusCode == 200) {
-      // Since we need the ad data for the DeactivateScreen, let's fetch it
-      final getResponse = await http.get(
-        Uri.parse('$baseUrl/adposts/my_ads'),
+      final response = await http.post(
+        Uri.parse('$baseUrl/adposts/mark_as_inactive'),
         headers: _getHeaders(token),
+        body: jsonEncode({'adpostId': adId}),
       );
 
-      if (getResponse.statusCode == 200) {
-        final data = jsonDecode(getResponse.body);
-        final adData = (data['data'] as List).firstWhere(
-          (ad) => ad['_id'] == adId,
-          orElse: () => null,
+      log("API Response: ${response.body}"); // Add this to debug
+
+      if (response.statusCode == 200) {
+        // Since we need the ad data for the DeactivateScreen, let's fetch it
+        final getResponse = await http.get(
+          Uri.parse('$baseUrl/adposts/my_ads'),
+          headers: _getHeaders(token),
         );
-        return adData;
+
+        if (getResponse.statusCode == 200) {
+          final data = jsonDecode(getResponse.body);
+          final adData = (data['data'] as List).firstWhere(
+            (ad) => ad['_id'] == adId,
+            orElse: () => null,
+          );
+          return adData;
+        }
+        throw Exception('Failed to get updated ad data');
       }
-      throw Exception('Failed to get updated ad data');
+      throw Exception('Failed to mark as inactive');
+    } catch (e) {
+      throw Exception('Error marking as inactive: $e');
     }
-    throw Exception('Failed to mark as inactive');
-  } catch (e) {
-    throw Exception('Error marking as inactive: $e');
   }
-}
-
-
-
 
   // Future<Map<String, dynamic>> markAsInactive(String adpostId) async {
   //   try {
@@ -158,7 +153,8 @@ Future<Map<String, dynamic>> markAsInactive(String adId) async {
     }
   }
 
-  Future<Map<String, dynamic>> updateAd(String adpostId, Map<String, dynamic> updates) async {
+  Future<Map<String, dynamic>> updateAd(
+      String adpostId, Map<String, dynamic> updates) async {
     try {
       final token = await _getToken();
       if (token == null) throw Exception('No token found');
@@ -180,6 +176,27 @@ Future<Map<String, dynamic>> markAsInactive(String adId) async {
       throw Exception('Failed to update ad');
     } catch (e) {
       throw Exception('Error updating ad: $e');
+    }
+  }
+
+  // In my_ads_service.dart
+  Future<bool> makeFeatured(String adId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token') ?? '';
+
+      final response = await http.post(
+        Uri.parse('http://13.200.179.78/adposts/make_featured'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({'adpostId': adId}),
+      );
+
+      return response.statusCode == 200;
+    } catch (e) {
+      throw Exception('Failed to make featured: $e');
     }
   }
 }

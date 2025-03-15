@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/controllers/location_controller.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
 
-import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
 
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
@@ -27,6 +31,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController lastNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final locationController = Get.find<LocationController>();
+
   bool vissiblePassword = true;
   bool sanitizeAndCheckEmailAndPassword(String email, String password) {
     // Email validation
@@ -40,6 +46,61 @@ class _RegisterScreenState extends State<RegisterScreen> {
             .hasMatch(password);
 
     return emailValid && passwordValid;
+  }
+
+  // In your auth controller or registration handler
+// In your register_screen.dart file
+  Future<void> handleRegistrationSuccess() async {
+    try {
+      if (!mounted) return;
+
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (placemarks.isNotEmpty) {
+        Placemark place = placemarks[0];
+        String city = place.locality ?? '';
+        String state = place.administrativeArea ?? '';
+
+        // Save location to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('city', place.locality ?? '');
+        await prefs.setString('state', place.administrativeArea ?? '');
+
+        // Update LocationController
+        final locationController = Get.find<LocationController>();
+        locationController.updateLocation(city: city, state: state
+            // city: place.locality ?? '',
+            // state: place.administrativeArea ?? '',
+            );
+
+        // Fetch products with new location
+        await _fetchProductsWithLocation(
+            place.locality ?? '', place.administrativeArea ?? '');
+      }
+    } catch (e) {
+      log('Error in handleRegistrationSuccess: $e');
+    }
+  }
+
+  Future<void> _fetchProductsWithLocation(String city, String state) async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
+      );
+
+      if (response.statusCode == 200) {
+        final productsController = Get.find<ProductsController>();
+        productsController.updateProducts(response.body);
+      }
+    } catch (e) {
+      log('Error fetching products: $e');
+    }
   }
 
   // void handleDummyRegister() {
@@ -125,7 +186,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       final response = await http.post(
-        Uri.parse("http://192.168.0.167:8080/authentication/register"),
+        Uri.parse("http://13.200.179.78/authentication/register"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -153,7 +214,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
         // Initialize prefs before using it
         final SharedPreferences prefs = await SharedPreferences.getInstance();
-
+        // Add this call after saving user data
+        _onRegistrationSuccess(); // Call the new method he
 // Before navigating to home screen, check location permission
         final hasPermission = await handleLocationPermission(context);
         if (!hasPermission) {
@@ -173,6 +235,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
           );
           return;
         }
+// After successful registration/login
+        await Get.find<LocationController>().updateToCurrentLocation();
 
         // Save location to SharedPreferences
         // final prefs = await SharedPreferences.getInstance();
@@ -268,6 +332,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  Future<void> handleRegistration() async {
+    try {
+      if (_formKey.currentState!.validate()) {
+        final firstName = firstNameController.text.trim();
+        final lastName = lastNameController.text.trim();
+        final email = emailController.text.trim();
+        final password = passwordController.text;
+
+        // First register the user
+        await registerUser(firstName, lastName, email, password);
+
+        // Then handle location and products
+        if (mounted) {
+          await handleRegistrationSuccess();
+
+          // Navigate to products screen
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => ResponsiveProductsScreen()),
+            (route) => false,
+          );
+        }
+      }
+    } catch (e) {
+      log('Registration error: $e');
+      if (mounted) {
+        Fluttertoast.showToast(
+          msg: "Error during registration: $e",
+          backgroundColor: Colors.red,
+        );
+      }
+    }
+  }
+
+  void _onRegistrationSuccess() async {
+    final locationController = Get.find<LocationController>();
+    final productsController = Get.find<ProductsController>();
+
+    try {
+      final response = await http.get(
+        Uri.parse(
+            'http://13.200.179.78/adposts?city=${locationController.city.value}&state=${locationController.state.value}'),
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        productsController.updateProducts(response.body);
+
+        // Navigate to splash screen (as per your existing code)
+        if (mounted) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => SplashScreen()),
+            (route) => false,
+          );
+        }
+      }
+    } catch (e) {
+      log('Error fetching initial ads: $e');
+    }
+  }
+
   @override
   void dispose() {
     firstNameController.dispose();
@@ -277,56 +403,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  // Future<void> _register() async {
-  //   if (!_formKey.currentState!.validate()) return;
-
-  //   setState(() => isLoading = true);
-
-  //   try {
-  //     // Get the response from ApiService
-  //     final responseData = await ApiService.register(
-  //         firstNameController.text,
-  //         lastNameController.text,
-  //         emailController.text,
-  //         passwordController.text);
-
-  //          final prefs = await SharedPreferences.getInstance();
-  //            // Add this after successful registration
-  //   await prefs.setString('first_name', firstNameController.text);
-  //   await prefs.setString('last_name', lastNameController.text);
-  //   await prefs.setString('email', emailController.text);
-
-  //     // Save user data to SharedPreferences
-  //     // final prefs = await SharedPreferences.getInstance();
-  //     if (responseData['data'] != null) {
-  //       await prefs.setString('first_name', responseData['data']['first_name']);
-  //       await prefs.setString('last_name', responseData['data']['last_name']);
-  //       await prefs.setString('email', responseData['data']['email']);
-  //     }
-
-  //     if (mounted) {
-  //       Fluttertoast.showToast(
-  //         msg: "Registration successful!",
-  //         backgroundColor: Colors.green,
-  //       );
-
-  //       Navigator.pushReplacement(
-  //         context,
-  //         MaterialPageRoute(builder: (context) => const HomeScreen()),
-  //       );
-  //     }
-  //   } catch (e) {
-  //     Fluttertoast.showToast(
-  //       msg: e.toString(),
-  //       backgroundColor: Colors.red,
-  //     );
-  //   } finally {
-  //     if (mounted) {
-  //       setState(() => isLoading = false);
-  //     }
-  //   }
-  // }
-
   @override
   void initState() {
     super.initState();
@@ -335,12 +411,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: Colors.blue,
-      // appBar: AppBar(
-      //   title: const Text("Register"),
-      //   backgroundColor: Colors.blue,
-      //   centerTitle: true,
-      // ),
       body: Stack(
         children: [
           // Background image
@@ -359,17 +429,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 padding: const EdgeInsets.all(30.0),
                 child: Column(
                   children: [
-                    // Image.asset(
-                    //   "assets/images/Register.jpg",
-                    //   width: 250,
-                    // ),
-                    // CachedNetworkImage(
-                    //   height: 150,
-                    //   imageUrl:
-                    //       "https://img.favpng.com/4/22/14/logo-brand-button-icon-png-favpng-6vjJ5T7t7zrXkhnpPQ80mB7mt.jpg",
-                    //   placeholder: (context, url) => CircularProgressIndicator(),
-                    //   errorWidget: (context, url, error) => Icon(Icons.error),
-                    // ),
                     Padding(
                       padding: const EdgeInsets.only(top: 60, left: 20),
                       child: Text("Welcome\nCreate your Account",
@@ -691,22 +750,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 const Color.fromARGB(255, 219, 9, 205),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(15))),
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            final firstName = firstNameController.text.trim();
-                            final lastName = lastNameController.text.trim();
-                            final email = emailController.text.trim();
-                            final password = passwordController.text;
+                        onPressed: handleRegistration, // Just change this line
 
-                            // Call the API
-                            log('first_name: $firstName');
-                            log('last_name: $lastName');
-                            log('email: $email');
-                            log('password: $password');
-                            await registerUser(
-                                firstName, lastName, email, password);
-                          }
-                        },
                         child: const Text(
                           "Register",
                           style: TextStyle(color: Colors.white, fontSize: 20),

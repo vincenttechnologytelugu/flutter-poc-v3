@@ -7,6 +7,10 @@
 -keep class io.flutter.view.** { *; }
 -keep class io.flutter.** { *; }
 -keep class io.flutter.plugins.** { *; }
+-keep class com.google.android.gms.maps.** { *; }
+-keep class com.google.android.gms.location.** { *; }
+-keep class com.google.android.gms.common.** { *; }
+
 
 # Razorpay
 -keepclassmembers class * {

@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/controllers/location_controller.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
+import 'package:flutter_poc_v3/models/product_model.dart';
 
 //import 'package:flutter_poc_v3/main.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/uploading_screen.dart';
 
 import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
 
@@ -12,6 +16,7 @@ import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 import 'package:flutter_poc_v3/services/auth_service.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -126,7 +131,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Make API call to get user details
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/authentication/auth_user'),
+        Uri.parse('http://13.200.179.78/authentication/auth_user'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -206,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       final response = await http.post(
-        Uri.parse('http://192.168.0.167:8080/authentication/login'),
+        Uri.parse('http://13.200.179.78/authentication/login'),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -233,6 +238,10 @@ class _LoginScreenState extends State<LoginScreen> {
             isLoading = false;
           });
 
+          // Save user location from login response
+          await prefs.setString('user_city', responseData['city'] ?? '');
+          await prefs.setString('user_state', responseData['state'] ?? '');
+
           // Request location permission
           bool hasLocationPermission = await handleLocationPermission(context);
           if (!hasLocationPermission) {
@@ -250,6 +259,8 @@ class _LoginScreenState extends State<LoginScreen> {
             });
             return;
           }
+// After successful registration/login
+          await Get.find<LocationController>().updateToCurrentLocation();
 
           // Save initial location
           await prefs.setDouble('latitude', position.latitude);
@@ -296,6 +307,40 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // In login_screen.dart or register_screen.dart
+  Future<void> handleLoginSuccess() async {
+    // or handleRegistrationSuccess
+    try {
+      final locationController = Get.find<LocationController>();
+      await locationController.updateToCurrentLocation();
+
+      // Navigate to home screen
+      Get.offAll(() => const HomeScreen());
+    } catch (e) {
+      log('Error handling login success: $e');
+    }
+  }
+
+  // In your login success handler
+void onLoginSuccess(Map<String, dynamic> userData) async {
+  final prefs = await SharedPreferences.getInstance();
+  
+  if (userData['active_subscription_rules'] != null) {
+    await prefs.setString(
+      'active_subscription_rules',
+      json.encode(userData['active_subscription_rules'])
+    );
+    log('Saved subscription rules: ${userData['active_subscription_rules']}');
+  }
+  
+  // Navigate to next screen
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(builder: (context) => const UploadingScreen()),
+  );
+}
+
+
 //   Future<void> loginUser(String email, String password) async {
 //     setState(() {
 //       isLoading = true;
@@ -304,7 +349,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
 //     try {
 //       final response = await http.post(
-//         Uri.parse('http://192.168.0.167:8080/authentication/login'),
+//         Uri.parse('http://13.200.179.78/authentication/login'),
 //         headers: <String, String>{
 //           'Content-Type': 'application/json; charset=UTF-8',
 //         },
@@ -377,6 +422,51 @@ class _LoginScreenState extends State<LoginScreen> {
 //     }
 //   }
 
+  Future<void> handleAuthSuccess() async {
+    final LocationController locationController =
+        Get.find<LocationController>();
+    final ProductsController productsController =
+        Get.find<ProductsController>();
+
+    final prefs = await SharedPreferences.getInstance();
+    final savedCity = prefs.getString('city');
+    final savedState = prefs.getString('state');
+
+    if (savedCity == null || savedState == null) {
+      try {
+        Position position = await Geolocator.getCurrentPosition();
+        List<Placemark> placemarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+
+        if (placemarks.isNotEmpty) {
+          String city = placemarks[0].locality ?? '';
+          String state = placemarks[0].administrativeArea ?? '';
+
+          // Save location
+          await locationController.saveLocation(city, state, isManual: false);
+
+          // Fetch products for current location
+          final response = await http.get(Uri.parse(
+              'http://13.200.179.78/adposts?city=$city&state=$state'));
+
+          if (response.statusCode == 200) {
+            final List<dynamic> data = json.decode(response.body);
+            productsController.productModelList.clear();
+            for (var item in data) {
+              productsController.productModelList
+                  .add(ProductModel.fromJson(item));
+            }
+            productsController.update();
+          }
+        }
+      } catch (e) {
+        log('Error setting initial location: $e');
+      }
+    }
+
+    Get.offAll(() => const HomeScreen());
+  }
+
   @override
   void dispose() {
     _emailController.dispose();
@@ -387,43 +477,79 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/bg1.png"),
-                fit: BoxFit.cover,
-              ),
-            ),
+      body: Container(
+        // Background: Solid magenta as per the image description
+        // color: const Color(0xFFFF00FF), // Vibrant magenta (#FF00FF)
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Color.fromARGB(255, 136, 132, 219), // Vibrant magenta (#E040FB)
+              Color.fromARGB(255, 153, 181, 112),
+              Color.fromARGB(255, 153, 4, 4), // Vibrant magenta (#D500F9)
+            ],
           ),
-          // Image.asset("assets/images/bg1.png",
-          //     fit: BoxFit.cover,
-          //     width: double.infinity,
-          //     height: double.infinity
-
-          // ),
-          SingleChildScrollView(
-            child: Container(
-              padding: const EdgeInsets.all(16.0),
+        ),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // CachedNetworkImage(
-                  //   height: 150,
-                  //   imageUrl:
-                  //       "https://static.vecteezy.com/ti/vetor-gratis/p1/15271968-design-de-icone-plano-de-homem-de-negocios-conceito-de-icone-de-recurso-humano-e-empresario-icone-de-homem-em-estilo-plano-da-moda-simbolo-para-o-design-do-seu-site-logotipo-app-vetor.jpg",
-                  //   placeholder: (context, url) =>
-                  //       const CircularProgressIndicator(),
-                  //   errorWidget: (context, url, error) => const Icon(Icons.error),
-                  // ),
-                  const SizedBox(height: 24),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 60, left: 20),
-                    child: Text("Welcome Back\nPlease Login",
-                        style: TextStyle(fontSize: 30, color: Colors.white)),
+                  // Header: LOGO placeholder
+                  const Text(
+                    "LOGIN",
+                    style: TextStyle(
+                      color: Colors.white, // White (#FFFFFF)
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black54,
+                          blurRadius: 2,
+                          offset: Offset(1, 1),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 24),
+                  // Profile Icon: Circular with white silhouette
+                  Container(
+                    width: 200,
+                    height: 200,
+
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: const Color(0xFFD81B60), // Slightly darker magenta
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: Image.asset(
+                      "assets/images/sales1.jpg",
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.fill,
+                    ),
+                    // child: const Icon(
+                    //   Icons.person,
+                    //   size: 60,
+                    //   color: Colors.white, // White (#FFFFFF)
+                    // ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Title: Welcome Back!
+                  const Text(
+                    "Welcome Back!",
+                    style: TextStyle(
+                      color: Colors.white, // White (#FFFFFF)
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 32),
+                  // Login Message (if any)
                   if (loginMessage != null)
                     Container(
                       padding: const EdgeInsets.all(8.0),
@@ -445,44 +571,77 @@ class _LoginScreenState extends State<LoginScreen> {
                         textAlign: TextAlign.center,
                       ),
                     ),
+                  const SizedBox(height: 16),
+                  // User ID Input Field
                   TextFormField(
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color.fromARGB(
+                          255, 25, 11, 11), // Light gray (#D3D3D3)
+                      fontSize: 23.0,
+                    ),
                     controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
                     onEditingComplete: () {
                       FocusScope.of(context).nextFocus();
                     },
-                    decoration: const InputDecoration(
-                      labelText: 'Email',
-                      labelStyle: TextStyle(color: Colors.white),
-                      hintText: 'Enter your email',
-                      helperStyle: TextStyle(color: Colors.white),
-                      prefixIcon: Icon(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.white, // White (#FFFFFF)
+                      hintText: 'Email',
+                      hintStyle: const TextStyle(
+                          color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
+                      prefixIcon: const Icon(
                         Icons.email,
-                        color: Colors.white,
+                        color: Color(0xFFD81B60), // Slightly darker magenta
                       ),
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color(0xFFD81B60), // Slightly darker magenta
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 91, 90, 93),
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 91, 90, 93),
+                          width: 2,
+                        ),
+                      ),
                       errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromARGB(255, 250, 248, 248),
-                              width: 1.0),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 1,
+                        ),
+                      ),
                       focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromARGB(255, 245, 242, 242),
-                              width: 2.0),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 2,
+                        ),
+                      ),
                     ),
                   ),
-                  textFieldDefaultGap,
+                  const SizedBox(height: 16),
+                  // Password Input Field
                   TextFormField(
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Color.fromARGB(
+                          255, 25, 11, 11), // Light gray (#D3D3D3)
+                      fontSize: 23.0,
+                    ),
                     controller: _passwordController,
                     obscureText: !visiblePassword,
                     textInputAction: TextInputAction.done,
@@ -490,19 +649,22 @@ class _LoginScreenState extends State<LoginScreen> {
                       FocusScope.of(context).unfocus();
                     },
                     decoration: InputDecoration(
-                      labelText: 'Password',
-                      labelStyle: TextStyle(color: Colors.white),
-                      hintText: 'Enter your password',
-                      helperStyle: TextStyle(color: Colors.white),
+                      filled: true,
+                      fillColor: Colors.white, // White (#FFFFFF)
+                      hintText: 'Password',
+                      hintStyle: const TextStyle(
+                          color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
                       prefixIcon: const Icon(
                         Icons.lock,
-                        color: Colors.white,
+                        color: Color(0xFFD81B60), // Slightly darker magenta
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           visiblePassword
                               ? Icons.visibility
                               : Icons.visibility_off,
+                          color: const Color(
+                              0xFFD81B60), // Slightly darker magenta
                         ),
                         onPressed: () {
                           setState(() {
@@ -511,155 +673,116 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                       ),
                       border: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 91, 90, 93),
+                          width: 1,
+                        ),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 91, 90, 93),
+                          width: 1,
+                        ),
                       ),
                       focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                      enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Color.fromARGB(255, 91, 90, 93),
+                          width: 2,
+                        ),
+                      ),
                       errorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: const Color.fromARGB(255, 250, 248, 248),
-                              width: 1.0),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 1,
+                        ),
+                      ),
                       focusedErrorBorder: OutlineInputBorder(
-                          borderSide: BorderSide(
-                              color: const Color.fromARGB(255, 245, 242, 242),
-                              width: 2.0),
-                          borderRadius: BorderRadius.all(Radius.circular(15))),
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      // color: Colors.pink,
-                      width: 50,
-                      margin: EdgeInsets.only(left: 90, right: 90),
-                      child:
-                          //               ElevatedButton(
-                          //                 onPressed: isLoading
-                          //                     ? null
-                          //                     : () {
-                          //                         final email = _emailController.text.trim();
-                          //                         final password = _passwordController.text;
-
-                          //                         // Comment out your API call logic
-                          //                         /*
-                          // Your existing API call code here
-                          // */
-
-                          //                         // Call dummy login instead
-                          //                         handleDummyLogin();
-                          //                       },
-                          //                 child: Text("Login"),
-                          //               ),
-
-                          ElevatedButton(
-                        onPressed: isLoading
-                            ? null
-                            : () {
-                                final email = _emailController.text.trim();
-                                final password = _passwordController.text;
-                                if (email.isNotEmpty && password.isNotEmpty) {
-                                  loginUser(email, password);
-                                } else {
-                                  Fluttertoast.showToast(
-                                    msg: "Please fill in all fields",
-                                    backgroundColor: Colors.red,
-                                  );
-                                }
-                              },
-                        child: Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: isLoading
-                              ? const CircularProgressIndicator()
-                              : const Text(
-                                  'Login',
-                                  style: TextStyle(
-                                      fontSize: 25, color: Colors.blue),
-                                ),
+                        borderRadius: BorderRadius.circular(10),
+                        borderSide: const BorderSide(
+                          color: Colors.red,
+                          width: 2,
                         ),
                       ),
                     ),
                   ),
+                  const SizedBox(height: 24),
+                  // Login Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isLoading
+                          ? null
+                          : () {
+                              final email = _emailController.text.trim();
+                              final password = _passwordController.text;
+                              if (email.isNotEmpty && password.isNotEmpty) {
+                                loginUser(email, password);
+                              } else {
+                                Fluttertoast.showToast(
+                                  msg: "Please fill in all fields",
+                                  backgroundColor: Colors.red,
+                                );
+                              }
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(
+                            255, 136, 67, 233), // Slightly darker magenta
+                        foregroundColor: Colors.white, // White (#FFFFFF)
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          side: const BorderSide(
+                            color: Color.fromARGB(
+                                255, 215, 215, 231), // Slightly darker magenta
+                            width: 1,
+                          ),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shadowColor: Colors.black.withOpacity(0.3),
+                        elevation: 5,
+                      ),
+                      child: isLoading
+                          ? const CircularProgressIndicator(
+                              color: Color.fromARGB(255, 87, 73, 241))
+                          : const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                    ),
+                  ),
                   const SizedBox(height: 16),
-                  SizedBox(height: 10),
+                  // Create Account Link
                   TextButton(
                     onPressed: () {
-                      // Navigate to registration screen
-                      // Navigator.pushNamed(context, '/register');
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => const RegisterScreen()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (ctx) => const RegisterScreen(),
+                        ),
+                      );
                     },
-                    child: const Text("New User? Creat Account",
-                        style: TextStyle(
-                            color: Color.fromARGB(255, 235, 230, 231),
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold)),
+                    child: const Text(
+                      "Create an account",
+                      style: TextStyle(
+                        color: Colors.white, // White (#FFFFFF)
+                        fontSize: 16,
+                        decoration: TextDecoration.underline,
+                        decorationThickness: 1.5,
+                        decorationColor: Colors.white,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 630),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                    topRight: Radius.circular(40),
-                    topLeft: Radius.circular(40)),
-                color: Colors.white70,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 246, 241, 242)
-                        .withOpacity(0.5),
-                    spreadRadius: 5,
-                    blurRadius: 7,
-                    offset: Offset(0, 3),
-                  ),
-                ],
-              ),
-              height: double.infinity,
-              width: double.infinity,
-            ),
-          ),
-          // Positioned(
-          //   bottom: 0,
-          //   left: 0,
-          //   right: 0,
-          //   height: MediaQuery.of(context).size.height *
-          //       0.3, // 15% of screen height
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.only(
-          //           topRight: Radius.circular(40),
-          //           topLeft: Radius.circular(40)),
-          //       color: Colors.white,
-          //     ),
-          //   ),
-          // ),
-
-          // Padding(
-          //   padding: const EdgeInsets.only(top: 580),
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       borderRadius: BorderRadius.only(
-          //           topRight: Radius.circular(40),
-          //           topLeft: Radius.circular(40)),
-          //       color: Colors.white,
-          //     ),
-          //     height: double.infinity,
-          //     width: double.infinity,
-          //   ),
-          // ),
-        ],
+        ),
       ),
     );
   }

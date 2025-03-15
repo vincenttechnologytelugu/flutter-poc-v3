@@ -45,7 +45,7 @@ class _ChatScreenState extends State<ChatScreen>
       // lastName = prefs.getString('lastName');
 
       final response = await http.get(
-        Uri.parse('http://192.168.0.167:8080/chat/conversations'),
+        Uri.parse('http://13.200.179.78/chat/conversations'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -59,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen>
         for (var conv in data) {
           // Load messages for each conversation
           final messagesResponse = await http.post(
-            Uri.parse('http://192.168.0.167:8080/chat/messages'),
+            Uri.parse('http://13.200.179.78/chat/messages'),
             headers: {
               'Authorization': 'Bearer $token',
               'Content-Type': 'application/json',

@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://192.168.0.167:8080'; // Your server URL
+  static const String baseUrl = 'http://13.200.179.78'; // Your server URL
 
   // Get authenticated user details
   static Future<Map<String, dynamic>> getAuthenticatedUser(String token) async {
@@ -215,9 +215,9 @@ class ApiService {
 // import 'package:shared_preferences/shared_preferences.dart';
 
 // class ApiService {
-//   static const String baseUrl = 'http:// 192.168.0.167:8080'; // Update with your server URL
+//   static const String baseUrl = 'http:// 13.200.179.78'; // Update with your server URL
 // // For real android device
-// //static const String baseUrl = 'http:// 192.168.0.167:8080'; // Update with your server URL
+// //static const String baseUrl = 'http:// 13.200.179.78'; // Update with your server URL
 //   // Get authenticated user details
 //   static Future<Map<String, dynamic>> getAuthenticatedUser(String token) async {
 //     try {

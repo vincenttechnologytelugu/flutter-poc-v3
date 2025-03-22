@@ -4,6 +4,8 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,6 +15,7 @@ class UserChatScreen extends StatefulWidget {
   final String thumb;
   final String title;
   final double price;
+
   final List<dynamic>? initialMessages;
   const UserChatScreen({
     super.key,
@@ -183,43 +186,143 @@ class _UserChatScreenState extends State<UserChatScreen> {
     }
   }
 
-  Widget buildThumbImage(String? thumbUrl, {double size = 60}) {
-    return thumbUrl != null && thumbUrl.isNotEmpty
-        ? Image.network(
-            thumbUrl,
-            width: size,
-            height: size,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Icon(
-              Icons.image_not_supported,
-              size: size * 0.75,
-              color: const Color.fromARGB(255, 182, 20, 20),
+  // Widget buildThumbImage(String? thumbUrl, {double size = 60}) {
+  //   return thumbUrl != null && thumbUrl.isNotEmpty
+  //       ? Image.network(
+  //           thumbUrl,
+  //           width: size,
+  //           height: size,
+  //           fit: BoxFit.cover,
+  //           errorBuilder: (context, error, stackTrace) => Icon(
+  //             Icons.image_not_supported,
+  //             size: size * 0.75,
+  //             color: const Color.fromARGB(255, 217, 137, 137),
+  //           ),
+  //           loadingBuilder: (context, child, loadingProgress) {
+  //             if (loadingProgress == null) return child;
+  //             return Center(
+  //               child: CircularProgressIndicator(
+  //                 value: loadingProgress.expectedTotalBytes != null
+  //                     ? loadingProgress.cumulativeBytesLoaded /
+  //                         loadingProgress.expectedTotalBytes!
+  //                     : null,
+  //               ),
+  //             );
+  //           },
+  //         )
+  //       : Icon(
+  //           Icons.image_not_supported,
+  //           size: size * 0.75,
+  //           color: const Color.fromARGB(255, 227, 33, 33),
+  //         );
+  // }
+
+// Widget buildThumbImage(ProductModel product) {
+//   String imageUrl = '';
+  
+//   // Get first image URL using the ProductModel method
+//   if (product.assets != null && product.assets!.isNotEmpty) {
+//     // Find first image asset
+//     var imageAsset = product.assets!.firstWhere(
+//       (asset) => asset['type'].toString().startsWith('image/'),
+//       orElse: () => {},
+//     );
+    
+//     if (imageAsset.containsKey('url')) {
+//       imageUrl = 'http://13.200.179.78/${imageAsset['url']}';
+//     }
+//   }
+
+//   return Container(
+//     width: 60,
+//     height: 60,
+//     decoration: BoxDecoration(
+//       borderRadius: BorderRadius.circular(8),
+//     ),
+//     child: imageUrl.isNotEmpty
+//         ? ClipRRect(
+//             borderRadius: BorderRadius.circular(8),
+//             child: Image.network(
+//               imageUrl,
+//               fit: BoxFit.cover,
+//               errorBuilder: (context, error, stackTrace) {
+//                 return Container(
+//                   color: Colors.grey[300],
+//                   child: const Icon(Icons.error),
+//                 );
+//               },
+//               loadingBuilder: (context, child, loadingProgress) {
+//                 if (loadingProgress == null) return child;
+//                 return Center(
+//                   child: CircularProgressIndicator(
+//                     value: loadingProgress.expectedTotalBytes != null
+//                         ? loadingProgress.cumulativeBytesLoaded /
+//                             loadingProgress.expectedTotalBytes!
+//                         : null,
+//                   ),
+//                 );
+//               },
+//             ),
+//           )
+//         : Container(
+//             color: Colors.grey[300],
+//             child: const Icon(Icons.image_not_supported),
+//           ),
+//   );
+// }
+
+Widget buildThumbImage(ProductModel product) {
+  // Use the existing getFirstImageUrl() method from ProductModel
+  String imageUrl = product.getFirstImageUrl();
+
+  return Container(
+    width: 60,
+    height: 60,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: imageUrl.isNotEmpty
+        ? ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: Image.network(
+              imageUrl,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey[300],
+                  child: const Icon(Icons.error),
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                  ),
+                );
+              },
             ),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              );
-            },
           )
-        : Icon(
-            Icons.image_not_supported,
-            size: size * 0.75,
-            color: const Color.fromARGB(255, 227, 33, 33),
-          );
-  }
+        : Container(
+            color: Colors.grey[300],
+            child: const Icon(Icons.image_not_supported),
+          ),
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 217, 221, 240),
       appBar: AppBar(
         elevation: 0, // Remove shadow
-        backgroundColor: Colors.white, // Modern clean look
+        backgroundColor: const Color.fromARGB(255, 249, 246, 246), // Modern clean look
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new,
               color: Colors.black87), // Modern back icon
@@ -227,38 +330,44 @@ class _UserChatScreenState extends State<UserChatScreen> {
         ),
         title: Row(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withAlpha((0.9 * 255).round()),
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: const Offset(0, 1),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: buildThumbImage(widget.product.thumb),
-                ),
-              ),
-            ),
+              buildThumbImage(widget.product), // Thumbnail
+            // Container(
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(12),
+            //     boxShadow: [
+            //       BoxShadow(
+            //         color: Colors.grey.withAlpha((0.9 * 255).round()),
+            //         spreadRadius: 1,
+            //         blurRadius: 1,
+            //         offset: const Offset(0, 1),
+            //       ),
+            //     ],
+            //   ),
+            //   child: ClipRRect(
+            //     borderRadius: BorderRadius.circular(12),
+            //     child: SizedBox(
+            //       width: 60,
+            //       height: 60,
+            //       child: buildThumbImage(widget.product.thumb),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.product.title ?? 'No Title',
+                   
+                    widget.product.title?.toUpperCase() ?? 'No Title',
+                     // Converts text to uppercase
                     style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black87,
                       fontWeight: FontWeight.w600,
+                      overflow: TextOverflow.ellipsis,
+                      
+                      
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -311,25 +420,123 @@ class _UserChatScreenState extends State<UserChatScreen> {
               icon: const Icon(Icons.more_vert, color: Colors.black87),
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  value: 'block',
+                  value: 'delete',
                   child: Row(
-                    children: const [
+                    children:  [
                       Icon(Icons.block, size: 20, color: Colors.red),
                       SizedBox(width: 8),
-                      Text('Block User'),
+                      // Text('DELETE'),
+
+
+                      TextButton(
+  onPressed: () async {
+    // Close the current dialog first
+    Navigator.pop(context);
+    
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Conversation'),
+          content: const Text('Are you sure you want to delete this conversation?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close confirmation dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Close confirmation dialog
+                Navigator.pop(context);
+                
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  final token = prefs.getString('token');
+
+                  final response = await http.post(
+                    Uri.parse('http://13.200.179.78/chat/removeConversation'),
+                    headers: {
+                      'Authorization': 'Bearer $token',
+                      'Content-Type': 'application/json',
+                    },
+                    body: json.encode({
+                      'conversationId': widget.conversationId,
+                    }),
+                  );
+
+                  if (response.statusCode == 200) {
+                    if (context.mounted) {
+                      // Show success message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Conversation deleted successfully'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      Navigator.pop(context);
+
+                      // // Navigate back to chat screen
+                      // Navigator.pushAndRemoveUntil(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const HomeScreen(),
+                      //   ),
+                      //   (route) => false,
+                      // );
+                    }
+                  } else {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Failed to delete conversation'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                }
+              },
+              child: const Text(
+                'Delete',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  },
+  child: const Text(
+    'Delete',
+    style: TextStyle(color: Colors.red),
+  ),
+),
+
                     ],
                   ),
                 ),
-                PopupMenuItem(
-                  value: 'report',
-                  child: Row(
-                    children: const [
-                      Icon(Icons.flag, size: 20, color: Colors.orange),
-                      SizedBox(width: 8),
-                      Text('Report'),
-                    ],
-                  ),
-                ),
+                // PopupMenuItem(
+                //   value: 'report',
+                //   child: Row(
+                //     children: const [
+                //       Icon(Icons.flag, size: 20, color: Colors.orange),
+                //       SizedBox(width: 8),
+                //       Text('Report'),
+                //     ],
+                //   ),
+                // ),
               ],
             ),
           ),
@@ -403,8 +610,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
+                          final previousMessage = index > 0 ? messages[index - 1] : null;
 
-                      return _MessageBubble(message: message);
+
+                      return _MessageBubble(message: message,
+                       previousMessage: previousMessage,
+                      
+                      );
                     },
                   ),
           ),
@@ -486,44 +698,267 @@ class _UserChatScreenState extends State<UserChatScreen> {
   }
 }
 
+// class _MessageBubble extends StatefulWidget {
+//   final Message message;
+
+//   const _MessageBubble({required this.message});
+
+//   @override
+//   State<_MessageBubble> createState() => _MessageBubbleState();
+// }
+
+// class _MessageBubbleState extends State<_MessageBubble> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Align(
+//       alignment: widget.message.isFromCurrentUser
+//           ? Alignment.centerRight
+//           : Alignment.centerLeft,
+//       child: Container(
+//         margin: const EdgeInsets.symmetric(vertical: 4),
+//         padding: const EdgeInsets.symmetric(
+//           horizontal: 16,
+//           vertical: 10,
+//         ),
+//         decoration: BoxDecoration(
+//           color:
+//               widget.message.isFromCurrentUser ? Colors.blue : Colors.grey[200],
+//           borderRadius: BorderRadius.circular(16),
+//         ),
+//         child: Text(
+//           widget.message.content,
+//           style: TextStyle(
+//             color:
+//                 widget.message.isFromCurrentUser ? Colors.white : Colors.black,
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+
+// class _MessageBubble extends StatefulWidget {
+//   final Message message;
+
+//   const _MessageBubble({required this.message});
+
+//   @override
+//   State<_MessageBubble> createState() => _MessageBubbleState();
+// }
+
+// class _MessageBubbleState extends State<_MessageBubble> {
+//   @override
+//   Widget build(BuildContext context) {
+//     return Align(
+//       alignment: widget.message.isFromCurrentUser
+//           ? Alignment.centerRight
+//           : Alignment.centerLeft,
+//       child: Column(
+//         crossAxisAlignment: widget.message.isFromCurrentUser
+//             ? CrossAxisAlignment.end
+//             : CrossAxisAlignment.start,
+//         children: [
+//           if (!widget.message.isFromCurrentUser && 
+//               (widget.message.firstName != null || widget.message.lastName != null))
+//             Padding(
+//               padding: const EdgeInsets.only(left: 8, bottom: 4),
+//               child: Text(
+//                 '${widget.message.firstName ?? ''} ${widget.message.lastName ?? ''}'.trim(),
+//                 style: TextStyle(
+//                   fontSize: 12,
+//                   color: Colors.grey[600],
+//                   fontWeight: FontWeight.w500,
+//                 ),
+//               ),
+//             ),
+//           Container(
+//             margin: const EdgeInsets.symmetric(vertical: 4),
+//             padding: const EdgeInsets.symmetric(
+//               horizontal: 16,
+//               vertical: 10,
+//             ),
+//             decoration: BoxDecoration(
+//               color: widget.message.isFromCurrentUser 
+//                   ? Colors.blue 
+//                   : Colors.grey[200],
+//               borderRadius: BorderRadius.circular(16),
+//             ),
+//             child: Text(
+//               widget.message.content,
+//               style: TextStyle(
+//                 color: widget.message.isFromCurrentUser 
+//                     ? Colors.white 
+//                     : Colors.black,
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
+
 class _MessageBubble extends StatefulWidget {
   final Message message;
+  final Message? previousMessage; // Add this to compare timestamps
 
-  const _MessageBubble({required this.message});
+  const _MessageBubble({
+    required this.message,
+    this.previousMessage,
+  });
 
   @override
   State<_MessageBubble> createState() => _MessageBubbleState();
 }
 
 class _MessageBubbleState extends State<_MessageBubble> {
+
+  String getMessageTime() {
+    final messageDate = widget.message.createdAt.toLocal();
+    final now = DateTime.now();
+    final difference = now.difference(messageDate);
+    
+    final timeFormat = DateFormat('hh:mm a'); // 12-hour format with AM/PM
+
+    if (difference.inDays == 0) {
+      return 'Today ${timeFormat.format(messageDate)}';
+    } else if (difference.inDays == 1) {
+      return 'Yesterday ${timeFormat.format(messageDate)}';
+    } else if (difference.inDays < 7) {
+      return '${difference.inDays} days ago';
+    } else {
+      return DateFormat('MMM d, y').format(messageDate) + 
+             ' ${timeFormat.format(messageDate)}';
+    }
+  }
+
+
+  bool shouldShowDate() {
+    if (widget.previousMessage == null) return true;
+    
+    final previousDate = widget.previousMessage!.createdAt;
+    final currentDate = widget.message.createdAt;
+    
+    return !DateUtils.isSameDay(previousDate, currentDate);
+  }
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: widget.message.isFromCurrentUser
-          ? Alignment.centerRight
-          : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 10,
-        ),
-        decoration: BoxDecoration(
-          color:
-              widget.message.isFromCurrentUser ? Colors.blue : Colors.grey[200],
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Text(
-          widget.message.content,
-          style: TextStyle(
-            color:
-                widget.message.isFromCurrentUser ? Colors.white : Colors.black,
+    // Explicitly check if the message is from current user
+    final isSentMessage = widget.message.isFromCurrentUser;
+
+    return Column(
+      children: [
+        if (shouldShowDate())
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  getMessageTime(),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        Align(
+          // Force alignment based on message type
+          alignment: isSentMessage ? Alignment.centerRight : Alignment.centerLeft,
+          child: Container(
+            constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width * 0.75,
+            ),
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            child: Column(
+              crossAxisAlignment: isSentMessage 
+                  ? CrossAxisAlignment.end 
+                  : CrossAxisAlignment.start,
+              children: [
+                // Only show sender name for received messages
+                if (!isSentMessage && 
+                    (widget.message.firstName != null || 
+                     widget.message.lastName != null))
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, bottom: 4),
+                    child: Text(
+                      '${widget.message.firstName ?? ''} ${widget.message.lastName ?? ''}'
+                          .trim(),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey[600],
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    // Different colors for sent and received messages
+                    color: isSentMessage
+                        ? const Color(0xFF2B7FFF) // Blue for sent messages
+                        : const Color.fromARGB(255, 189, 211, 24),       // Grey for received messages
+                    borderRadius: BorderRadius.only(
+                      topLeft: const Radius.circular(16),
+                      topRight: const Radius.circular(16),
+                      bottomLeft: Radius.circular(isSentMessage ? 16 : 4),
+                      bottomRight: Radius.circular(isSentMessage ? 4 : 16),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isSentMessage 
+                        ? CrossAxisAlignment.end 
+                        : CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.message.content,
+                        style: TextStyle(
+                          color: isSentMessage ? Colors.white : const Color.fromARGB(221, 249, 248, 248),
+                          fontSize: 18,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        DateFormat('hh:mm a').format(
+                          widget.message.createdAt.toLocal()
+                        ),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isSentMessage
+                              ? Colors.white.withOpacity(0.7)
+                              : const Color.fromARGB(255, 13, 2, 2),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }
+
+
 
 // Add these model classes at the bottom of the file or in a separate models file
 
@@ -533,6 +968,8 @@ class Message {
   final String content;
   final DateTime createdAt;
   final bool isFromCurrentUser;
+   final String? firstName;  // Add this
+  final String? lastName;   // Add this
 
   Message({
     required this.id,
@@ -540,16 +977,20 @@ class Message {
     required this.content,
     required this.createdAt,
     required this.isFromCurrentUser,
+    this.firstName,         // Add this
+    this.lastName,         // Add this
   });
 
   factory Message.fromJson(Map<String, dynamic> map, String currentUserId) {
+     final senderName = map['senderName'] as Map<String, dynamic>?;
     return Message(
       id: map['_id']?.toString() ?? '',
       senderId: map['senderId']?.toString() ?? '',
       content: map['content']?.toString() ?? '',
-      createdAt:
-          DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()),
+       createdAt: DateTime.parse(map['createdAt'] ?? DateTime.now().toIso8601String()).toLocal(), // Convert to local time
       isFromCurrentUser: map['senderId']?.toString() == currentUserId,
+        firstName: senderName?['first_name']?.toString(),
+      lastName: senderName?['last_name']?.toString(),
     );
   }
 }
@@ -565,6 +1006,7 @@ class Conversation {
   final DateTime createdAt;
   final ProductModel product;
   final bool isBuying;
+  
 
   // final String? firstName;
   // final String? lastName;

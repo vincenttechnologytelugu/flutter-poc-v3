@@ -4,7 +4,12 @@ import 'package:flutter_poc_v3/models/action_flags.dart';
 import 'package:intl/intl.dart';
 
 class ProductModel {
+
    final String? published_at;
+  final String publishedAt; // Add this field
+  
+    final dynamic featured_at;  // Add this line
+  dynamic valid_till; // Change type to dynamic to handle both int and String
   final ActionFlags? actionFlags;
   final String? id;
   final String? title;
@@ -23,6 +28,8 @@ class ProductModel {
   final String? city;
   final String? thumb;
   final String icon;
+  
+ 
   
 
   final String? electronics_category;
@@ -59,7 +66,7 @@ class ProductModel {
   // ignore: non_constant_identifier_names
   final String? contact_info;
   final String? warranty;
-  int? featured_at; // Unix timestamp in seconds
+//  final int? featured_at; // Unix timestamp in seconds
 
   // Pets specific
 
@@ -79,7 +86,7 @@ class ProductModel {
   final String? bikeBrand;
   final String? bikeModel;
   final String? bikeYear;
-  final String? bikeMileage;
+ 
   final String? bikeCondition;
   final String? bikeDescription;
 
@@ -122,10 +129,12 @@ class ProductModel {
   String? posted_by;
   int? created_at;
   int? last_updated_at;
-  int? valid_till;
+  // final int? valid_till;
   
   int? deleted_at;
   int? assetId;
+
+  
   final List<Map<String, dynamic>>? assets; // Add this field
 
   String get thumbnailUrl {
@@ -138,9 +147,24 @@ class ProductModel {
     return imageAsset['url'] ?? '';
   }
 
-  ProductModel({
-    this.published_at,
 
+  //  String getFirstImageUrl() {
+  //   if (assets != null && assets!.isNotEmpty) {
+  //     var imageAsset = assets!.firstWhere(
+  //       (asset) => asset['type'].toString().contains('image'),
+  //       orElse: () => {},
+  //     );
+  //     if (imageAsset.containsKey('url')) {
+  //       return 'http://13.200.179.78/${imageAsset['url']}';
+  //     }
+  //   }
+  //   return '';
+  // }
+
+  ProductModel({
+   
+    this.published_at,
+ required this.publishedAt, // Add this
     this.assetId,
     this.assets,
     this.actionFlags,
@@ -178,7 +202,7 @@ class ProductModel {
     this.bikeBrand,
     this.bikeModel,
     this.bikeYear,
-    this.bikeMileage,
+    
     this.bikeCondition,
     this.bikeDescription,
     this.type,
@@ -235,9 +259,12 @@ class ProductModel {
     this.created_at,
     this.last_updated_at,
     this.valid_till,
-    
+   this.featured_at,
+   
     this.deleted_at,
-    this.featured_at,
+   
+
+   
   });
   Map<String, dynamic> toJson() {
     return {
@@ -246,6 +273,9 @@ class ProductModel {
       // Add other fields as needed
     };
   }
+
+ 
+
 
   factory ProductModel.fromJson(Map<String, dynamic> map) {
     try {
@@ -270,6 +300,7 @@ class ProductModel {
       // }
       //    log('Parsed ID: $id'); // Debug print to verify parsed ID
       return ProductModel(
+        publishedAt: map['published_at'] ?? '',
           published_at: map['published_at'],
         id: id,
         // id: int.tryParse(id.toString()), // Convert to int if needed
@@ -347,7 +378,7 @@ class ProductModel {
         bikeBrand: map['bikeBrand']?.toString(),
         bikeModel: map['bikeModel']?.toString(),
         bikeYear: map['bikeYear']?.toString(),
-        bikeMileage: map['bikeMileage']?.toString(),
+    
         bikeCondition: map['bikeCondition']?.toString(),
         bikeDescription: map['bikeDescription']?.toString(),
         type: map['type']?.toString(),
@@ -457,6 +488,7 @@ class ProductModel {
                         1000
                     : null)
             : null,
+         
         valid_till: map['valid_till'] != null
             ? (map['valid_till'] is int
                 ? map['valid_till']
@@ -469,6 +501,9 @@ class ProductModel {
         assets: map['assets'] != null
             ? List<Map<String, dynamic>>.from(map['assets'])
             : null, // Add this line to parse assets
+
+
+            
       );
     } catch (e) {
       log('Error parsing JSON: $e');
@@ -479,94 +514,9 @@ class ProductModel {
   }
   Map<String, dynamic> toMap() {
     return {
-      // 'id': id,
-      // 'icon': icon,
-      // 'title': title,
-      // 'price': price,
-      // 'model': model,
-      // 'year': year,
-      // 'location': location,
-      // 'brand': brand,
-      // 'fuel': fuel,
-      // 'transmission': transmission,
-      // 'mileage': mileage,
-      // 'ownerType': ownerType,
-      // 'condition': condition,
-      // 'description': description,
-      // 'category': category,
-      // 'city': city,
-      // 'thumb': thumb,
-      // 'propertyType': propertyType,
-      // 'bedrooms': bedrooms,
-      // 'bathrooms': bathrooms,
-      // 'area': area,
-      // 'furnishing': furnishing,
-      // 'storage': storage,
-      // 'ram': ram,
-      // 'screenSize': screenSize,
-      // 'camera': camera,
-      // 'battery': battery,
-      // 'processor': processor,
-      // 'operatingSystem': operatingSystem,
-      // 'position': position,
-      // 'company': company,
-      // 'salary': salary,
-      // 'experienceLevel': experienceLevel,
-      // 'jobType': jobType,
-      // 'industry': industry,
-      // 'qualifications': qualifications,
-      // 'contact_info': contact_info,
-      // 'pet_category': pet_category,
-      // 'breed': breed,
-      // 'vaccinationType': vaccinationType,
-      // 'serviceType': serviceType,
-      // 'serviceCategory': serviceCategory,
-      // 'bikeType': bikeType,
-      // 'bikeBrand': bikeBrand,
-      // 'bikeModel': bikeModel,
-      // 'bikeYear': bikeYear,
-      // 'bikeMileage': bikeMileage,
-      // 'bikeCondition': bikeCondition,
-      // 'bikeDescription': bikeDescription,
-      // 'type': type,
-      // 'floorNumber': floorNumber,
-      // 'totalFloors': totalFloors,
-      // 'electronics_category': electronics_category,
-      // 'product': product,
-      // 'warranty': warranty,
-      // 'color': color,
-      // 'fashion_category': fashion_category,
-      // 'size': size,
-      // 'hobby_category': hobby_category,
-      // 'material': material,
-      // 'dimensions': dimensions,
-      // 'vaccinationdType': vaccinationdType,
-      // 'posted_at': posted_at,
-      // 'kilometers': kilometers,
-      // 'fuelType': fuelType,
-      // 'firstName': firstName,
-      // 'lastName': lastName,
-      // 'name': name,
-      // 'features': features,
-      // 'postCount': postCount,
-      // 'validityMonths': validityMonths,
-      // 'imageAttachments': imageAttachments,
-      // 'videoAttachments': videoAttachments,
-      // 'contacts': contacts,
-      // 'manualBoostInterval': manualBoostInterval,
-      // 'createdAt': createdAt,
-      // 'lastUpdated': lastUpdated,
-      // 'isActive': isActive,
-      // 'state': state,
-      // 'convesationId': convesationId,
-      // 'posted_by': posted_by,
-      // 'created_at': created_at,
-      // 'last_updated_at': last_updated_at,
-      // 'valid_till': valid_till,
-      // 'published_at': published_at,
-      // 'deleted_at': deleted_at,
-      // 'featured_at': featured_at,
+     
       'assets': assets, // Add this line to include assets in the map
+        'featured_at': featured_at,  // Add this line
     };
   }
  List<String> getAllImageIds() {
@@ -610,4 +560,39 @@ class ProductModel {
     }
   }
 
+
+
+  String getFirstImageUrl() {
+    try {
+      if (assets != null && assets!.isNotEmpty) {
+        var imageAsset = assets!.firstWhere(
+          (asset) => asset['type'].toString().contains('image'),
+          orElse: () => {},
+        );
+        if (imageAsset.containsKey('url')) {
+          log('Found image URL: ${imageAsset['url']}'); // Debug print
+          return 'http://13.200.179.78/${imageAsset['url']}';
+        }
+      }
+      log('No image assets found'); // Debug print
+      return '';
+    } catch (e) {
+      log('Error getting image URL: $e'); // Debug print
+      return '';
+    }
+  }
+
+
+
+
+
+ 
+
+  
+
 }
+
+// In product_model.dart
+
+
+

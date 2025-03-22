@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'dart:math' show sin, pi;
 
 class CategoryBasedPostsScreen extends StatefulWidget {
   final String apiUrl;
@@ -19,8 +20,6 @@ class CategoryBasedPostsScreen extends StatefulWidget {
     super.key,
     required this.apiUrl,
     required this.title,
-  
-    
   });
 
   @override
@@ -32,11 +31,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
   CartController cartController = Get.put(CartController());
   final ScrollController _scrollController = ScrollController();
   // At the top of the class, add:
-LocationController locationController = Get.find<LocationController>();
-
- 
-
-
+  LocationController locationController = Get.find<LocationController>();
 
   List<ProductModel> productModel = [];
 
@@ -44,44 +39,24 @@ LocationController locationController = Get.find<LocationController>();
   bool hasMore = true;
   int page = 0;
   final int pageSize = 50;
- String location = "Select Location"; // Add this line
-@override
+  String location = "Select Location"; // Add this line
+  @override
   void initState() {
     super.initState();
-  
 
+    // Listen to location changes
+    ever(locationController.currentCity, (_) {
+      _loadPosts();
+    });
 
-     // Listen to location changes
-  ever(locationController.currentCity, (_) {
-    _loadPosts();
-  });
-  
-  ever(locationController.currentState, (_) {
-    _loadPosts();
-  });
-   
+    ever(locationController.currentState, (_) {
+      _loadPosts();
+    });
+
     _loadPosts();
 
-   
     _scrollController.addListener(_scrollListener);
   }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
   void _scrollListener() {
     if (_scrollController.position.pixels ==
@@ -93,27 +68,18 @@ LocationController locationController = Get.find<LocationController>();
     }
   }
 
-  String _formatDateTime(String? dateTimeStr) {
-    if (dateTimeStr == null) return 'No date';
-
+  String _formatDate(String dateString) {
     try {
-      final dateTime = DateTime.parse(dateTimeStr);
-      final now = DateTime.now();
-      final difference = now.difference(dateTime);
+      // Parse ISO 8601 format string to DateTime
+      DateTime dateTime = DateTime.parse(dateString);
 
-      if (difference.inDays > 7) {
-        // Show full date for posts older than a week
-        return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
-      } else if (difference.inDays > 0) {
-        return '${difference.inDays} ${difference.inDays == 1 ? 'day' : 'days'} ago';
-      } else if (difference.inHours > 0) {
-        return '${difference.inHours} ${difference.inHours == 1 ? 'hour' : 'hours'} ago';
-      } else if (difference.inMinutes > 0) {
-        return '${difference.inMinutes} ${difference.inMinutes == 1 ? 'minute' : 'minutes'} ago';
-      } else {
-        return 'Just now';
-      }
+      // Convert to local time zone
+      dateTime = dateTime.toLocal();
+
+      // Format the date
+      return DateFormat('EEE, MMM d, yyyy').format(dateTime);
     } catch (e) {
+      log('Error parsing date: $e');
       return 'Invalid date';
     }
   }
@@ -131,7 +97,7 @@ LocationController locationController = Get.find<LocationController>();
   //         ...Uri.parse(widget.apiUrl).queryParameters,
   //         'page': page.toString(),
   //         'psize': pageSize.toString(),
-          
+
   //       },
   //     );
 
@@ -171,17 +137,10 @@ LocationController locationController = Get.find<LocationController>();
   //   }
   // }
 
+  Future<void> _loadPosts() async {
+    if (isLoading) return;
 
-
-
-
-
-
-
-Future<void> _loadPosts() async {
-  if (isLoading) return;
-
-  setState(() {
+    setState(() {
       isLoading = true;
       // Clear existing posts when location changes
       if (page == 0) {
@@ -189,74 +148,65 @@ Future<void> _loadPosts() async {
       }
     });
 
-  try {
-    // Get current location details from LocationController
-    final currentCity = locationController.currentCity.value;
-    final currentState = locationController.currentState.value;
-    
-    // Create query parameters map
-    final queryParams = {
-      'page': page.toString(),
-      'psize': pageSize.toString(),
-      'city': currentCity,
-      'state': currentState,
-      // Add any other existing query parameters from the original URL
-      ...Uri.parse(widget.apiUrl).queryParameters,
-    };
+    try {
+      // Get current location details from LocationController
+      final currentCity = locationController.currentCity.value;
+      final currentState = locationController.currentState.value;
 
-    // Remove null or empty values
-    queryParams.removeWhere((key, value) => value == null || value.isEmpty);
+      // Create query parameters map
+      final queryParams = {
+        'page': page.toString(),
+        'psize': pageSize.toString(),
+        'city': currentCity,
+        'state': currentState,
+        // Add any other existing query parameters from the original URL
+        ...Uri.parse(widget.apiUrl).queryParameters,
+      };
 
-    final Uri uri = Uri.parse(widget.apiUrl).replace(
-      queryParameters: queryParams,
-    );
+      // Remove null or empty values
+      queryParams.removeWhere((key, value) => value == null || value.isEmpty);
 
-    log('Loading posts from: $uri');
+      final Uri uri = Uri.parse(widget.apiUrl).replace(
+        queryParameters: queryParams,
+      );
 
-    final response = await http.get(uri);
-    log('Response status: ${response.statusCode}');
-    log('Response body: ${response.body}');
+      log('Loading posts from: $uri');
 
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseData = json.decode(response.body);
-      final List<dynamic> data = responseData['data'] ?? [];
+      final response = await http.get(uri);
+      log('Response status: ${response.statusCode}');
+      log('Response body: ${response.body}');
 
-      final List<ProductModel> newPosts =
-          data.map((json) => ProductModel.fromJson(json)).toList();
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        final List<dynamic> data = responseData['data'] ?? [];
 
-      setState(() {
-        productModel.addAll(newPosts);
-        hasMore = newPosts.length == pageSize;
-        isLoading = false;
-        // Update location in the UI
-        location = '$currentCity, $currentState';
-      });
+        final List<ProductModel> newPosts =
+            data.map((json) => ProductModel.fromJson(json)).toList();
 
-      log('Number of posts loaded: ${newPosts.length}');
-      log('Total posts: ${productModel.length}');
-    } else {
-      log('Error: ${response.statusCode}');
+        setState(() {
+          productModel.addAll(newPosts);
+          hasMore = newPosts.length == pageSize;
+          isLoading = false;
+          // Update location in the UI
+          location = '$currentCity, $currentState';
+        });
+
+        log('Number of posts loaded: ${newPosts.length}');
+        log('Total posts: ${productModel.length}');
+      } else {
+        log('Error: ${response.statusCode}');
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e, stackTrace) {
+      log('Exception: $e');
+      log('Stack trace: $stackTrace');
       setState(() {
         isLoading = false;
       });
     }
-  } catch (e, stackTrace) {
-    log('Exception: $e');
-    log('Stack trace: $stackTrace');
-    setState(() {
-      isLoading = false;
-    });
   }
-}
-
-
-
-
-
-
-
-  
-
 
   void _navigateToProductDetails(ProductModel product) {
     Get.to(() => ProductDetails(productModel: product));
@@ -265,33 +215,38 @@ Future<void> _loadPosts() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-          appBar: PreferredSize(
-  preferredSize: const Size.fromHeight(130), // Adjust height as needed
-  child: SafeArea(
-    child: Column(
-      mainAxisSize: MainAxisSize.min, // Added this to minimize height
-      children: [
-         HomeappbarScreen(
-           location: location,
-          onLocationTap: () async{
-            
-            // Handle location tap if needed
-          },
-        ), // Add HomeAppBar here
-        AppBar(
-       centerTitle: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(130), // Adjust height as needed
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Added this to minimize height
+            children: [
+              HomeappbarScreen(
+                location: location,
+                onLocationTap: () async {
+                  // Handle location tap if needed
+                },
+              ), // Add HomeAppBar here
+              AppBar(
+                centerTitle: true,
 
-           automaticallyImplyLeading: false,  // Add this line to remove b
-        title: Text(widget.title.toUpperCase(),style:TextStyle(color: Colors.black,fontSize: 20,fontWeight: FontWeight.bold,),textAlign: TextAlign.center),
-          elevation: 0,
-          
-          backgroundColor: Colors.transparent, // Make it transparent to avoid double background
-        
+                automaticallyImplyLeading: false, // Add this line to remove b
+                title: Text(widget.title.toUpperCase(),
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center),
+                elevation: 0,
+
+                backgroundColor: Colors
+                    .transparent, // Make it transparent to avoid double background
+              ),
+            ],
+          ),
         ),
-      ],
-    ),
-  ),
-),
+      ),
       // appBar: AppBar(
       //   automaticallyImplyLeading: false,
       //   title: Text(widget.title),
@@ -457,10 +412,17 @@ Future<void> _loadPosts() async {
                                       color: Colors.grey[
                                           100], // Light background for placeholder
                                     ),
-                                    child: post.thumb != null &&
-                                            post.thumb!.isNotEmpty
+                                    // child: post.thumb != null &&
+                                    //         post.thumb!.isNotEmpty
+                                    //     ? Image.network(
+                                    //         post.thumb!,
+                                    //         fit: BoxFit.cover,
+                                    child: post.thumbnailUrl != null &&
+                                            post.thumbnailUrl.isNotEmpty
                                         ? Image.network(
-                                            post.thumb!,
+                                            'http://13.200.179.78/${post.thumbnailUrl!}',
+                                            height: 200,
+                                            width: double.infinity,
                                             fit: BoxFit.cover,
                                             errorBuilder:
                                                 (context, error, stackTrace) {
@@ -516,90 +478,344 @@ Future<void> _loadPosts() async {
                                           ),
                                   ),
 
-                                  // Favorite Button
+                                  // // Favorite Button
+                                  // Positioned(
+                                  //   top: 8,
+                                  //   right: 8,
+                                  //   child: Container(
+                                  //       decoration: BoxDecoration(
+                                  //         color: Colors.white.withOpacity(0.9),
+                                  //         shape: BoxShape.circle,
+                                  //       ),
+                                  //       child: GetBuilder<CartController>(
+                                  //         builder: (controller) => IconButton(
+                                  //           onPressed: () {
+                                  //             if (cartController.isFavourite(
+                                  //                 post.id.toString())) {
+                                  //               cartController
+                                  //                   .removeFromFavourite(
+                                  //                       context,
+                                  //                       post.id.toString());
+                                  //             } else {
+                                  //               cartController.addToFavourite(
+                                  //                   context,
+                                  //                   post.id.toString());
+                                  //             }
+                                  //           },
+                                  //           icon: Icon(
+                                  //             Icons.favorite,
+                                  //             color: cartController.isFavourite(
+                                  //                     post.id.toString())
+                                  //                 ? Colors.pink
+                                  //                 : Colors.grey,
+                                  //             size: 20,
+                                  //           ),
+                                  //         ),
+                                  //       )),
+                                  // ),
+
                                   Positioned(
-                                    top: 8,
-                                    right: 8,
+                                    top: 5,
+                                    right: 5,
                                     child: Container(
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withOpacity(0.9),
-                                          shape: BoxShape.circle,
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                            255, 203, 203, 189),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: Colors.white,
+                                          width: 3.0,
                                         ),
-                                        child: GetBuilder<CartController>(
-                                          builder: (controller) => IconButton(
-                                            onPressed: () {
-                                              if (cartController.isFavourite(
-                                                  post.id.toString())) {
-                                                cartController
-                                                    .removeFromFavourite(
-                                                        context,
-                                                        post.id.toString());
-                                              } else {
-                                                cartController.addToFavourite(
-                                                    context,
-                                                    post.id.toString());
-                                              }
-                                            },
-                                            icon: Icon(
-                                              Icons.favorite,
-                                              color: cartController.isFavourite(
-                                                      post.id.toString())
-                                                  ? Colors.pink
-                                                  : Colors.grey,
-                                              size: 20,
-                                            ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black
+                                                .withAlpha((0.5 * 255).round()),
+                                            blurRadius: 4,
+                                            spreadRadius: 1,
                                           ),
-                                        )
-
-                                        //  child: IconButton(
-                                        //         onPressed: () {
-                                        //           if (cartController
-                                        //               .isFavourite(post
-                                        //                   .id
-                                        //                   .toString())) {
-                                        //             cartController
-                                        //                 .removeFromFavourite(
-                                        //                     context,
-                                        //                     post.id
-                                        //                         .toString());
-                                        //           } else {
-                                        //             cartController
-                                        //                 .addToFavourite(
-                                        //                     context,
-                                        //                     post.id
-                                        //                         .toString());
-                                        //           }
-
-                                        //           // cartController.addToCart(
-                                        //           //     context, productModel);
-                                        //         },
-                                        //         icon:  Icon(
-                                        //           Icons.favorite,
-
-                                        //           // Icons
-                                        //           //     .add_shopping_cart_outlined,
-                                        //           color: cartController
-                                        //                   .isFavourite(
-                                        //                       post.id
-                                        //                           .toString())
-                                        //               ? Colors.pink
-                                        //               : Colors.grey,
-                                        //           size: 20,
-                                        //         ),
-                                        //       ),
-                                        // child: IconButton(
-                                        //   icon: const Icon(
-                                        //     Icons.favorite_border,
-                                        //     color: Colors.red,
-                                        //   ),
-                                        //   onPressed: () {
-                                        //     // Add your favorite functionality here using CartController
-                                        //     // Get.find<CartController>()
-                                        //     //     .addToCart(context, post);
-                                        //   },
-                                        // ),
+                                        ],
+                                      ),
+                                      child: GetBuilder<CartController>(
+                                        builder: (cartController) =>
+                                            TweenAnimationBuilder(
+                                          duration: Duration(milliseconds: 100),
+                                          tween: Tween<double>(
+                                            begin: 0,
+                                            end: cartController.isFavourite(
+                                                    post.id.toString())
+                                                ? 1
+                                                : 0,
+                                          ),
+                                          builder: (context, double value, _) {
+                                            return IconButton(
+                                              onPressed: () {
+                                                if (cartController.isFavourite(
+                                                    post.id.toString())) {
+                                                  cartController
+                                                      .removeFromFavourite(
+                                                    context,
+                                                    post.id.toString(),
+                                                  );
+                                                } else {
+                                                  cartController.addToFavourite(
+                                                    context,
+                                                    post.id.toString(),
+                                                  );
+                                                }
+                                              },
+                                              icon: Stack(
+                                                alignment: Alignment.center,
+                                                children: [
+                                                  if (cartController
+                                                      .isFavourite(
+                                                          post.id.toString()))
+                                                    ...List.generate(
+                                                      5,
+                                                      (index) =>
+                                                          AnimatedOpacity(
+                                                        duration:
+                                                            const Duration(
+                                                                milliseconds:
+                                                                    100),
+                                                        opacity: value,
+                                                        child: Transform.scale(
+                                                          scale: 1 +
+                                                              (index * 0.2) *
+                                                                  value,
+                                                          child:
+                                                              Transform.rotate(
+                                                            angle:
+                                                                (index * 0.0) *
+                                                                    value *
+                                                                    0.10,
+                                                            child: Icon(
+                                                              Icons.favorite,
+                                                              color: HSLColor
+                                                                      .fromAHSL(
+                                                                1.0,
+                                                                (index *
+                                                                        10.0 *
+                                                                        value) %
+                                                                    20,
+                                                                0.8,
+                                                                0.5 +
+                                                                    (value *
+                                                                        0.3),
+                                                              )
+                                                                  .toColor()
+                                                                  .withOpacity(1 -
+                                                                      (index *
+                                                                          0.15)),
+                                                              size: 20,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ).toList(),
+                                                  if (cartController
+                                                      .isFavourite(
+                                                          post.id.toString()))
+                                                    ...List.generate(
+                                                      6,
+                                                      (index) =>
+                                                          TweenAnimationBuilder(
+                                                        tween: Tween(
+                                                            begin: 0.0,
+                                                            end: 1.0),
+                                                        duration: Duration(
+                                                            milliseconds: 1000 +
+                                                                index * 200),
+                                                        curve:
+                                                            Curves.easeInExpo,
+                                                        builder: (context,
+                                                            value, child) {
+                                                          return Transform
+                                                              .translate(
+                                                            offset: Offset(
+                                                              sin(value *
+                                                                      pi *
+                                                                      2) *
+                                                                  15,
+                                                              -value * 50,
+                                                            ),
+                                                            child: Opacity(
+                                                              opacity:
+                                                                  1 - value,
+                                                              child: Transform
+                                                                  .scale(
+                                                                scale: 1 -
+                                                                    value * 0.5,
+                                                                child:
+                                                                    Container(
+                                                                  width: 10,
+                                                                  height: 10,
+                                                                  decoration:
+                                                                      BoxDecoration(
+                                                                    color: const Color
+                                                                            .fromARGB(
+                                                                            255,
+                                                                            246,
+                                                                            3,
+                                                                            226)
+                                                                        .withOpacity(
+                                                                            0.9),
+                                                                    shape: BoxShape
+                                                                        .circle,
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: Colors
+                                                                            .white
+                                                                            .withOpacity(0.4),
+                                                                        blurRadius:
+                                                                            10,
+                                                                        spreadRadius:
+                                                                            2,
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                    ),
+                                                  Icon(
+                                                    Icons.favorite,
+                                                    color: TweenSequence<
+                                                        Color?>([
+                                                      TweenSequenceItem(
+                                                        weight: 1.0,
+                                                        tween: ColorTween(
+                                                          begin: Colors.grey,
+                                                          end: const Color
+                                                              .fromARGB(
+                                                              255, 205, 4, 241),
+                                                        ),
+                                                      ),
+                                                      TweenSequenceItem(
+                                                        weight: 1.0,
+                                                        tween: ColorTween(
+                                                          begin: const Color
+                                                              .fromARGB(
+                                                              255, 213, 4, 250),
+                                                          end: const Color
+                                                              .fromARGB(
+                                                              255, 6, 82, 157),
+                                                        ),
+                                                      ),
+                                                      TweenSequenceItem(
+                                                        weight: 1.0,
+                                                        tween: ColorTween(
+                                                          begin: Colors.blue,
+                                                          end: const Color
+                                                              .fromARGB(
+                                                              255, 160, 243, 7),
+                                                        ),
+                                                      ),
+                                                      TweenSequenceItem(
+                                                        weight: 1.0,
+                                                        tween: ColorTween(
+                                                          begin: const Color
+                                                              .fromARGB(
+                                                              255, 247, 1, 112),
+                                                          end: const Color
+                                                              .fromARGB(
+                                                              255, 241, 2, 2),
+                                                        ),
+                                                      ),
+                                                    ]).evaluate(
+                                                        AlwaysStoppedAnimation(
+                                                            value)),
+                                                    size: 20,
+                                                  )
+                                                ],
+                                              ),
+                                            );
+                                          },
                                         ),
+                                      ),
+                                    ),
                                   ),
+
+  Builder(
+                                            builder: (context) {
+                                              // More detailed debug prints
+                                              log('Raw product data: ${jsonEncode(post.toJson())}'); // Add toJson() method if not exists
+                                              log('Featured at: ${post.featured_at}');
+                                              log('Valid till: ${post.valid_till}');
+                                              log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
+
+                                              // Simplified featured check
+                                              bool isFeatured = false;
+                                              if (post.featured_at != null &&
+                                                  post.valid_till != null) {
+                                                final now = DateTime.now()
+                                                        .millisecondsSinceEpoch ~/
+                                                    1000;
+                                                isFeatured = post
+                                                            .featured_at! <=
+                                                        now &&
+                                                   post.valid_till! >= now;
+                                                log('Time check: $now is between ${post.featured_at} and ${post.valid_till}');
+                                              }
+
+                                              log('Is Featured: $isFeatured');
+
+                                              if (!isFeatured)
+                                                return const SizedBox.shrink();
+
+                                              return Positioned(
+                                                top: 10,
+                                                left: 10,
+                                                child: Container(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 8,
+                                                      vertical: 4),
+                                                  decoration: BoxDecoration(
+                                                    gradient:
+                                                        const LinearGradient(
+                                                      colors: [
+                                                        Color(
+                                                            0xFF6A1B9A), // Deep Purple
+                                                        Color(
+                                                            0xFFE91E63), // Pink
+                                                      ],
+                                                      begin: Alignment.topLeft,
+                                                      end:
+                                                          Alignment.bottomRight,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            12),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.3),
+                                                        blurRadius: 4,
+                                                        offset:
+                                                            const Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: const Text(
+                                                    'FEATURED',
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontSize: 12,
+                                                      letterSpacing: 0.5,
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+
+
+
                                 ],
                               ),
                               Padding(
@@ -627,7 +843,7 @@ Future<void> _loadPosts() async {
                                           style: const TextStyle(
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color:Colors.red,
+                                            color: Colors.red,
                                             // color: Color.fromARGB(
                                             //     255, 243, 6, 176),
                                           ),
@@ -662,14 +878,35 @@ Future<void> _loadPosts() async {
                                       ],
                                     ),
                                     const SizedBox(height: 8),
+                                    // Row(
+                                    //   children: [
+                                    //     Icon(Icons.access_time,
+                                    //         size: 16, color: Colors.grey[600]),
+                                    //     const SizedBox(width: 4),
+
+                                    // Text(
+                                    //       (post.getFormattedDateWithTime()),
+                                    //       style: TextStyle(
+                                    //         color: Colors.grey[600],
+                                    //         fontSize: 14,
+                                    //       ),
+                                    //     ),
+                                    //   ],
+                                    // ),
+
+                                    const SizedBox(
+                                        height:
+                                            8), // Add spacing between location and published date
                                     Row(
                                       children: [
-                                        Icon(Icons.access_time,
-                                            size: 16, color: Colors.grey[600]),
+                                        Icon(
+                                            Icons
+                                                .calendar_today, // Using calendar icon for published date
+                                            size: 16,
+                                            color: Colors.grey[600]),
                                         const SizedBox(width: 4),
-                                              
-                                    Text(
-                                          _formatDateTime(post.posted_at),
+                                        Text(
+                                          'Published: ${post.published_at != null ? DateFormat('MMM dd, yyyy').format(DateTime.parse(post.published_at!)) : 'Not available'}',
                                           style: TextStyle(
                                             color: Colors.grey[600],
                                             fontSize: 14,
@@ -687,141 +924,6 @@ Future<void> _loadPosts() async {
                     );
                   },
                 ),
-
-      // : ListView.builder(
-      //     controller: _scrollController,
-      //     itemCount: posts.length + (hasMore ? 1 : 0),
-      //     itemBuilder: (context, index) {
-      //       if (index == posts.length) {
-      //         return Center(
-      //           child: Padding(
-      //             padding: const EdgeInsets.all(8.0),
-      //             child: isLoading
-      //                 ? const CircularProgressIndicator()
-      //                 : const SizedBox(),
-      //           ),
-      //         );
-      //       }
-
-      //       final post = posts[index];
-      //       return InkWell(
-      //         onTap: () => _navigateToProductDetails(post),
-      //         child: Card(
-      //           margin: const EdgeInsets.symmetric(
-      //             horizontal: 16,
-      //             vertical: 8,
-      //           ),
-      //           child: Column(
-      //             crossAxisAlignment: CrossAxisAlignment.start,
-      //             children: [
-      //               ListTile(
-      //                 leading: SizedBox(
-      //                   width: 80,
-      //                   height: 80,
-      //                   child: post.thumb != null &&
-      //                           post.thumb!.isNotEmpty
-      //                       ? ClipRRect(
-      //                           borderRadius: BorderRadius.circular(4),
-      //                           child: Image.network(
-      //                             post.thumb!,
-      //                             fit: BoxFit.cover,
-      //                             errorBuilder:
-      //                                 (context, error, stackTrace) {
-      //                               return Container(
-      //                                 decoration: BoxDecoration(
-      //                                   color: Colors.grey[200],
-      //                                   borderRadius:
-      //                                       BorderRadius.circular(4),
-      //                                 ),
-      //                                 child: const Icon(
-      //                                   Icons.image_not_supported,
-      //                                   color: Colors.grey,
-      //                                 ),
-      //                               );
-      //                             },
-      //                           ),
-      //                         )
-      //                       : Container(
-      //                           decoration: BoxDecoration(
-      //                             color: Colors.grey[200],
-      //                             borderRadius:
-      //                                 BorderRadius.circular(4),
-      //                           ),
-      //                           child: const Icon(
-      //                             Icons.image_not_supported,
-      //                             color: Colors.grey,
-      //                           ),
-      //                         ),
-      //                 ),
-      //                 title: Text(
-      //                   post.title ?? 'No Title',
-      //                   maxLines: 2,
-      //                   overflow: TextOverflow.ellipsis,
-      //                 ),
-
-      //                 trailing: Text(
-      //                   '₹${post.price ?? 'N/A'}',
-      //                   style: const TextStyle(
-      //                     fontWeight: FontWeight.bold,
-      //                     fontSize: 16,
-      //                   ),
-      //                 ),
-      //               ),
-      //               Padding(
-      //                 padding: const EdgeInsets.only(
-      //                   left: 16,
-      //                   right: 16,
-      //                   bottom: 12,
-      //                 ),
-      //                 child: Row(
-      //                   children: [
-      //                     Icon(
-      //                       Icons.access_time,
-      //                       size: 16,
-      //                       color: Colors.grey[600],
-      //                     ),
-      //                     const SizedBox(width: 4),
-      //                     Text(
-      //                       _formatDateTime(post.posted_at),
-      //                       style: TextStyle(
-      //                         color: Colors.grey[600],
-      //                         fontSize: 12,
-      //                       ),
-      //                     ),
-      //                     const SizedBox(width: 16),
-      //                     Icon(
-      //                       Icons.location_on,
-      //                       size: 16,
-      //                       color: Colors.grey[600],
-      //                     ),
-      //                     const SizedBox(width: 4),
-      //                     Expanded(
-      //                       child: Text(
-      //                         [
-      //                           post.location,
-      //                           post.city,
-      //                           post.state,
-      //                         ]
-      //                             .where((item) =>
-      //                                 item != null && item.isNotEmpty)
-      //                             .join(', '),
-      //                         style: TextStyle(
-      //                           color: Colors.grey[600],
-      //                           fontSize: 12,
-      //                         ),
-      //                         maxLines: 1,
-      //                         overflow: TextOverflow.ellipsis,
-      //                       ),
-      //                     ),
-      //                   ],
-      //                 ),
-      //               ),
-      //             ],
-      //           ),
-      //         ),
-      //       );
-      //     },
-      //   ),
     );
   }
 
@@ -831,6 +933,3 @@ Future<void> _loadPosts() async {
     super.dispose();
   }
 }
-
-
-

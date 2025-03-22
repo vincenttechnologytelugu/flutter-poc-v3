@@ -1,894 +1,9 @@
-// import 'dart:convert';
-// import 'dart:developer';
-// import 'dart:math' show sin, pi;
-
-// import 'package:flutter/material.dart';
-// import 'package:flutter_poc_v3/controllers/location_controller.dart';
-// import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
-
-// // import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
-// import 'package:get/get.dart';
-// import 'package:flutter_poc_v3/controllers/cart_controller.dart';
-// import 'package:flutter_poc_v3/controllers/products_controller.dart';
-// import 'package:flutter_poc_v3/models/product_model.dart';
-
-// import 'package:http/http.dart' as http;
-// import 'package:intl/intl.dart';
-
-// import 'product_details.dart';
-
-// class ResponsiveProductsScreen extends StatefulWidget {
-//   static final GlobalKey<_ResponsiveProductsScreenState> globalKey = GlobalKey();
-
-//   // Remove the key from the constructor
-//   const ResponsiveProductsScreen({Key? key}) : super(key: key);  // Changed this line
-
-//   @override
-//   State<ResponsiveProductsScreen> createState() => _ResponsiveProductsScreenState();
-// }
-
-// class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
-
-//  final locationController = Get.find<LocationController>();
-//   final productsController = Get.find<ProductsController>();
-//   CartController cartController = Get.put(CartController());
-//   final ScrollController _scrollController = ScrollController();
-
-//   bool initialLoadDone = false;
-//   bool isLoadingMore = false;
-//   int currentPage = 0;
-//   final int pageSize = 50;
-//   bool hasMoreData = true;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//       // Initialize data when screen loads
-//     WidgetsBinding.instance.addPostFrameCallback((_) {
-//       if (mounted) {
-//         _initializeData();
-//       }
-//     });
-//     // if (!initialLoadDone) {
-//     //   _loadInitialProducts();
-//     //   initialLoadDone = true;
-//     // }
-
-//     _scrollController.addListener(_scrollListener);
-
-//     // Listen to location changes only when manual location is selected
-//     ever(locationController.selectedCity, (_) {
-//       if (mounted && locationController.isManualLocation.value) {
-//         refreshData();
-//       }
-//     });
-//   }
-//     Future<void> _initializeData() async {
-//     if (locationController.currentCity.value.isNotEmpty ||
-//         locationController.currentState.value.isNotEmpty) {
-//       await getData();
-//     }
-//   }
-
-//   // void _loadInitialProducts() {
-//   //   if (locationController.hasLocation) {
-//   //     getData();
-//   //   }
-//   // }
-
-//   void refreshData() {
-//     setState(() {
-//       productsController.productModelList.clear();
-//       currentPage = 0;
-//       hasMoreData = true;
-//       isLoadingMore = false;
-//     });
-//     getData();
-//   }
-
-//     void _scrollListener() {
-//     if (!_scrollController.hasClients) return;
-
-//     final maxScroll = _scrollController.position.maxScrollExtent;
-//     final currentScroll = _scrollController.position.pixels;
-
-//     if (currentScroll >= maxScroll && !isLoadingMore && hasMoreData) {
-//       getData();
-//     }
-//   }
-
-//  Future<void> getData() async {
-//   if (isLoadingMore) return;
-
-//   setState(() {
-//     isLoadingMore = true;
-//   });
-
-//   try {
-//     String city = locationController.currentCity.value;
-//     String state = locationController.currentState.value;
-
-//     if (city.isEmpty && state.isEmpty) return;
-
-//     String url = "http://13.200.179.78/adposts?page=$currentPage&psize=$pageSize";
-//     if (city.isNotEmpty) url += "&city=$city";
-//     if (state.isNotEmpty) url += "&state=$state";
-
-//     final response = await http.get(Uri.parse(url));
-
-//     if (response.statusCode == 200) {
-//       final Map<String, dynamic> jsonResponse = json.decode(response.body);
-
-//       // Access the 'posts' array from the response
-//       if (jsonResponse.containsKey('posts')) {
-//         final List<dynamic> posts = jsonResponse['posts'] as List<dynamic>;
-
-//         setState(() {
-//           if (currentPage == 0) {
-//             productsController.productModelList.clear();
-//           }
-
-//           for (var post in posts) {
-//             final product = ProductModel(
-//               id: post['_id'],
-//               title: post['title'],
-//               description: post['description'],
-//               price: post['price'],
-//               thumb: post['images']?[0] ?? '', // Assuming first image is thumb
-//               city: post['city'],
-//               state: post['state'],
-//               icon:post['icon'],
-
-//               // Add other fields as needed
-//             );
-//             productsController.productModelList.add(product);
-//           }
-
-//           hasMoreData = posts.length >= pageSize;
-//           if (posts.isNotEmpty) {
-//             currentPage++;
-//           }
-//         });
-//       }
-//     }
-//   } catch (e) {
-//     log('Error fetching products: $e');
-//   } finally {
-//     setState(() {
-//       isLoadingMore = false;
-//     });
-//   }
-// }
-
-// bool _shouldAddProduct(dynamic item, String city, String state) {
-//   String productCity = item['city']?.toString().toLowerCase() ?? '';
-//   String productState = item['state']?.toString().toLowerCase() ?? '';
-
-//   return productCity.contains(city.toLowerCase()) &&
-//          productState.contains(state.toLowerCase());
-// }
-
-//   Future<void> loadMoreData() async {
-//     if (!isLoadingMore && hasMoreData) {
-//       setState(() {
-//         isLoadingMore = true;
-//       });
-
-//       try {
-//         final locationController = Get.find<LocationController>();
-//         final selectedArea = locationController.selectedLocation.value;
-//         final currentCity = locationController.selectedCity.value;
-//         final currentState = locationController.selectedState.value;
-
-//         // Build URL with proper sequence
-//         String url =
-//             "http://13.200.179.78/adposts?page=$currentPage&psize=$pageSize";
-
-//         // Add parameters based on what's available
-//         if (selectedArea.isNotEmpty) url += "&location=$selectedArea";
-//         if (currentCity.isNotEmpty) url += "&city=$currentCity";
-//         if (currentState.isNotEmpty) url += "&state=$currentState";
-
-//         final response = await http.get(Uri.parse(url));
-
-//         if (response.statusCode == 200) {
-//           final Map<String, dynamic> responseData = json.decode(response.body);
-//           final List<dynamic> newProducts = responseData['data'];
-
-//           List<dynamic> matchedProducts = newProducts.where((product) {
-//             String productArea =
-//                 product['location']?.toString().toLowerCase() ?? '';
-//             String productCity =
-//                 product['city']?.toString().toLowerCase() ?? '';
-//             String productState =
-//                 product['state']?.toString().toLowerCase() ?? '';
-
-//             bool matches = false;
-
-//             // Check all three parameters
-//             if (selectedArea.isNotEmpty &&
-//                 currentCity.isNotEmpty &&
-//                 currentState.isNotEmpty) {
-//               matches = productArea.contains(selectedArea.toLowerCase()) &&
-//                   productCity.contains(currentCity.toLowerCase()) &&
-//                   productState.contains(currentState.toLowerCase());
-//             }
-//             // Check combinations of two parameters
-//             else if (selectedArea.isNotEmpty && currentCity.isNotEmpty) {
-//               matches = productArea.contains(selectedArea.toLowerCase()) &&
-//                   productCity.contains(currentCity.toLowerCase());
-//             } else if (selectedArea.isNotEmpty && currentState.isNotEmpty) {
-//               matches = productArea.contains(selectedArea.toLowerCase()) &&
-//                   productState.contains(currentState.toLowerCase());
-//             } else if (currentCity.isNotEmpty && currentState.isNotEmpty) {
-//               matches = productCity.contains(currentCity.toLowerCase()) &&
-//                   productState.contains(currentState.toLowerCase());
-//             }
-//             // Check single parameters
-//             else if (selectedArea.isNotEmpty) {
-//               matches = productArea.contains(selectedArea.toLowerCase());
-//             } else if (currentCity.isNotEmpty) {
-//               matches = productCity.contains(currentCity.toLowerCase());
-//             } else if (currentState.isNotEmpty) {
-//               matches = productState.contains(currentState.toLowerCase());
-//             }
-
-//             return matches;
-//           }).toList();
-
-//           setState(() {
-//             for (var item in matchedProducts) {
-//               productsController.productModelList
-//                   .add(ProductModel.fromJson(item));
-//             }
-
-//             hasMoreData = matchedProducts.isNotEmpty &&
-//                 matchedProducts.length >= pageSize;
-//             if (matchedProducts.isNotEmpty) {
-//               currentPage++;
-//             }
-//           });
-//         }
-//       } catch (e) {
-//         log('Error loading more data: $e');
-//         setState(() {
-//           hasMoreData = false;
-//         });
-//       } finally {
-//         setState(() {
-//           isLoadingMore = false;
-//         });
-//       }
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     Size size = MediaQuery.of(context).size;
-//     // log("buildsize width ${size.width}");
-//     // log("buildsize height ${size.height}");
-//     return GetBuilder<ProductsController>(
-//         // key: ResponsiveProductsScreen.globalKey, // Add key here
-
-//         builder: (productsController) {
-//           return Scaffold(
-//             appBar: AppBar(
-//               centerTitle: true,
-//               title: Container(
-//                   alignment: Alignment.centerLeft,
-//                   padding: const EdgeInsets.all(10),
-//                   margin: EdgeInsets.only(top: 5),
-//                   child: const Text(
-//                     "Updated Suggestions",
-//                     style: TextStyle(color: Color.fromARGB(255, 234, 17, 2)),
-//                   )),
-//               actions: [
-//                 GetBuilder<CartController>(builder: (cartController) {
-//                   return Stack(
-//                     children: [
-//                       Container(
-//                         margin: EdgeInsets.only(top: 15),
-//                         child: IconButton(
-//                             onPressed: () {
-//                               Navigator.of(context).push(MaterialPageRoute(
-//                                   builder: (builder) =>
-//                                       const FavouriteScreen()));
-//                             },
-//                             icon: Icon(
-//                               size: 30,
-//                               Icons.favorite_rounded,
-//                               color: cartController.favouriteIds.isNotEmpty
-//                                   ? const Color.fromARGB(255, 243, 3, 3)
-//                                   : Color.fromARGB(255, 141, 138, 128),
-//                             )),
-//                       ),
-//                       Container(
-//                         margin: EdgeInsets.only(top: 15, left: 30),
-//                         child: CircleAvatar(
-//                           radius: 12,
-//                           backgroundColor:
-//                               const Color.fromARGB(255, 81, 7, 255),
-//                           child: Container(
-//                               alignment: Alignment.center,
-//                               padding: const EdgeInsets.all(2),
-//                               margin: const EdgeInsets.all(1),
-//                               decoration: const BoxDecoration(
-//                                   shape: BoxShape.circle, color: Colors.white),
-//                               child: Text(
-//                                   "${cartController.favouriteIds.length}")),
-//                         ),
-//                       )
-//                     ],
-//                   );
-//                 })
-//               ],
-//             ),
-//             body: Column(
-//               children: [
-//                  Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: Text(
-//                 'Showing ads in: ${locationController.formattedLocation}',
-//                 style: const TextStyle(
-//                   fontSize: 16,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//                 SizedBox(
-//                   height: 5,
-//                   child: ListView.builder(
-//                       // shrinkWrap: true,
-//                       scrollDirection: Axis.horizontal,
-//                       itemCount: productsController.categoriesList.length,
-//                       itemBuilder: (context, index) {
-//                         return InkWell(
-//                           onTap: () {
-//                             productsController.getProductsByCategory(
-//                                 productsController.categoriesList[index]);
-//                           },
-//                           child: Card(
-//                               child: Padding(
-//                             padding: const EdgeInsets.all(8.0),
-//                             child:
-//                                 Text(productsController.categoriesList[index]),
-//                           )),
-//                         );
-//                       }),
-//                 ),
-//                 Expanded(
-//                   child: productsController.isLoading.value
-//                       ? const Center(child: CircularProgressIndicator())
-//                       : GridView.builder(
-//                           padding: EdgeInsets.only(
-//                               bottom: MediaQuery.of(context).padding.bottom),
-//                           controller: _scrollController,
-//                           shrinkWrap: true,
-//                           gridDelegate:
-//                               SliverGridDelegateWithFixedCrossAxisCount(
-//                                   crossAxisCount: size.width > 1368
-//                                       ? 6
-//                                       : size.width > 767 && size.width < 1368
-//                                           ? 4
-//                                           : 2,
-//                                   childAspectRatio: size.width > 1368
-//                                       ? 0.8
-//                                       : size.width > 767 && size.width < 1368
-//                                           ? 2.0
-//                                           : 0.8,
-//                                   crossAxisSpacing: 1,
-//                                   mainAxisSpacing: 1),
-//                           itemCount: productsController.productModelList.length,
-//                           itemBuilder: (context, index) {
-//                             ProductModel productModel =
-//                                 productsController.productModelList[index];
-//                             return GestureDetector(
-//                                 onTap: () {
-//                                   Navigator.push(
-//                                       context,
-//                                       MaterialPageRoute(
-//                                           builder: (builder) => ProductDetails(
-//                                                 productModel: productModel,
-//                                               )));
-//                                 },
-//                                 child: Card(
-//                                   elevation: 2,
-//                                   color:
-//                                       const Color.fromARGB(255, 245, 242, 242),
-//                                   shape: RoundedRectangleBorder(
-//                                       borderRadius: BorderRadius.circular(15)),
-//                                   // surfaceTintColor: Colors.amber,
-//                                   shadowColor:
-//                                       const Color.fromARGB(255, 35, 252, 2),
-//                                   margin: const EdgeInsets.all(4),
-//                                   child: Column(
-//                                     children: [
-//                                       Padding(
-//                                         padding: const EdgeInsets.all(6.0),
-//                                         child: SizedBox(
-//                                           height:
-//                                               105, // Fixed height for the image container
-//                                           child: Stack(
-//                                             children: [
-//                                               ClipRRect(
-//                                                 borderRadius:
-//                                                     const BorderRadius.only(
-//                                                   topLeft: Radius.circular(20),
-//                                                   topRight: Radius.circular(20),
-//                                                   bottomLeft:
-//                                                       Radius.circular(20),
-//                                                   bottomRight:
-//                                                       Radius.circular(20),
-//                                                 ),
-//                                                 child: Image.network(
-//                                                   productModel.thumb.toString(),
-//                                                   width: double.infinity,
-//                                                   height: 130,
-//                                                   fit: BoxFit.cover,
-//                                                   loadingBuilder:
-//                                                       (BuildContext context,
-//                                                           Widget child,
-//                                                           ImageChunkEvent?
-//                                                               loadingProgress) {
-//                                                     if (loadingProgress ==
-//                                                         null) {
-//                                                       return child;
-//                                                     } else {
-//                                                       return const Center(
-//                                                           child:
-//                                                               CircularProgressIndicator());
-//                                                     }
-//                                                   },
-//                                                   errorBuilder: (BuildContext
-//                                                           context,
-//                                                       Object exception,
-//                                                       StackTrace? stackTrace) {
-//                                                     return const Center(
-//                                                       child: Icon(
-//                                                         Icons
-//                                                             .image_not_supported_outlined, // You can change this icon
-//                                                         size:
-//                                                             50, // Adjust size as needed
-//                                                         color: Color.fromARGB(
-//                                                             255,
-//                                                             123,
-//                                                             74,
-//                                                             74), // Adjust color as needed
-//                                                       ),
-//                                                     );
-//                                                   },
-//                                                 ),
-//                                               ),
-//                                               Positioned(
-//                                                 top: 5,
-//                                                 right: 5,
-//                                                 child: Container(
-//                                                   decoration: BoxDecoration(
-//                                                     color: const Color.fromARGB(
-//                                                         255, 203, 203, 189),
-//                                                     borderRadius:
-//                                                         BorderRadius.circular(
-//                                                             20),
-//                                                     border: Border.all(
-//                                                       color: Colors.white,
-//                                                       width:
-//                                                           3.0, // Thick white border
-//                                                     ),
-//                                                     boxShadow: [
-//                                                       BoxShadow(
-//                                                         color: Colors.black
-//                                                             .withAlpha(
-//                                                                 (0.5 * 255)
-//                                                                     .round()),
-//                                                         blurRadius: 4,
-//                                                         spreadRadius: 1,
-//                                                       ),
-//                                                     ],
-//                                                   ),
-//                                                   child: TweenAnimationBuilder(
-//                                                     duration: Duration(
-//                                                         milliseconds: 100),
-//                                                     tween: Tween<double>(
-//                                                       begin: 0,
-//                                                       end: cartController
-//                                                               .isFavourite(
-//                                                                   productModel
-//                                                                       .id
-//                                                                       .toString())
-//                                                           ? 1
-//                                                           : 0,
-//                                                     ),
-//                                                     builder: (context,
-//                                                         double value, _) {
-//                                                       return IconButton(
-//                                                           onPressed: () {
-//                                                             if (cartController
-//                                                                 .isFavourite(
-//                                                                     productModel
-//                                                                         .id
-//                                                                         .toString())) {
-//                                                               cartController
-//                                                                   .removeFromFavourite(
-//                                                                       context,
-//                                                                       productModel
-//                                                                           .id
-//                                                                           .toString());
-//                                                             } else {
-//                                                               cartController
-//                                                                   .addToFavourite(
-//                                                                       context,
-//                                                                       productModel
-//                                                                           .id
-//                                                                           .toString());
-//                                                             }
-//                                                           },
-//                                                           icon: Stack(
-//                                                             alignment: Alignment
-//                                                                 .center,
-//                                                             children: [
-//                                                               if (cartController
-//                                                                   .isFavourite(
-//                                                                       productModel
-//                                                                           .id
-//                                                                           .toString()))
-//                                                                 ...List
-//                                                                     .generate(
-//                                                                   5,
-//                                                                   (index) =>
-//                                                                       AnimatedOpacity(
-//                                                                     duration: const Duration(
-//                                                                         milliseconds:
-//                                                                             100),
-//                                                                     opacity:
-//                                                                         value,
-//                                                                     child: Transform
-//                                                                         .scale(
-//                                                                       scale: 1 +
-//                                                                           (index * 0.2) *
-//                                                                               value,
-//                                                                       child: Transform
-//                                                                           .rotate(
-//                                                                         angle: (index *
-//                                                                                 0.0) *
-//                                                                             value *
-//                                                                             0.10,
-//                                                                         child:
-//                                                                             Icon(
-//                                                                           Icons
-//                                                                               .favorite,
-//                                                                           color: HSLColor
-//                                                                               .fromAHSL(
-//                                                                             1.0,
-//                                                                             (index * 10.0 * value) %
-//                                                                                 20,
-//                                                                             0.8,
-//                                                                             0.5 +
-//                                                                                 (value * 0.3),
-//                                                                           ).toColor().withOpacity(1 -
-//                                                                               (index * 0.15)),
-//                                                                           size:
-//                                                                               20,
-//                                                                         ),
-//                                                                       ),
-//                                                                     ),
-//                                                                   ),
-//                                                                 ).toList(),
-//                                                               // Bubble floating animation
-//                                                               if (cartController
-//                                                                   .isFavourite(
-//                                                                       productModel
-//                                                                           .id
-//                                                                           .toString()))
-//                                                                 ...List
-//                                                                     .generate(
-//                                                                   6,
-//                                                                   (index) =>
-//                                                                       TweenAnimationBuilder(
-//                                                                     tween: Tween(
-//                                                                         begin:
-//                                                                             0.0,
-//                                                                         end:
-//                                                                             1.0),
-//                                                                     duration: Duration(
-//                                                                         milliseconds:
-//                                                                             1000 +
-//                                                                                 index * 200),
-//                                                                     curve: Curves
-//                                                                         .easeInExpo,
-//                                                                     builder: (context,
-//                                                                         value,
-//                                                                         child) {
-//                                                                       return Transform
-//                                                                           .translate(
-//                                                                         offset:
-//                                                                             Offset(
-//                                                                           sin(value * pi * 2) *
-//                                                                               15, // Horizontal sway
-//                                                                           -value *
-//                                                                               50, // Vertical movement
-//                                                                         ),
-//                                                                         child:
-//                                                                             Opacity(
-//                                                                           opacity:
-//                                                                               1 - value,
-//                                                                           child:
-//                                                                               Transform.scale(
-//                                                                             scale:
-//                                                                                 1 - value * 0.5,
-//                                                                             child:
-//                                                                                 Container(
-//                                                                               width: 10,
-//                                                                               height: 10,
-//                                                                               decoration: BoxDecoration(
-//                                                                                 color: const Color.fromARGB(255, 246, 3, 226).withOpacity(0.9),
-//                                                                                 shape: BoxShape.circle,
-//                                                                                 boxShadow: [
-//                                                                                   BoxShadow(
-//                                                                                     color: Colors.white.withOpacity(0.4),
-//                                                                                     blurRadius: 10,
-//                                                                                     spreadRadius: 2,
-//                                                                                   ),
-//                                                                                 ],
-//                                                                               ),
-//                                                                             ),
-//                                                                           ),
-//                                                                         ),
-//                                                                       );
-//                                                                     },
-//                                                                   ),
-//                                                                 ),
-//                                                               Icon(
-//                                                                 Icons.favorite,
-//                                                                 color: TweenSequence<
-//                                                                     Color?>([
-//                                                                   TweenSequenceItem(
-//                                                                     weight: 1.0,
-//                                                                     tween:
-//                                                                         ColorTween(
-//                                                                       begin: Colors
-//                                                                           .grey,
-//                                                                       end: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           205,
-//                                                                           4,
-//                                                                           241),
-//                                                                     ),
-//                                                                   ),
-//                                                                   TweenSequenceItem(
-//                                                                     weight: 1.0,
-//                                                                     tween:
-//                                                                         ColorTween(
-//                                                                       begin: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           213,
-//                                                                           4,
-//                                                                           250),
-//                                                                       end: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           6,
-//                                                                           82,
-//                                                                           157),
-//                                                                     ),
-//                                                                   ),
-//                                                                   TweenSequenceItem(
-//                                                                     weight: 1.0,
-//                                                                     tween:
-//                                                                         ColorTween(
-//                                                                       begin: Colors
-//                                                                           .blue,
-//                                                                       end: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           160,
-//                                                                           243,
-//                                                                           7),
-//                                                                     ),
-//                                                                   ),
-//                                                                   TweenSequenceItem(
-//                                                                     weight: 1.0,
-//                                                                     tween:
-//                                                                         ColorTween(
-//                                                                       begin: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           247,
-//                                                                           1,
-//                                                                           112),
-//                                                                       end: const Color
-//                                                                           .fromARGB(
-//                                                                           255,
-//                                                                           241,
-//                                                                           2,
-//                                                                           2),
-//                                                                     ),
-//                                                                   ),
-//                                                                 ]).evaluate(
-//                                                                     AlwaysStoppedAnimation(
-//                                                                         value)),
-//                                                                 size: 20,
-//                                                               )
-//                                                             ],
-//                                                           )
-
-//                                                           );
-//                                                     },
-//                                                   ),
-//                                                 ),
-//                                               ),
-//                                             ],
-//                                           ),
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 20),
-//                                       Padding(
-//                                         padding: const EdgeInsets.symmetric(
-//                                             horizontal: 8,
-//                                             vertical: 1), // Reduced padding
-//                                         child: Column(
-//                                           crossAxisAlignment:
-//                                               CrossAxisAlignment.start,
-//                                           children: [
-//                                             Text(
-//                                                 "₹ ${productModel.price.toString()}",
-//                                                 style: const TextStyle(
-//                                                     color: Color.fromARGB(
-//                                                         255, 243, 6, 176),
-//                                                     fontSize: 16,
-//                                                     fontWeight:
-//                                                         FontWeight.bold)),
-//                                             Text(
-//                                               productModel.title.toString(),
-//                                               style: const TextStyle(
-//                                                   color: Colors.black,
-//                                                   fontWeight: FontWeight.bold),
-//                                               maxLines: 1,
-//                                             ),
-//                                           ],
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 2),
-//                                       Container(
-//                                         margin: EdgeInsets.all(0),
-//                                         width: MediaQuery.of(context)
-//                                                 .size
-//                                                 .width -
-//                                             32, // Subtract total horizontal paddin
-//                                         child: Row(
-//                                           children: [
-//                                             const Icon(
-//                                               Icons.location_on_outlined,
-//                                               color: Colors.black,
-//                                               size: 20,
-//                                             ),
-//                                             const SizedBox(
-//                                               width: 2,
-//                                             ),
-//                                             Flexible(
-//                                               flex: 0,
-//                                               child: Text(
-//                                                 productModel.location
-//                                                     .toString(),
-//                                                 maxLines: 1,
-//                                                 overflow: TextOverflow.ellipsis,
-//                                                 style: const TextStyle(
-//                                                     color: Colors.black,
-//                                                     fontWeight:
-//                                                         FontWeight.bold),
-//                                               ),
-//                                             ),
-//                                             Flexible(
-//                                               flex: 1,
-//                                               child: Text(
-//                                                 productModel.city.toString(),
-//                                                 maxLines: 1,
-//                                                 overflow: TextOverflow.ellipsis,
-//                                                 style: const TextStyle(
-//                                                     color: Colors.black,
-//                                                     fontWeight:
-//                                                         FontWeight.bold),
-//                                               ),
-//                                             ),
-//                                             const SizedBox(
-//                                               width: 2,
-//                                             ),
-//                                             Flexible(
-//                                               flex: 2,
-//                                               child: Text(
-//                                                 productModel.state.toString(),
-//                                                 maxLines: 1,
-//                                                 overflow: TextOverflow.ellipsis,
-//                                                 style: const TextStyle(
-//                                                     color: Colors.black,
-//                                                     fontWeight:
-//                                                         FontWeight.bold),
-//                                               ),
-//                                             ),
-//                                           ],
-//                                         ),
-//                                       ),
-//                                       const SizedBox(height: 2),
-//                                       Row(
-//                                         mainAxisAlignment:
-//                                             MainAxisAlignment.start,
-//                                         crossAxisAlignment:
-//                                             CrossAxisAlignment.center,
-//                                         children: [
-//                                           Container(
-//                                             margin: EdgeInsets.only(left: 4),
-//                                             child: const Icon(
-//                                               Icons.access_time,
-//                                               size: 18,
-//                                               color:
-//                                                   Color.fromARGB(255, 9, 2, 2),
-//                                             ),
-//                                           ),
-//                                           const SizedBox(width: 4),
-//                                           Flexible(
-//                                             child: Text(
-//                                               productModel.posted_at != null
-//                                                   ? DateFormat(
-//                                                           'dd MMM yyyy, hh:mm a')
-//                                                       .format(DateTime.parse(
-//                                                           productModel
-//                                                               .posted_at!))
-//                                                   : 'No date',
-//                                               maxLines: 1,
-//                                               overflow: TextOverflow.ellipsis,
-//                                               style: const TextStyle(
-//                                                 fontSize: 14,
-//                                                 fontWeight: FontWeight.bold,
-//                                                 color: Color.fromARGB(
-//                                                     255, 12, 0, 0),
-//                                               ),
-//                                             ),
-//                                           ),
-//                                         ],
-//                                       ),
-//                                     ],
-//                                   ),
-//                                 ));
-//                           }),
-//                 ),
-//                 if (productsController.hasMoreData)
-//                   Padding(
-//                     padding: const EdgeInsets.all(16.0),
-//                     child: ElevatedButton(
-//                       onPressed: isLoadingMore
-//                           ? null
-//                           : () async {
-//                               await loadMoreData();
-//                             },
-//                       child: isLoadingMore
-//                           ? const CircularProgressIndicator()
-//                           : const Text(
-//                               'Load More',
-//                               style: TextStyle(color: Colors.red),
-//                             ),
-//                     ),
-//                   )
-//               ],
-//             ),
-//           );
-//         });
-//   }
-
-//   @override
-//   void dispose() {
-//     _scrollController.dispose();
-//     _scrollController.removeListener(_scrollListener);
-
-//     super.dispose();
-//   }
-// }
-
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
@@ -923,25 +38,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
   String city = '';
   String state = '';
   bool _isInitialized = false;
-
-  // @override
-  // void initState() {
-  //   super.initState();
-
-  //   // Clear existing products first
-  //   productsController.productModelList.clear();
-
-  //   // Initial load
-  //    loadProductsForLocation();
-
-  //   // Listen to location changes
-  //   ever(locationController.currentCity, (_) {
-  //     log('Location changed: ${locationController.currentCity.value}');
-  //     refreshProducts();
-  //   });
-
-  //   _scrollController.addListener(_scrollListener);
-  // }
 
   late Worker _locationWorker;
   late Worker _refreshWorker;
@@ -999,9 +95,13 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     if (city.isEmpty || state.isEmpty) return;
 
     try {
+       
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+           
+          'Content-Type': 'application/json'
+          },
       );
 
       if (response.statusCode == 200 && mounted) {
@@ -1015,6 +115,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                 .add(ProductModel.fromJson(post));
           }
         });
+      }else if (response.statusCode == 401) {
+        log('Error: Token expired. Please log in again.');
       }
     } catch (e) {
       log('Error loading products: $e');
@@ -1024,9 +126,13 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
 // Add this method to handle location updates
   void _updateProductsForLocation(String city, String state) async {
     try {
+    
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-        headers: {'Content-Type': 'application/json'},
+        headers: {
+        
+          
+          'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200 && mounted) {
@@ -1055,9 +161,14 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
 
     if (city.isNotEmpty && state.isNotEmpty) {
       try {
+       
         final response = await http.get(
           Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-          headers: {'Content-Type': 'application/json'},
+          headers: {
+
+         
+            
+            'Content-Type': 'application/json'},
         );
 
         if (response.statusCode == 200 && mounted) {
@@ -1083,7 +194,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     final prefs = await SharedPreferences.getInstance();
     final city = prefs.getString('city');
     final state = prefs.getString('state');
-    log('ResponsiveProductsScreen - Loaded location: City: $city, State: $state');
+    log('ResponsiveProductsScreen - Loaded location: city: $city, state: $state');
 
     // Your existing products loading logic
   }
@@ -1145,6 +256,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     final state = prefs.getString('state') ?? '';
 
     try {
+     
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
       );
@@ -1159,30 +271,63 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     }
   }
 
-  // String _formatDate(String dateString) {
-  //   try {
-  //     final DateTime date = DateTime.parse(dateString);
-  //     return DateFormat('dd MMM yyyy, hh:mm a').format(date);
-  //   } catch (e) {
-  //     return 'Invalid date';
-  //   }
-  // }
+// String _formatDate(String dateString) {
+//   try {
+//     // Parse ISO 8601 format string to DateTime
+//     DateTime dateTime = DateTime.parse(dateString);
 
-String _formatDate(String dateString) {
-  try {
-    // Parse ISO 8601 format string to DateTime
-    DateTime dateTime = DateTime.parse(dateString);
-    
-    // Convert to local time zone
-    dateTime = dateTime.toLocal();
-    
-    // Format the date
-    return DateFormat('EEE, MMM d, yyyy').format(dateTime);
-  } catch (e) {
-    print('Error parsing date: $e');
-    return 'Invalid date';
+//     // Convert to local time zone
+//     dateTime = dateTime.toLocal();
+
+//     // Format the date
+//     return DateFormat('EEE, MMM d, yyyy').format(dateTime);
+//   } catch (e) {
+//     print('Error parsing date: $e');
+//     return 'Invalid date';
+//   }
+// }
+// Add this helper function to format the date string
+// String _formatDate(String dateString) {
+//   try {
+//     final DateTime date = DateTime.parse(dateString);
+//     return '${date.day}/${date.month}/${date.year}';
+//   } catch (e) {
+//     return '';
+//   }
+// }
+
+// Add this helper function at the class level
+  // Update the _formatDateTime function with null safety
+  String _formatDateTime(String? dateString) {
+    if (dateString == null || dateString.isEmpty) {
+      return 'Recently'; // Default text if date is null or empty
+    }
+
+    try {
+      final DateTime dateTime = DateTime.parse(dateString);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inDays == 0) {
+        if (difference.inHours == 0) {
+          if (difference.inMinutes == 0) {
+            return 'Just now';
+          }
+          return '${difference.inMinutes} minutes ago';
+        }
+        return '${difference.inHours} hours ago';
+      } else if (difference.inDays == 1) {
+        return 'Yesterday';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays} days ago';
+      } else {
+        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      }
+    } catch (e) {
+      return 'Recently'; // Return default text if date parsing fails
+    }
   }
-}
+
 // Add method for manual location update
   void updateManualLocation(String city, String state) {
     locationController.setManualLocation(city, state);
@@ -1409,9 +554,18 @@ String _formatDate(String dateString) {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.only(top: 5),
-            child: const Text(
+            child:  Text(
               "Updated Suggestions",
-              style: TextStyle(color: Color.fromARGB(255, 234, 17, 2)),
+              // style: TextStyle(color: Color.fromARGB(255, 1, 69, 38),
+           
+              
+              // ),
+                style: GoogleFonts.tenorSans(
+    textStyle: TextStyle(color: const Color.fromARGB(255, 1, 44, 30), letterSpacing: .5),
+   
+    fontWeight: FontWeight.w500,
+    fontStyle: FontStyle.normal,
+  ),
             )),
         actions: [
           GetBuilder<CartController>(builder: (cartController) {
@@ -1509,88 +663,102 @@ String _formatDate(String dateString) {
                                 height: 105,
                                 child: Stack(
                                   children: [
-                                    // ClipRRect(
-                                    //   borderRadius: BorderRadius.circular(20),
-                                    //   child: Image.network(
-                                    //     product.thumb.toString(),
-                                    //     width: double.infinity,
-                                    //     height: 130,
-                                    //     fit: BoxFit.cover,
-                                    //     loadingBuilder:
-                                    //         (context, child, loadingProgress) {
-                                    //       if (loadingProgress == null)
-                                    //         return child;
-                                    //       return const Center(
-                                    //           child:
-                                    //               CircularProgressIndicator());
-                                    //     },
-                                    //     errorBuilder:
-                                    //         (context, error, stackTrace) {
-                                    //       return const Center(
-                                    //         child: Icon(
-                                    //           Icons
-                                    //               .image_not_supported_outlined,
-                                    //           size: 50,
-                                    //           color: Color.fromARGB(
-                                    //               255, 123, 74, 74),
-                                    //         ),
-                                    //       );
-                                    //     },
-                                    //   ),
-                                    // ),
+                                   
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Stack(
                                         children: [
-                                          // Image.network(
-                                          //   product.thumb.toString(),
-                                          //   width: double.infinity,
-                                          //   height: 130,
-                                          //   fit: BoxFit.cover,
-                                          //   loadingBuilder: (context, child,
-                                          //       loadingProgress) {
-                                          //     if (loadingProgress == null)
-                                          //       return child;
-                                          //     return const Center(
-                                          //         child:
-                                          //             CircularProgressIndicator());
-                                          //   },
-                                          //   errorBuilder:
-                                          //       (context, error, stackTrace) {
-                                          //     return const Center(
-                                          //       child: Icon(
-                                          //         Icons
-                                          //             .image_not_supported_outlined,
-                                          //         size: 50,
-                                          //         color: Color.fromARGB(
-                                          //             255, 123, 74, 74),
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          // ),
+                                        
 
                                           product.thumbnailUrl.isNotEmpty
                                               ? Image.network(
                                                   'http://13.200.179.78/${product.thumbnailUrl}',
                                                   height: 200,
                                                   width: double.infinity,
-                                                  fit: BoxFit.cover,
+                                                  fit: BoxFit.fill,
                                                   errorBuilder: (context, error,
                                                       stackTrace) {
-                                                    return Image.asset(
-                                                      'assets/images/placeholder.png',
+                                                    return Container(
                                                       height: 200,
                                                       width: double.infinity,
-                                                      fit: BoxFit.cover,
+                                                      decoration: BoxDecoration(
+                                                        color: const Color
+                                                            .fromARGB(
+                                                            255, 245, 242, 242),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(20),
+                                                      ),
+                                                      child: const Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Icon(
+                                                            Icons
+                                                                .image_not_supported_outlined,
+                                                            size: 50,
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    123,
+                                                                    74,
+                                                                    74),
+                                                          ),
+                                                          SizedBox(height: 8),
+                                                          Text(
+                                                            'Image not available',
+                                                            style: TextStyle(
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      255,
+                                                                      123,
+                                                                      74,
+                                                                      74),
+                                                              fontSize: 12,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     );
                                                   },
                                                 )
-                                              : Image.asset(
-                                                  'assets/images/placeholder.png',
+                                              : Container(
                                                   height: 200,
                                                   width: double.infinity,
-                                                  fit: BoxFit.cover,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color.fromARGB(
+                                                        255, 245, 242, 242),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                  ),
+                                                  child: const Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Icon(
+                                                        Icons
+                                                            .image_not_supported_outlined,
+                                                        size: 50,
+                                                        color: Color.fromARGB(
+                                                            255, 123, 74, 74),
+                                                      ),
+                                                      SizedBox(height: 8),
+                                                      Text(
+                                                        'Image not available',
+                                                        style: TextStyle(
+                                                          color: Color.fromARGB(
+                                                              255, 123, 74, 74),
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
+
+                                          
                                           Builder(
                                             builder: (context) {
                                               // More detailed debug prints
@@ -1908,25 +1076,79 @@ String _formatDate(String dateString) {
                             ),
                             // Product details...
                             SizedBox(height: 2),
+                            // Update the Row widget after location
+                            Row(
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(left: 5),
+                                  child: const Icon(
+                                    Icons.access_time,
+                                    size: 15,
+                                    color: Color.fromARGB(255, 9, 2, 2),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Posted: ${_formatDateTime(productModel.publishedAt)}', // Remove DateTime.parse here
+                                    style: const TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 12, 3, 3),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
+                                  horizontal: 5,
                                   vertical: 1), // Reduced padding
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                //  crossAxisAlignment: CrossAxisAlignment.start,
+                                // mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text("₹ ${productModel.price.toString()}",
                                       style: const TextStyle(
                                           color:
-                                              Color.fromARGB(255, 243, 6, 176),
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(
-                                    productModel.title.toString(),
-                                    style: const TextStyle(
-                                        color: Colors.black,
-                                        fontWeight: FontWeight.bold),
-                                    maxLines: 1,
+                                              Color.fromARGB(255, 55, 3, 245),
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          fontFamily: 'Poppins',
+                                          fontStyle: FontStyle.italic,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          ),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                    Icons.title_sharp,
+                                    color: Colors.black,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(
+                                    width: 2,
+                                  ),
+                                      Expanded(
+                                       
+                                        child: Text(
+                                          productModel.title.toString(),
+                                          style: const TextStyle(
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                              fontFamily: 'Poppins',
+                                             
+                                              
+                                              overflow: TextOverflow.ellipsis,
+                                             
+                                              ),
+                                          maxLines: 1,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -1934,7 +1156,7 @@ String _formatDate(String dateString) {
 
                             const SizedBox(height: 2),
                             Container(
-                              margin: EdgeInsets.all(0),
+                              margin: EdgeInsets.all(2),
                               width: MediaQuery.of(context).size.width -
                                   32, // Subtract total horizontal paddin
                               child: Row(
@@ -1945,7 +1167,7 @@ String _formatDate(String dateString) {
                                     size: 20,
                                   ),
                                   const SizedBox(
-                                    width: 2,
+                                    width: 1,
                                   ),
                                   Flexible(
                                     flex: 0,
@@ -1987,62 +1209,60 @@ String _formatDate(String dateString) {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  margin: EdgeInsets.only(left: 4),
-                                  child: const Icon(
-                                    Icons.access_time,
-                                    size: 18,
-                                    color: Color.fromARGB(255, 9, 2, 2),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  // Your Text widget:
-                                  child: Text(
-                                     productModel.getFormattedDateWithTime(),
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 12, 0, 0),
-                                    ),
-                                  ),
-                                  // child: Text(
-                                  //   productModel.posted_at != null
-                                  //       ? _formatDate(productModel.posted_at!)
-                                  //       : 'No date',
-                                  //   maxLines: 1,
-                                  //   overflow: TextOverflow.ellipsis,
-                                  //   style: const TextStyle(
-                                  //     fontSize: 14,
-                                  //     fontWeight: FontWeight.bold,
-                                  //     color: Color.fromARGB(255, 12, 0, 0),
-                                  //   ),
-                                  // ),
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.start,
+                            //   crossAxisAlignment: CrossAxisAlignment.center,
+                            //   children: [
+                            //     Container(
+                            //       margin: EdgeInsets.only(left: 4),
+                            //       child: const Icon(
+                            //         Icons.access_time,
+                            //         size: 15,
+                            //         color: Color.fromARGB(255, 9, 2, 2),
+                            //       ),
+                            //     ),
+                            //     const SizedBox(width: 4),
+                            //     Flexible(
+                            //       child: Text(
+                            //         'Posted: ${_formatDateTime(DateTime.parse(productModel.publishedAt))}',
+                            //         style: const TextStyle(
+                            //           fontSize: 15,
+                            //           fontWeight: FontWeight.bold,
+                            //           color: Color.fromARGB(255, 12, 3, 3),
+                            //         ),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // ),
 
-                                  // child: Text(
-                                  //   productModel.posted_at != null
-                                  //       ? DateFormat(
-                                  //               'dd MMM yyyy, hh:mm a')
-                                  //           .format(DateTime.parse(
-                                  //               productModel
-                                  //                   .posted_at!))
-                                  //       : 'No date',
-                                  //   maxLines: 1,
-                                  //   overflow: TextOverflow.ellipsis,
-                                  //   style: const TextStyle(
-                                  //     fontSize: 14,
-                                  //     fontWeight: FontWeight.bold,
-                                  //     color: Color.fromARGB(
-                                  //         255, 12, 0, 0),
-                                  //   ),
-                                  // ),
-                                ),
-                              ],
-                            ),
+                            //                 Row(
+                            //                   mainAxisAlignment: MainAxisAlignment.start,
+                            //                   crossAxisAlignment: CrossAxisAlignment.center,
+                            //                   children: [
+                            //                     Container(
+                            //                       margin: EdgeInsets.only(left: 4),
+                            //                       child: const Icon(
+                            //                         Icons.access_time,
+                            //                         size: 15,
+                            //                         color: Color.fromARGB(255, 9, 2, 2),
+                            //                       ),
+                            //                     ),
+                            //                     const SizedBox(width: 4),
+                            //                     Flexible(
+                            //                       // Your Text widget:
+                            //                       child:
+                            //                         Text(
+                            //   'Posted: ${_formatDate(productModel.publishedAt)}', // Add this line
+                            //   style: TextStyle(
+                            //     fontSize: 15,
+                            //     fontWeight: FontWeight.bold,
+                            //     color: const Color.fromARGB(255, 12, 3, 3),
+                            //   ),
+                            // ),
+
+                            //                     ),
+                            //                   ],
+                            //                 ),
                           ],
                         ),
                       ),

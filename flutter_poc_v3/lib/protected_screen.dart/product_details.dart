@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/contact_seller_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/user_chat_screen.dart';
@@ -138,6 +139,21 @@ class _ProductDetailsState extends State<ProductDetails> {
     // You can use url_launcher package to make phone calls
   }
 
+ String _formatMileage(dynamic mileage) {
+  if (mileage != null) {
+    if (mileage is int) {
+      return '$mileage km';
+    } else if (mileage is String) {
+      final parsedMileage = int.tryParse(mileage);
+      if (parsedMileage != null) {
+        return '$parsedMileage km';
+      }
+    }
+  }
+  return 'N/A';
+}
+
+
   Widget _buildProductSpecificDetails() {
     // Switch case to return different details based on category
     switch (widget.productModel.category?.toLowerCase()) {
@@ -212,15 +228,18 @@ class _ProductDetailsState extends State<ProductDetails> {
             _buildInfoRow('Fuel Type', widget.productModel.fuelType),
             _buildInfoRow(
                 'Year', widget.productModel.year?.toString() ?? 'N/A'),
-            _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
+            // _buildInfoRow('Mileage', '${widget.productModel.mileage} km'),
+           
+_buildInfoRow('Mileage', _formatMileage(widget.productModel.mileage)),
             _buildInfoRow('Transmission', widget.productModel.transmission),
+               _buildInfoRow(
+                'ownerType', widget.productModel.ownerType.toString() ?? 'N/A'),
           ]),
           const SizedBox(height: 20),
           _buildSectionHeader('Additional Information'),
           _buildInfoCard([
             _buildInfoRow('Condition', widget.productModel.condition),
-            _buildInfoRow(
-                'Owner Type', widget.productModel.ownerType.toString()),
+         
           ]),
         ],
       ),
@@ -432,7 +451,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           _buildInfoCard([
             _buildInfoRow('Floor Number', widget.productModel.floorNumber),
             _buildInfoRow(
-                'Owner Type', widget.productModel.ownerType.toString()),
+                'ownerType', widget.productModel.ownerType.toString() ?? 'N/A'),
           ]),
         ],
       ),
@@ -869,10 +888,17 @@ class _ProductDetailsState extends State<ProductDetails> {
           _buildInfoCard([
             _buildInfoRow('Model', widget.productModel.model),
             _buildInfoRow('Year', widget.productModel.year.toString()),
-            _buildInfoRow('Mileage', widget.productModel.mileage.toString()),
+            // _buildInfoRow('Mileage', widget.productModel.mileage.toString()),
+  //             _buildInfoRow('Mileage', 
+  //             widget.productModel.mileage != null 
+  //     ? '${widget.productModel.mileage.toString()} km'
+  //     : 'N/A'
+  // ),
+
+_buildInfoRow('Mileage', _formatMileage(widget.productModel.mileage)),
             _buildInfoRow('Condition', widget.productModel.condition ?? 'N/A'),
             _buildInfoRow(
-                'Owner Type', widget.productModel.ownerType.toString()),
+                'ownerType', widget.productModel.ownerType.toString() ?? 'N/A'),
           ]),
           const SizedBox(height: 20),
           _buildSectionHeader('Additional Information'),
@@ -1009,7 +1035,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           const SizedBox(height: 20),
           _buildSectionHeader('Technical Details'),
           _buildInfoCard([
-            _buildInfoRow('Breed', widget.productModel.breed),
+           
             _buildInfoRow('Condition', widget.productModel.condition),
             _buildInfoRow(
                 'VaccinationType', widget.productModel.vaccinationType),
@@ -1017,8 +1043,7 @@ class _ProductDetailsState extends State<ProductDetails> {
           const SizedBox(height: 20),
           _buildSectionHeader('Additional Information'),
           _buildInfoCard([
-            _buildInfoRow(
-                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+            _buildInfoRow('Breed', widget.productModel.breed),
           ]),
         ],
       ),
@@ -1080,7 +1105,8 @@ class _ProductDetailsState extends State<ProductDetails> {
             _buildInfoRow('State', widget.productModel.state),
             _buildInfoRow('City', widget.productModel.city),
             _buildInfoRow('Category', widget.productModel.category),
-            _buildInfoRow('Mileage', widget.productModel.mileage.toString()),
+        
+_buildInfoRow('Mileage', _formatMileage(widget.productModel.mileage)),
           ]),
           const SizedBox(height: 20),
           _buildSectionHeader('Technical Details'),
@@ -1358,7 +1384,7 @@ class _ProductDetailsState extends State<ProductDetails> {
                               width: MediaQuery.of(context).size.width - 60,
                               child: Image.network(
                                 'http://13.200.179.78/${asset['url']}',
-                                fit: BoxFit.cover,
+                                fit: BoxFit.fill,
                                 loadingBuilder:
                                     (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
@@ -1379,33 +1405,30 @@ class _ProductDetailsState extends State<ProductDetails> {
                             );
                           },
                         )
-                      : widget.productModel.thumb != null
-                          ? Image.network(
-                              widget.productModel.thumb!,
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                            )
-                          : Container(
-                              color: Colors.grey[200],
-                              child: const Icon(
-                                Icons.image_not_supported,
-                                size: 140,
-                                color: Colors.red,
+                   
+                      : Container(
+                          color: Colors.grey[200],
+                          child: Column(
+                              mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported_outlined,
+                                size: 50,
+                                color: Color.fromARGB(255, 123, 74, 74),
                               ),
-                            ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Image not available',
+                                style: TextStyle(
+                                  color: Color.fromARGB(255, 123, 74, 74),
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -1453,52 +1476,60 @@ class _ProductDetailsState extends State<ProductDetails> {
                   ],
 
                   const Divider(height: 32),
-                Column(children: [
-
-                   ...widget.productModel.getAllImageIds().asMap().entries.map(
-              (entry) => Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: Text(
-                  'Image${entry.key + 1}: ${entry.value}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
+                  Column(
+                    children: [
+                      ...widget.productModel
+                          .getAllImageIds()
+                          .asMap()
+                          .entries
+                          .map(
+                            (entry) => Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Text(
+                                'Image${entry.key + 1}: ${entry.value}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                      ...widget.productModel
+                          .getAllVideoIds()
+                          .asMap()
+                          .entries
+                          .map(
+                            (entry) => Container(
+                              margin: const EdgeInsets.only(right: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: Colors.grey[300]!),
+                              ),
+                              child: Text(
+                                'Video${entry.key + 1}: ${entry.value}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ),
+                          ),
+                    ],
                   ),
-                ),
-              ),
-            ),
-            ...widget.productModel.getAllVideoIds().asMap().entries.map(
-              (entry) => Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(4),
-                  border: Border.all(color: Colors.grey[300]!),
-                ),
-                child: Text(
-                  'Video${entry.key + 1}: ${entry.value}',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
-            ),
-                ],),
-                  
 
                   Text(
                     "Description",

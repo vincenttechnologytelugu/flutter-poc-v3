@@ -1,6 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/models/asset_model.dart';
+import 'package:flutter_poc_v3/models/product_model.dart' show ProductModel;
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/my_adds.dart';
+
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +21,8 @@ class UploadingScreen extends StatefulWidget {
 }
 
 class _UploadingScreenState extends State<UploadingScreen> {
+  List<AssetModel> imageAssets = [];
+  AssetModel? videoAsset;
   Map<String, dynamic>? packageRules;
   final ImagePicker _picker = ImagePicker();
   List<File> selectedImages = [];
@@ -29,8 +35,6 @@ class _UploadingScreenState extends State<UploadingScreen> {
   @override
   void initState() {
     super.initState();
-    // Force reload package rules when screen initializes
-    // Force reload package rules when screen initializes
 
     _loadPackageRules();
     _checkSharedPrefs(); // Add this line to debug
@@ -127,10 +131,6 @@ class _UploadingScreenState extends State<UploadingScreen> {
     return true;
   }
 
-// // Constants
-//   final String IMAGE_ASSETS_KEY = 'image_assets';
-//   final String VIDEO_ASSETS_KEY = 'video_assets';
-
   Future<void> uploadFile(File file, bool isVideo) async {
     try {
       // Validate file size
@@ -202,22 +202,22 @@ class _UploadingScreenState extends State<UploadingScreen> {
       var jsonResponse = json.decode(responseData);
 
       if (response.statusCode == 200) {
-        // // After successful upload, save the asset ID
-        // String assetId = jsonResponse['data']['_id'];
-  //  // Debug print for API response
-  //     log('Upload Response Asset ID: $assetId');
-        // Get file extension to determine if it's image or video
+        AssetModel asset = AssetModel.fromJson(jsonResponse);
+        setState(() {
+          if (isVideo) {
+            videoAsset = asset;
+          } else {
+            imageAssets.add(asset);
+          }
+        });
+        // Debug print to verify the ID
+        log('Uploaded asset ID: ${asset.id}');
+
         String fileExtension = file.path.split('.').last.toLowerCase();
         bool isImage = ['jpg', 'jpeg', 'png'].contains(fileExtension);
 
-        // Save the asset ID
-      //   await _saveAssetId(assetId, isImage);
-      //   // Print current assets after saving
-      // checkCurrentAssets();
-      // getSavedAssetIds() ;
-
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload successful')),
+          SnackBar(content: Text('Upload successful - ID: ${asset.id}')),
         );
         log('Upload response: $jsonResponse');
       } else {
@@ -233,33 +233,234 @@ class _UploadingScreenState extends State<UploadingScreen> {
     }
   }
 
-// Helper function to save asset IDs
-//   Future<void> _saveAssetId(String assetId, bool isImage) async {
-//     try {
-//       final prefs = await SharedPreferences.getInstance();
-//       String key = isImage ? IMAGE_ASSETS_KEY : VIDEO_ASSETS_KEY;
+// Add this method to your state class
+  Future<bool> deleteAssetFromServer(String assetId) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      final adpostId = prefs.getString('adpostId');
 
-//       // Get existing asset IDs
-//       List<String> existingAssets = prefs.getStringList(key) ?? [];
+      log('Deleting asset - ID: $assetId, AdpostId: $adpostId'); // Debug log
 
-//       // Add new asset ID
-//       if (!existingAssets.contains(assetId)) {
-//         existingAssets.add(assetId);
-//         await prefs.setStringList(key, existingAssets);
-//       }
-//     } catch (e) {
-//       log('Error saving asset ID: $e');
-//     }
-//   }
+      final response = await http.post(
+        Uri.parse('http://13.200.179.78/adposts/delete_asset'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'adpostId': adpostId,
+          'assetId': assetId,
+        }),
+      );
 
-// // Function to get all saved asset IDs
-//   Future<Map<String, List<String>>> getSavedAssetIds() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     return {
-//       'images': prefs.getStringList(IMAGE_ASSETS_KEY) ?? [],
-//       'videos': prefs.getStringList(VIDEO_ASSETS_KEY) ?? []
-//     };
-//   }
+      log('Delete response: ${response.body}'); // Debug log
+      return response.statusCode == 200;
+    } catch (e) {
+      log('Delete error: $e');
+      return false;
+    }
+  }
+
+// Update the image preview widget to show the ID clearly
+// Modify your image preview widget
+  Widget _buildImagePreview() {
+    return SizedBox(
+      height: 180,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: selectedImages.length,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Stack(
+              children: [
+                Image.file(
+                  selectedImages[index],
+                  height: 120,
+                  width: 120,
+                  fit: BoxFit.cover,
+                ),
+                if (index < imageAssets.length)
+                  // Positioned(
+                  //   bottom: 0,
+                  //   left: 0,
+                  //   right: 0,
+                  //   child: Container(
+                  //     color: Colors.black.withOpacity(0.7),
+                  //     padding: EdgeInsets.all(4),
+                  //     child: Text(
+                  //       'ID: ${imageAssets[index].id}',
+                  //       style: TextStyle(
+                  //         color: Colors.white,
+                  //         fontSize: 10,
+                  //       ),
+                  //       textAlign: TextAlign.center,
+                  //     ),
+                  //   ),
+                  // ),
+
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: Container(
+                      color: Colors.black.withOpacity(0.7),
+                      padding: EdgeInsets.all(4),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Asset ID:',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Text(
+                            imageAssets[index].id,
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 9,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                // Positioned(
+                //   right: 0,
+                //   child: Container(
+                //     decoration: BoxDecoration(
+                //       color:
+                //           const Color.fromARGB(255, 17, 9, 9).withOpacity(0.5),
+                //       shape: BoxShape.circle,
+                //     ),
+                //     child: IconButton(
+                //       icon: const Icon(
+                //         Icons.delete_forever_rounded,
+                //         color: Color.fromARGB(255, 249, 247, 247),
+                //       ),
+                //       onPressed: () {
+                //         setState(() {
+                //           selectedImages.removeAt(index);
+                //           if (index < imageAssets.length) {
+                //             imageAssets.removeAt(index);
+                //           }
+                //         });
+                //       },
+                //     ),
+                //   ),
+                // ),
+
+                Positioned(
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black.withOpacity(0.5),
+                      shape: BoxShape.circle,
+                    ),
+                    child:
+                        //  IconButton(
+                        //   icon: const Icon(
+                        //     Icons.delete_forever_rounded,
+                        //     color: Colors.white,
+                        //   ),
+                        //   onPressed: () async {
+                        //     if (index < imageAssets.length) {
+                        //       // Show loading indicator
+                        //       showDialog(
+                        //         context: context,
+                        //         barrierDismissible: false,
+                        //         builder: (BuildContext context) {
+                        //           return Center(child: CircularProgressIndicator());
+                        //         },
+                        //       );
+
+                        //       // Delete from server
+                        //       final success = await deleteAssetFromServer(
+                        //           imageAssets[index].id);
+
+                        //       // Remove loading indicator
+                        //       Navigator.pop(context);
+
+                        //       if (success) {
+                        //         setState(() {
+                        //           selectedImages.removeAt(index);
+                        //           imageAssets.removeAt(index);
+                        //         });
+
+                        //         ScaffoldMessenger.of(context).showSnackBar(
+                        //           SnackBar(
+                        //               content: Text('Image deleted successfully')),
+                        //         );
+
+                        //         // Allow picking new image
+                        //         await pickImage();
+                        //       } else {
+
+                        //         ScaffoldMessenger.of(context).showSnackBar(
+                        //           SnackBar(content: Text('Failed to delete image')),
+                        //         );
+                        //       }
+                        //     }
+                        //   },
+                        // ),
+
+                        IconButton(
+                      icon: const Icon(
+                        Icons.delete_forever_rounded,
+                        color: Colors.white,
+                      ),
+                      onPressed: () async {
+                        try {
+                          if (index < imageAssets.length) {
+                            // Has assetId - delete from server
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Center(
+                                    child: CircularProgressIndicator());
+                              },
+                            );
+
+                            final success = await deleteAssetFromServer(
+                                imageAssets[index].id);
+                            Navigator.pop(context);
+
+                            if (success) {
+                              setState(() {
+                                selectedImages.removeAt(index);
+                                imageAssets.removeAt(index);
+                              });
+                              // Pick new image after successful deletion
+                              await pickImage();
+                            }
+                          } else {
+                            // No assetId - just remove from UI and pick new image
+                            setState(() {
+                              selectedImages.removeAt(index);
+                            });
+                            // Pick new image
+                            await pickImage();
+                          }
+                        } catch (e) {
+                          log('Error in delete operation: $e');
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
 
 // Update pickImage function
   Future<void> pickImage() async {
@@ -271,6 +472,10 @@ class _UploadingScreenState extends State<UploadingScreen> {
       );
       return;
     }
+
+    // Show dialog first
+    bool proceed = await _showFileTypeDialog(false);
+    if (!proceed) return;
 
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -304,7 +509,9 @@ class _UploadingScreenState extends State<UploadingScreen> {
       );
       return;
     }
-
+// Show dialog first
+    bool proceed = await _showFileTypeDialog(true);
+    if (!proceed) return;
     try {
       final XFile? video = await _picker.pickVideo(source: ImageSource.gallery);
 
@@ -357,12 +564,41 @@ class _UploadingScreenState extends State<UploadingScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _disposeVideoControllers();
-    super.dispose();
+  // Add this function to show the file type dialog
+  Future<bool> _showFileTypeDialog(bool isVideo) async {
+    return await showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(isVideo ? 'Select Video' : 'Select Image'),
+              content: Text(
+                isVideo
+                    ? 'Please select MP4 video files only'
+                    : 'Please select JPEG or PNG image files only',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(true); // Return true when OK is pressed
+                  },
+                  child: Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // Return false when Cancel is pressed
+                  },
+                  child: Text('Cancel'),
+                ),
+              ],
+            );
+          },
+        ) ??
+        false; // Return false if dialog is dismissed
   }
 
+  // Modify your video preview widget
   Widget _buildVideoPreview() {
     if (_isVideoLoading) {
       return Container(
@@ -375,13 +611,14 @@ class _UploadingScreenState extends State<UploadingScreen> {
       return Container(
         height: 80,
         width: 80,
-        color: const Color.fromARGB(255, 235, 217, 217),
-        child: const Center(
-            child: Icon(
-          Icons.video_library_rounded,
-          color: Color.fromARGB(255, 244, 6, 38),
-          size: 60,
-        )),
+        color: const Color.fromRGBO(235, 217, 217, 1),
+        child: Center(
+          child: Icon(
+            Icons.video_library_rounded,
+            color: Color.fromARGB(255, 244, 6, 38),
+            size: 60,
+          ),
+        ),
       );
     }
 
@@ -393,29 +630,178 @@ class _UploadingScreenState extends State<UploadingScreen> {
               ? Chewie(controller: _chewieController!)
               : Center(child: Text('Error loading video')),
         ),
-        // Close icon to clear video
+        if (videoAsset != null)
+
+          // Positioned(
+          //   bottom: 0,
+          //   left: 0,
+          //   right: 0,
+          //   child: Container(
+          //     color: Colors.black.withOpacity(0.7),
+          //     padding: EdgeInsets.all(4),
+          //     child: Text(
+          //       'Video ID: ${videoAsset!.id}',
+          //       style: TextStyle(
+          //         color: Colors.white,
+          //         fontSize: 12,
+          //       ),
+          //       textAlign: TextAlign.center,
+          //     ),
+          //   ),
+          // ),
+
+          Positioned(
+            top: 150,
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black.withOpacity(0.7),
+              padding: EdgeInsets.all(4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Video Asset ID:',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    videoAsset!.id,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        // Positioned(
+        //   left: 0,
+        //   child: Container(
+        //     decoration: BoxDecoration(
+        //       color: Colors.black.withOpacity(0.5),
+        //       shape: BoxShape.circle,
+        //     ),
+        //     child: IconButton(
+        //       icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
+        //       onPressed: () async {
+        //         await _disposeVideoControllers();
+        //         setState(() {
+        //           selectedVideo = null;
+        //           videoAsset = null;
+        //         });
+        //       },
+        //     ),
+        //   ),
+        // ),
+
         Positioned(
-          top: 8,
-          right: 8,
+          left: 0,
           child: Container(
             decoration: BoxDecoration(
               color: Colors.black.withOpacity(0.5),
               shape: BoxShape.circle,
             ),
-            child: IconButton(
-              icon: Icon(Icons.close, color: Colors.white),
+            child:
+                // IconButton(
+                //   icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
+                //   onPressed: () async {
+                //     if (videoAsset != null) {
+                //       // Show loading indicator
+                //       showDialog(
+                //         context: context,
+                //         barrierDismissible: false,
+                //         builder: (BuildContext context) {
+                //           return Center(child: CircularProgressIndicator());
+                //         },
+                //       );
+
+                //       // Delete from server
+                //       final success = await deleteAssetFromServer(videoAsset!.id);
+
+                //       // Remove loading indicator
+                //       Navigator.pop(context);
+
+                //       if (success) {
+                //         // Dispose video controllers
+                //         await _disposeVideoControllers();
+                //         setState(() {
+                //           selectedVideo = null;
+                //           videoAsset = null;
+                //         });
+
+                //         ScaffoldMessenger.of(context).showSnackBar(
+                //           SnackBar(content: Text('Video deleted successfully')),
+                //         );
+
+                //         // Allow picking new video
+                //         await pickVideo();
+                //       } else {
+                //         ScaffoldMessenger.of(context).showSnackBar(
+                //           SnackBar(content: Text('Failed to delete video')),
+                //         );
+                //       }
+                //     }
+                //   },
+                // ),
+
+                IconButton(
+              icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
               onPressed: () async {
-                // Dispose controllers and clear video
-                await _disposeVideoControllers();
-                setState(() {
-                  selectedVideo = null;
-                });
+                try {
+                  if (videoAsset != null) {
+                    // Has assetId - delete from server
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return Center(child: CircularProgressIndicator());
+                      },
+                    );
+
+                    final success = await deleteAssetFromServer(videoAsset!.id);
+                    Navigator.pop(context);
+
+                    if (success) {
+                      await _disposeVideoControllers();
+                      setState(() {
+                        selectedVideo = null;
+                        videoAsset = null;
+                      });
+                      // Pick new video after successful deletion
+                      await pickVideo();
+                    }
+                  } else {
+                    // No assetId - just remove from UI and pick new video
+                    await _disposeVideoControllers();
+                    setState(() {
+                      selectedVideo = null;
+                      videoAsset = null;
+                    });
+                    // Pick new video
+                    await pickVideo();
+                  }
+                } catch (e) {
+                  log('Error in delete operation: $e');
+                }
               },
             ),
           ),
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    _disposeVideoControllers();
+    super.dispose();
   }
 
   @override
@@ -455,116 +841,162 @@ class _UploadingScreenState extends State<UploadingScreen> {
                     Text('Pick Video ${selectedVideo != null ? '(1/1)' : ''}'),
               ),
 
-            const SizedBox(height: 20),
-            // Display saved assets count
-            // FutureBuilder<Map<String, List<String>>>(
-            //   future: getSavedAssetIds(),
-            //   builder: (context, snapshot) {
-            //     if (snapshot.hasData) {
-            //       return Column(
-            //         children: [
-            //           Text(
-            //               'Images: ${snapshot.data!['images']?.length ?? 0}/4'),
-            //           Text(
-            //               'Videos: ${snapshot.data!['videos']?.length ?? 0}/1'),
-            //         ],
-            //       );
-            //     }
-            //     return SizedBox();
-            //   },
-            // ),
+            // For video button
+            if (maxVideos > 0) const SizedBox(height: 20),
 
-            // Display selected images
-            if (selectedImages.isNotEmpty)
-              SizedBox(
-                height: 100,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: selectedImages.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Stack(
-                        children: [
-                          Image.file(
-                            selectedImages[index],
-                            height: 100,
-                            width: 100,
-                            fit: BoxFit.cover,
-                          ),
-                          Positioned(
-                            right: 0,
-                            top: 0,
-                            left: 50,
-                            bottom: 140,
-                            child: IconButton(
-                              icon: const Icon(Icons.delete_forever_rounded,
-                                  color: Color.fromARGB(255, 11, 5, 5)),
-                              onPressed: () {
-                                setState(() {
-                                  selectedImages.removeAt(index);
-                                });
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
-              ),
-
-            // // Display selected video
-            // if (selectedVideo != null)
-            //   Padding(
-            //     padding: const EdgeInsets.all(8.0),
-            //     child: Stack(
-            //       children: [
-            //         Container(
-            //           height: 80,
-            //           width: 80,
-            //           color: Colors.grey[300],
-            //           child: const Center(child: Text('Video')),
-            //         ),
-            //         Positioned(
-            //           right: 0,
-            //           top: 0,
-            //           child: IconButton(
-            //             icon: const Icon(Icons.close, color: Colors.red),
-            //             onPressed: () {
-            //               setState(() {
-            //                 selectedVideo = null;
-            //               });
-            //             },
+            // if (selectedImages.isNotEmpty)
+            //   SizedBox(
+            //     height: 100,
+            //     child: ListView.builder(
+            //       scrollDirection: Axis.horizontal,
+            //       itemCount: selectedImages.length,
+            //       itemBuilder: (context, index) {
+            //         return Padding(
+            //           padding: const EdgeInsets.all(8.0),
+            //           child: Stack(
+            //             children: [
+            //               Container(
+            //                 decoration: BoxDecoration(
+            //                   border: Border.all(color: Colors.black),
+            //                 ),
+            //                 child: Image.file(
+            //                   selectedImages[index],
+            //                   height: 100,
+            //                   width: 100,
+            //                   fit: BoxFit.cover,
+            //                 ),
+            //               ),
+            //               Positioned(
+            //                 right: 20,
+            //                 top: 40,
+            //                 left: 50,
+            //                 bottom: 100,
+            //                 child: Container(
+            //                   decoration: BoxDecoration(
+            //                     color: Colors.black.withOpacity(0.5),
+            //                     shape: BoxShape.circle,
+            //                   ),
+            //                   child: IconButton(
+            //                     icon: const Icon(Icons.delete_forever_rounded,
+            //                         color: Color.fromARGB(255, 11, 5, 5)),
+            //                     onPressed: () {
+            //                       setState(() {
+            //                         selectedImages.removeAt(index);
+            //                       });
+            //                     },
+            //                   ),
+            //                 ),
+            //               ),
+            //             ],
             //           ),
-            //         ),
-            //       ],
+            //         );
+            //       },
             //     ),
             //   ),
+            _buildImagePreview(),
 
             _buildVideoPreview(),
-            
           ],
         ),
       ),
-    );
-  }
-  // Optional: Function to clear all saved asset IDs
-// Future<void> clearSavedAssetIds() async {
-//   final prefs = await SharedPreferences.getInstance();
-//   await prefs.remove(IMAGE_ASSETS_KEY);
-//   await prefs.remove(VIDEO_ASSETS_KEY);
-// }
+      bottomNavigationBar: Container(
+  padding: EdgeInsets.all(16),
+  child: AnimatedContainer(
+    duration: Duration(milliseconds: 300),
+    child: ElevatedButton(
+      onPressed: () {
+        // Add a small loading animation before navigation
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          
+          builder: (BuildContext context) {
+            return Center(
+              child: Container(
+                padding: EdgeInsets.all(30),
+                width: 250,
+                height: 250,
 
-// Optional: Function to check saved assets
-// void checkSavedAssets() async {
-//   Map<String, List<String>> assets = await getSavedAssetIds();
-//   log('Saved Image Asset IDs: ${assets['images']}');
-// log('Saved Video Asset IDs: ${assets['videos']}');
-// }
-// void checkCurrentAssets() async {
-//   Map<String, List<String>> assets = await getSavedAssetIds();
-//   log('Current Image Assets: ${assets['images']}');
-//   log('Current Video Assets: ${assets['videos']}');
-// }
+                decoration: BoxDecoration(
+                  color: const Color.fromARGB(255, 114, 104, 104),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
+                      offset: Offset(0, 3),
+
+                    ),
+                  ],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 10),
+                    Text('Submitting...',
+
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+
+                      ),
+                    
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+
+        // Delay navigation slightly to show the animation
+        Future.delayed(Duration(milliseconds: 10000), () {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => MyAdds()),
+            (route) => false,
+          );
+        });
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        padding: EdgeInsets.symmetric(vertical: 15),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 5,
+      ),
+      child: Container(
+        width: double.infinity,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle_outline,
+              size: 24,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Submit',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  ),
+),
+
+    );
+    
+  }
 }

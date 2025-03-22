@@ -102,7 +102,7 @@ class _CityScreenState extends State<CityScreen> {
         return ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Nellore',
         'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
         'Vijayanagaram', 'Eluru', 'Adoni', 'Chittoor', 'Nandyal', 'Kavali',
-        'Nellore', 'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
+        'Nellore', 'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada','gudivada'
        
 
 
@@ -111,7 +111,7 @@ class _CityScreenState extends State<CityScreen> {
         case 'Telangana':
         return ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam',
 
-        'Ranga Reddy', 'Nalgonda', 'Khammam', 'Warangal', 'Nizamabad', 'Karimnagar',
+        'Ranga Reddy', 'Nalgonda', 'Khammam', 'Warangal', 'Nizamabad', 'Karimnagar','Miyapur','Gachibowli'
 
         
         ];

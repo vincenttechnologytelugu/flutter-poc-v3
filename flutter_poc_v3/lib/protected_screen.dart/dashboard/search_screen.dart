@@ -19,14 +19,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   // Define all categories and their subcategories
   final Map<String, List<String>> categoryMap = {
-    'Cars': ['Maruti', 'Mahindra', 'Hyundai', 'Tata', 'Honda', 'Tyota', 'Honda', 'BMW', 'Mercedes',
+    'Cars': ['Maruti', 'Mahindra', 'Hyundai', 'Tata', 'Honda', 'Toyota', 'Honda', 'BMW', 'Mercedes',
     'Toyota', 'Ford', 'Chevrolet', 'Nissan', 'Volkswagen', 'Mazda', 'Subaru', 'Audi', 'Ferrari', 'Lamborghini', 'Bugatti', 'Rolls-Royce',
     'Land Rover', 'Jaguar',  'Porsche', 'Tesla', 'Kia', 'Acura', 'Maserati', 'Lexus', 'Infiniti', 'Mclaren', 'Aston Martin', 'Jaguar', 'McLaren', 'Aston Martin'
 
     
     ],
     'Bikes': ['Honda', 'Yamaha', 'Suzuki', 'KTM', 'Royal Enfield',
-    'Hero', 'TVS', 'Bajaj', 'Hero', 'Royal Enfield',
+    'Hero', 'TVS', 'Bajaj', 'Hero', 'Royal Enfield','activa 6G', 'activa 5G', 'activa 3G', 'activa 2G', 'activa 1G',
 
     ],
     'Properties': ['House', 'Apartment', 'Plot', 'Commercial', 
@@ -44,7 +44,7 @@ class _SearchScreenState extends State<SearchScreen> {
     
     ],
     'Services': ['Cleaning', 'Plumbing', 'Electrical', 'Education', 'Beauty',],
-    'Pets': ['Dog', 'Cat', 'Birds', 'Fish', 'Accessories'],
+    'Pets': ['Dog', 'Cat', 'Birds', 'Fish', 'Accessories','pets'],
     'Furniture': ['Sofa', 'Bed', 'Table', 'Chair', 'Wardrobe','stool'],
     'Fashion': ['Men', 'Women', 'Kids', 'Accessories', 'Footwear'],
     // 'Books': ['Fiction', 'Non-Fiction', 'Educational', 'Comics', 'Magazines'],

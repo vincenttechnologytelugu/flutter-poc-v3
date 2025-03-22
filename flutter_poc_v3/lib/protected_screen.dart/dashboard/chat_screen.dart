@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/user_chat_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -197,14 +198,366 @@ class _ChatScreenState extends State<ChatScreen>
   }
 }
 
+// class _ConversationTile extends StatelessWidget {
+//   final Conversation conversation;
+//   // final String userName;
+
+//   const _ConversationTile({
+//     Key? key,
+//     required this.conversation,
+//     // required this.userName,
+//   }) : super(key: key);
+
+//   Widget buildThumbImage(String? thumbUrl, {double size = 40}) {
+//     return thumbUrl != null && thumbUrl.isNotEmpty
+//         ? Image.network(
+//             thumbUrl,
+//             width: size,
+//             height: size,
+//             fit: BoxFit.fill,
+//             errorBuilder: (context, error, stackTrace) => Icon(
+//               Icons.image_not_supported,
+//               size: size * 0.45,
+//               color: Colors.grey[400],
+//             ),
+//             loadingBuilder: (context, child, loadingProgress) {
+//               if (loadingProgress == null) return child;
+//               return Center(
+//                 child: CircularProgressIndicator(
+//                   value: loadingProgress.expectedTotalBytes != null
+//                       ? loadingProgress.cumulativeBytesLoaded /
+//                           loadingProgress.expectedTotalBytes!
+//                       : null,
+//                 ),
+//               );
+//             },
+//           )
+//         : Icon(
+//             Icons.image_not_supported,
+//             size: size * 0.75,
+//             color: Colors.grey[400],
+//           );
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(12),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.grey.withAlpha((0.9 * 255).round()),
+//             spreadRadius: 1,
+//             blurRadius: 5,
+//             offset: const Offset(0, 2),
+//           ),
+//         ],
+//       ),
+//       child: ListTile(
+//         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+//         leading: Container(
+//           width: 85, // Increased image size
+//           height: 85, // Increased image size
+//           decoration: BoxDecoration(
+//             shape: BoxShape.circle,
+//             border: Border.all(
+//               color: Colors.grey.shade200,
+//               width: 2,
+//             ),
+//           ),
+//           child: ClipOval(
+//             child: buildThumbImage(
+//               conversation.product.thumb,
+//               size: 85,
+//             ),
+//           ),
+//         ),
+//         title: Text(
+//           conversation.product.title ?? 'No Title',
+//           style: const TextStyle(
+//             fontWeight: FontWeight.bold,
+//             fontSize: 16,
+//           ),
+//         ),
+//         subtitle: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             const SizedBox(height: 4),
+//             Text(
+//               conversation.lastMessage ?? 'No messages',
+//               style: TextStyle(
+//                 color: Colors.grey[600],
+//                 fontSize: 14,
+//               ),
+//               maxLines: 2,
+//               overflow: TextOverflow.ellipsis,
+//             ),
+//             const SizedBox(height: 4),
+//             Text(
+//               '₹${conversation.product.price ?? 0}',
+//               style: const TextStyle(
+//                 fontWeight: FontWeight.w600,
+//                 color: Colors.blue,
+//                 fontSize: 15,
+//               ),
+//             ),
+//           ],
+//         ),
+//         trailing: Row(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             Text(
+//               _formatTime(conversation.lastMessageTime),
+//               style: TextStyle(
+//                 color: Colors.grey[600],
+//                 fontSize: 12,
+//               ),
+//             ),
+//             const SizedBox(width: 8),
+//             // PopupMenuButton<String>(
+//             //   icon: const Icon(
+//             //     Icons.more_vert,
+//             //     color: Colors.grey,
+//             //   ),
+//             //   itemBuilder: (context) => [
+//             //     const PopupMenuItem(
+//             //       value: 'delete',
+//             //       child: Row(
+//             //         children: [
+//             //           Icon(
+//             //             Icons.delete_outline,
+//             //             color: Colors.red,
+//             //             size: 20,
+//             //           ),
+//             //           SizedBox(width: 8),
+//             //           Text(
+//             //             'Delete',
+//             //             style: TextStyle(color: Colors.red),
+//             //           ),
+//             //         ],
+//             //       ),
+//             //     ),
+//             //   ],
+//             //   onSelected: (value) {
+//             //     if (value == 'delete') {
+//             //       // Add your delete functionality here
+//             //       // For example, show a confirmation dialog
+//             //       showDialog(
+//             //         context: context,
+//             //         builder: (context) => AlertDialog(
+//             //           title: const Text('Delete Conversation'),
+//             //           content: const Text(
+//             //               'Are you sure you want to delete this conversation?'),
+//             //           actions: [
+//             //             TextButton(
+//             //               onPressed: () => Navigator.pop(context),
+//             //               child: const Text('Cancel'),
+//             //             ),
+//             //             TextButton(
+//             //               onPressed: () {
+//             //                 // Add delete logic here
+//             //                 Navigator.pop(context);
+//             //               },
+//             //               child: const Text(
+//             //                 'Delete',
+//             //                 style: TextStyle(color: Colors.red),
+//             //               ),
+//             //             ),
+//             //           ],
+//             //         ),
+//             //       );
+//             //     }
+//             //   },
+//             // ),
+
+//             PopupMenuButton<String>(
+//   icon: const Icon(
+//     Icons.more_vert,
+//     color: Colors.grey,
+//   ),
+//   itemBuilder: (context) => [
+//     const PopupMenuItem(
+//       value: 'delete',
+//       child: Row(
+//         children: [
+//           Icon(
+//             Icons.delete_outline,
+//             color: Colors.red,
+//             size: 20,
+//           ),
+//           SizedBox(width: 8),
+//           Text(
+//             'Delete',
+//             style: TextStyle(color: Colors.red),
+//           ),
+//         ],
+//       ),
+//     ),
+//   ],
+//   onSelected: (value) async {
+//     if (value == 'delete') {
+//       try {
+//         final prefs = await SharedPreferences.getInstance();
+//         final token = prefs.getString('token');
+        
+//         showDialog(
+//           context: context,
+//           builder: (context) => AlertDialog(
+//             title: const Text('Choose Action'),
+//             content: const Text('Do you want to deactivate or delete this conversation?'),
+//             actions: [
+//               TextButton(
+//                 onPressed: () async {
+//                   Navigator.pop(context);
+//                   try {
+//                     final response = await http.put(
+//                       Uri.parse('http://13.200.179.78/chat/deactivate'),
+//                       headers: {
+//                         'Authorization': 'Bearer $token',
+//                         'Content-Type': 'application/json',
+//                       },
+//                       body: json.encode({
+//                         'conversationId': conversation.id,
+//                       }),
+//                     );
+
+//                     if (response.statusCode == 200) {
+//                       if (context.mounted) {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           const SnackBar(content: Text('Conversation deactivated successfully')),
+//                         );
+//                         Navigator.pushReplacement(
+//                           context,
+//                           MaterialPageRoute(builder: (context) => const ChatScreen()),
+//                         );
+//                       }
+//                     } else {
+//                       if (context.mounted) {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           const SnackBar(content: Text('Failed to deactivate conversation')),
+//                         );
+//                       }
+//                     }
+//                   } catch (e) {
+//                     if (context.mounted) {
+//                       ScaffoldMessenger.of(context).showSnackBar(
+//                         SnackBar(content: Text('Error: $e')),
+//                       );
+//                     }
+//                   }
+//                 },
+//                 child: const Text('Deactivate'),
+//               ),
+//               TextButton(
+//                 onPressed: () async {
+//                   Navigator.pop(context);
+//                   try {
+//                     final response = await http.post(
+//                       Uri.parse('http://13.200.179.78/chat/removeConversation'),
+//                       headers: {
+//                         'Authorization': 'Bearer $token',
+//                         'Content-Type': 'application/json',
+//                       },
+//                       body: json.encode({
+//                         'conversationId': conversation.id,
+//                       }),
+//                     );
+
+//                     if (response.statusCode == 200) {
+//                       if (context.mounted) {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           const SnackBar(content: Text('Conversation deleted successfully')),
+//                         );
+//                         Navigator.pushReplacement(
+//                           context,
+//                           MaterialPageRoute(builder: (context) => const ChatScreen()),
+//                         );
+//                       }
+//                     } else {
+//                       if (context.mounted) {
+//                         ScaffoldMessenger.of(context).showSnackBar(
+//                           const SnackBar(content: Text('Failed to delete conversation')),
+//                         );
+//                       }
+//                     }
+//                   } catch (e) {
+//                     if (context.mounted) {
+//                       ScaffoldMessenger.of(context).showSnackBar(
+//                         SnackBar(content: Text('Error: $e')),
+//                       );
+//                     }
+//                   }
+//                 },
+//                 child: const Text(
+//                   'Delete',
+//                   style: TextStyle(color: Colors.red),
+//                 ),
+//               ),
+//               TextButton(
+//                 onPressed: () => Navigator.pop(context),
+//                 child: const Text('Cancel'),
+//               ),
+//             ],
+//           ),
+//         );
+//       } catch (e) {
+//         if (context.mounted) {
+//           ScaffoldMessenger.of(context).showSnackBar(
+//             SnackBar(content: Text('Error: $e')),
+//           );
+//         }
+//       }
+//     }
+//   },
+// ),
+
+//           ],
+//         ),
+//         onTap: () {
+//           Navigator.push(
+//             context,
+//             MaterialPageRoute(
+//               builder: (context) => UserChatScreen(
+//                 conversationId: conversation.id,
+//                 product: conversation.product,
+//                 thumb: conversation.product.thumb ?? '',
+//                 title: conversation.product.title ?? '',
+//                 price: conversation.product.price ?? 0.0,
+//               ),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+
+//   String _formatTime(DateTime time) {
+//     final now = DateTime.now();
+//     final difference = now.difference(time);
+
+//     if (difference.inDays == 0) {
+//       return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
+//     } else if (difference.inDays == 1) {
+//       return 'Yesterday';
+//     } else {
+//       return '${time.day}/${time.month}/${time.year}';
+//     }
+//   }
+// }
+
+
+
+
+
+
 class _ConversationTile extends StatelessWidget {
   final Conversation conversation;
-  // final String userName;
 
   const _ConversationTile({
     Key? key,
     required this.conversation,
-    // required this.userName,
   }) : super(key: key);
 
   Widget buildThumbImage(String? thumbUrl, {double size = 40}) {
@@ -243,7 +596,7 @@ class _ConversationTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: conversation.isActive ? Colors.white : Colors.grey[200],
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -257,12 +610,12 @@ class _ConversationTile extends StatelessWidget {
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
-          width: 85, // Increased image size
-          height: 85, // Increased image size
+          width: 85,
+          height: 85,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             border: Border.all(
-              color: Colors.grey.shade200,
+              color: conversation.isActive ? Colors.grey.shade200 : Colors.grey.shade400,
               width: 2,
             ),
           ),
@@ -275,9 +628,10 @@ class _ConversationTile extends StatelessWidget {
         ),
         title: Text(
           conversation.product.title ?? 'No Title',
-          style: const TextStyle(
+          style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 16,
+            color: conversation.isActive ? Colors.black : Colors.grey,
           ),
         ),
         subtitle: Column(
@@ -287,7 +641,7 @@ class _ConversationTile extends StatelessWidget {
             Text(
               conversation.lastMessage ?? 'No messages',
               style: TextStyle(
-                color: Colors.grey[600],
+                color: conversation.isActive ? Colors.grey[600] : Colors.grey[400],
                 fontSize: 14,
               ),
               maxLines: 2,
@@ -296,9 +650,9 @@ class _ConversationTile extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '₹${conversation.product.price ?? 0}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.blue,
+                color: conversation.isActive ? Colors.blue : Colors.grey,
                 fontSize: 15,
               ),
             ),
@@ -315,64 +669,281 @@ class _ConversationTile extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
+            // PopupMenuButton<String>(
+            //   icon: const Icon(
+            //     Icons.more_vert,
+            //     color: Colors.grey,
+            //   ),
+            //   itemBuilder: (context) => [
+            //     const PopupMenuItem(
+            //       value: 'delete',
+            //       child: Row(
+            //         children: [
+            //           Icon(
+            //             Icons.delete_outline,
+            //             color: Colors.red,
+            //             size: 20,
+            //           ),
+            //           SizedBox(width: 8),
+            //           Text(
+            //             'Delete',
+            //             style: TextStyle(color: Colors.red),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ],
+            //   onSelected: (value) async {
+            //     if (value == 'delete') {
+            //       try {
+            //         final prefs = await SharedPreferences.getInstance();
+            //         final token = prefs.getString('token');
+                    
+            //         showDialog(
+            //           context: context,
+            //           builder: (context) => AlertDialog(
+            //             title: const Text('Choose Action'),
+            //             content: const Text('Do you want to deactivate or delete this conversation?'),
+            //             actions: [
+            //               TextButton(
+            //                 onPressed: () async {
+            //                   Navigator.pop(context);
+            //                   try {
+            //                     final response = await http.put(
+            //                       Uri.parse('http://13.200.179.78/chat/deactivate'),
+            //                       headers: {
+            //                         'Authorization': 'Bearer $token',
+            //                         'Content-Type': 'application/json',
+            //                       },
+            //                       body: json.encode({
+            //                         'conversationId': conversation.id,
+            //                       }),
+            //                     );
+
+            //                     if (response.statusCode == 200) {
+            //                       if (context.mounted) {
+            //                         ScaffoldMessenger.of(context).showSnackBar(
+            //                           const SnackBar(content: Text('Conversation deactivated successfully')),
+            //                         );
+            //                         Navigator.pushReplacement(
+            //                           context,
+            //                           MaterialPageRoute(builder: (context) => const ChatScreen()),
+            //                         );
+            //                       }
+            //                     } else {
+            //                       if (context.mounted) {
+            //                         ScaffoldMessenger.of(context).showSnackBar(
+            //                           const SnackBar(content: Text('Failed to deactivate conversation')),
+            //                         );
+            //                       }
+            //                     }
+            //                   } catch (e) {
+            //                     if (context.mounted) {
+            //                       ScaffoldMessenger.of(context).showSnackBar(
+            //                         SnackBar(content: Text('Error: $e')),
+            //                       );
+            //                     }
+            //                   }
+            //                 },
+            //                 child: const Text('Deactivate'),
+            //               ),
+            //               TextButton(
+            //                 onPressed: () async {
+            //                   Navigator.pop(context);
+            //                   try {
+            //                     final response = await http.post(
+            //                       Uri.parse('http://13.200.179.78/chat/removeConversation'),
+            //                       headers: {
+            //                         'Authorization': 'Bearer $token',
+            //                         'Content-Type': 'application/json',
+            //                       },
+            //                       body: json.encode({
+            //                         'conversationId': conversation.id,
+            //                       }),
+            //                     );
+
+            //                     if (response.statusCode == 200) {
+            //                       if (context.mounted) {
+            //                         ScaffoldMessenger.of(context).showSnackBar(
+            //                           const SnackBar(content: Text('Conversation deleted successfully')),
+            //                         );
+            //                         Navigator.pushReplacement(
+            //                           context,
+            //                           MaterialPageRoute(builder: (context) => const ChatScreen()),
+            //                         );
+            //                       }
+            //                     } else {
+            //                       if (context.mounted) {
+            //                         ScaffoldMessenger.of(context).showSnackBar(
+            //                           const SnackBar(content: Text('Failed to delete conversation')),
+            //                         );
+            //                       }
+            //                     }
+            //                   } catch (e) {
+            //                     if (context.mounted) {
+            //                       ScaffoldMessenger.of(context).showSnackBar(
+            //                         SnackBar(content: Text('Error: $e')),
+            //                       );
+            //                     }
+            //                   }
+            //                 },
+            //                 child: const Text(
+            //                   'Delete',
+            //                   style: TextStyle(color: Colors.red),
+            //                 ),
+            //               ),
+            //               TextButton(
+            //                 onPressed: () => Navigator.pop(context),
+            //                 child: const Text('Cancel'),
+            //               ),
+            //             ],
+            //           ),
+            //         );
+            //       } catch (e) {
+            //         if (context.mounted) {
+            //           ScaffoldMessenger.of(context).showSnackBar(
+            //             SnackBar(content: Text('Error: $e')),
+            //           );
+            //         }
+            //       }
+            //     }
+            //   },
+            // ),
             PopupMenuButton<String>(
-              icon: const Icon(
-                Icons.more_vert,
-                color: Colors.grey,
-              ),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'delete',
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.delete_outline,
-                        color: Colors.red,
-                        size: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Delete',
-                        style: TextStyle(color: Colors.red),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-              onSelected: (value) {
-                if (value == 'delete') {
-                  // Add your delete functionality here
-                  // For example, show a confirmation dialog
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Delete Conversation'),
-                      content: const Text(
-                          'Are you sure you want to delete this conversation?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Cancel'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            // Add delete logic here
-                            Navigator.pop(context);
-                          },
-                          child: const Text(
-                            'Delete',
-                            style: TextStyle(color: Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-              },
+  icon: const Icon(
+    Icons.more_vert,
+    color: Colors.grey,
+  ),
+  itemBuilder: (context) => [
+    if (conversation.isActive) // Only show deactivate option if conversation is active
+      const PopupMenuItem(
+        value: 'deactivate',
+        child: Row(
+          children: [
+            Icon(
+              Icons.block,
+              color: Colors.orange,
+              size: 20,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Deactivate',
+              style: TextStyle(color: Colors.orange),
             ),
           ],
         ),
-        onTap: () {
+      ),
+    const PopupMenuItem(
+      value: 'delete',
+      child: Row(
+        children: [
+          Icon(
+            Icons.delete_outline,
+            color: Colors.red,
+            size: 20,
+          ),
+          SizedBox(width: 8),
+          Text(
+            'Delete',
+            style: TextStyle(color: Colors.red),
+          ),
+        ],
+      ),
+    ),
+  ],
+  onSelected: (value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (value == 'deactivate') {
+        try {
+          final response = await http.put(
+            Uri.parse('http://13.200.179.78/chat/deactivate'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              'conversationId': conversation.id,
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Conversation deactivated successfully')),
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to chat tab
+              );
+            }
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to deactivate conversation')),
+              );
+            }
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $e')),
+            );
+          }
+        }
+      } else if (value == 'delete') {
+        try {
+          final response = await http.post(
+            Uri.parse('http://13.200.179.78/chat/removeConversation'),
+            headers: {
+              'Authorization': 'Bearer $token',
+              'Content-Type': 'application/json',
+            },
+            body: json.encode({
+              'conversationId': conversation.id,
+            }),
+          );
+
+          if (response.statusCode == 200) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Conversation deleted successfully')),
+              );
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to chat tab
+              );
+            }
+          } else {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Failed to delete conversation')),
+              );
+            }
+          }
+        } catch (e) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $e')),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
+  },
+),
+
+          ],
+        ),
+        onTap: conversation.isActive ? () {
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -385,7 +956,7 @@ class _ConversationTile extends StatelessWidget {
               ),
             ),
           );
-        },
+        } : null,
       ),
     );
   }

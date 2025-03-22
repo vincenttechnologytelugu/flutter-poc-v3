@@ -334,10 +334,10 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
   }
   
   // Navigate to next screen
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(builder: (context) => const UploadingScreen()),
-  );
+  // Navigator.pushReplacement(
+  //   context,
+  //   MaterialPageRoute(builder: (context) => const UploadingScreen()),
+  // );
 }
 
 
@@ -478,19 +478,20 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+         color: const Color.fromARGB(255, 234, 223, 223),
         // Background: Solid magenta as per the image description
-        // color: const Color(0xFFFF00FF), // Vibrant magenta (#FF00FF)
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Color.fromARGB(255, 136, 132, 219), // Vibrant magenta (#E040FB)
-              Color.fromARGB(255, 153, 181, 112),
-              Color.fromARGB(255, 153, 4, 4), // Vibrant magenta (#D500F9)
-            ],
-          ),
-        ),
+        //  color: const Color(0xFFFF00FF), // Vibrant magenta (#FF00FF)
+        // decoration: const BoxDecoration(
+        //   gradient: LinearGradient(
+        //     begin: Alignment.topCenter,
+        //     end: Alignment.bottomCenter,
+        //     colors: [
+        //       Color.fromARGB(255, 136, 132, 219), // Vibrant magenta (#E040FB)
+        //       Color.fromARGB(255, 153, 181, 112),
+        //       Color.fromARGB(255, 153, 4, 4), // Vibrant magenta (#D500F9)
+        //     ],
+        //   ),
+        // ),
         child: Center(
           child: SingleChildScrollView(
             child: Padding(
@@ -502,12 +503,13 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const Text(
                     "LOGIN",
                     style: TextStyle(
-                      color: Colors.white, // White (#FFFFFF)
+                      color: Color.fromARGB(255, 43, 33, 33), // White (#FFFFFF)
                       fontSize: 40,
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                          color: Colors.black54,
+                                              color: Color.fromARGB(255, 43, 33, 33), // White (#FFFFFF)
+
                           blurRadius: 2,
                           offset: Offset(1, 1),
                         ),
@@ -542,7 +544,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const Text(
                     "Welcome Back!",
                     style: TextStyle(
-                      color: Colors.white, // White (#FFFFFF)
+                         color: Color.fromARGB(255, 53, 6, 240),
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -574,6 +576,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const SizedBox(height: 16),
                   // User ID Input Field
                   TextFormField(
+                    
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       color: Color.fromARGB(
@@ -594,7 +597,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                           color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
                       prefixIcon: const Icon(
                         Icons.email,
-                        color: Color(0xFFD81B60), // Slightly darker magenta
+                          color: Color.fromARGB(255, 53, 6, 240),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -656,15 +659,14 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                           color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
                       prefixIcon: const Icon(
                         Icons.lock,
-                        color: Color(0xFFD81B60), // Slightly darker magenta
+                         color: Color.fromARGB(255, 53, 6, 240),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           visiblePassword
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: const Color(
-                              0xFFD81B60), // Slightly darker magenta
+                          color: const Color.fromARGB(255, 19, 5, 10), // Slightly darker magenta
                         ),
                         onPressed: () {
                           setState(() {
@@ -728,30 +730,38 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                                 );
                               }
                             },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color.fromARGB(
-                            255, 136, 67, 233), // Slightly darker magenta
-                        foregroundColor: Colors.white, // White (#FFFFFF)
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                          side: const BorderSide(
-                            color: Color.fromARGB(
-                                255, 215, 215, 231), // Slightly darker magenta
-                            width: 1,
-                          ),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shadowColor: Colors.black.withOpacity(0.3),
-                        elevation: 5,
-                      ),
+                      // style: ElevatedButton.styleFrom(
+                      //   backgroundColor: Color.fromARGB(255, 233, 67, 164), // Slightly darker magenta
+                      //   foregroundColor: Colors.white, // White (#FFFFFF)
+                      // //  shape: RoundedRectangleBorder(
+                      // //     borderRadius: BorderRadius.circular(10),
+                      // //     side: const BorderSide(
+                      // //        color: Color.fromARGB(
+                      // //           255, 215, 215, 231), // Slightly darker magenta
+                      // //       width: 1,
+                      // //     ),
+                      // //   ),
+                      //   // padding: const EdgeInsets.symmetric(vertical: 16),
+                      //   // shadowColor: Colors.black.withOpacity(0.3),
+                      //   // elevation: 5,
+                      // ),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromARGB(255, 219, 9, 205),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15)),
+                                minimumSize: const Size(100, 50),
+                                
+                                ),
                       child: isLoading
                           ? const CircularProgressIndicator(
-                              color: Color.fromARGB(255, 87, 73, 241))
+                              color: Color.fromARGB(255, 244, 244, 249))
                           : const Text(
                               'Login',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
+                                color: Colors.white,
                               ),
                             ),
                     ),
@@ -770,7 +780,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                     child: const Text(
                       "Create an account",
                       style: TextStyle(
-                        color: Colors.white, // White (#FFFFFF)
+                        color: Color.fromARGB(255, 8, 19, 238),
                         fontSize: 16,
                         decoration: TextDecoration.underline,
                         decorationThickness: 1.5,

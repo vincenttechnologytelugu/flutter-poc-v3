@@ -6,6 +6,7 @@
 import 'dart:developer';
 
 // import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
+import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -203,8 +204,10 @@ void updateLocation({ String city="",  String state=""}) {
    currentCity.value = city;
     currentState.value = state;
       shouldRefreshProducts.value = true;  // Add this line
+       // Refresh the products list or trigger a rebuild
+   
       update();
-    log('LocationController updated - City: $city, State: $state');
+    log('LocationController updated - city: $city, state: $state');
     
   // Only update if not in manual mode
   if (!isManualLocation.value) {

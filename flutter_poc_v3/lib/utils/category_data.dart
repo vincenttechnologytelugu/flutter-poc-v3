@@ -84,6 +84,8 @@ class CategoryData {
       'Pets Foods & Accessories',
       'Horses & Ponds',
       'Pets Tools & Accessories',
+      'Cats & Dogs',
+      
       'Other Pets'
     ]
   

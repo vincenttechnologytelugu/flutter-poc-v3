@@ -9,7 +9,11 @@
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
 <uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+ <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 <!-- <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> -->
+<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- If you need background location -->
 
 
 
@@ -18,6 +22,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         
+        android:usesCleartextTraffic="true"
         android:enableOnBackInvokedCallback="true">
         <activity
             android:name=".MainActivity"

@@ -6,10 +6,11 @@ import 'package:flutter_poc_v3/protected_screen.dart/deactivate_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/edit_my_ad_screen.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class MyAdds extends StatefulWidget {
   const MyAdds({super.key});
 
@@ -302,6 +303,11 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
     ).then((_) => _loadMyAds());
   }
 
+
+
+
+  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -346,22 +352,73 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
                       child: Column(
                         children: [
                           ListTile(
-                            leading: Opacity(
-                              opacity: ad['action_flags']['mark_as_sold']
-                                  ? 1.0
-                                  : 0.5, // Dim thumb if sold
-                              child: Image.network(
-                                ad['thumb'] ?? '',
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) =>
-                                    Icon(
-                                  Icons.image_not_supported,
-                                  size: 110,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                           leading: Opacity(
+  opacity: ad['action_flags']['mark_as_sold'] ? 1.0 : 0.5,
+  child: ad['assets']?.isNotEmpty == true 
+      ? CachedNetworkImage(
+          imageUrl: 'http://13.200.179.78/${ad['assets'][0]['url']}',
+          width: 80,
+          height: 80,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Center(
+            child: CircularProgressIndicator(),
+          ),
+          errorWidget: (context, url, error) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.image_outlined,
+                  size: 40,
+                  color: const Color.fromARGB(255, 127, 85, 85),
+                ),
+             
+                Text(
+                  'No Image Available',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        )
+      :  Column(
+        children: [
+          Icon(
+                      Icons.image_outlined,
+                      size: 40,
+                      color: const Color.fromARGB(255, 127, 85, 85),
+                    ),
+                    Text(
+                  'No Image Available',
+                  style: TextStyle(
+                    color: Colors.grey[600],
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+        ],
+      ),
+
+
+                                   
+                              // child: Image.network(
+                              //   ad['thumb'] ?? '',
+                              //   width: 80,
+                              //   height: 80,
+                              //   fit: BoxFit.cover,
+                              //   errorBuilder: (context, error, stackTrace) =>
+                              //       Icon(
+                              //     Icons.image_not_supported,
+                              //     size: 110,
+                              //     color: Colors.grey,
+                              //   ),
+                              // ),
                             ),
                             title: Text(
                               ad['title'] ?? '',
@@ -449,27 +506,100 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
                               //     ),
                               //   ),
                               // ),
-                              TextButton(
-                                onPressed: _isFeaturedEnabled(ad)
-                                    ? () => _makeFeatured(ad['_id'])
-                                    : null,
-                                child: Text(
-                                  'FEATURED',
-                                  style: TextStyle(
-                                    color: (!ad['isActive'] ||
-                                            !ad['action_flags']['edit'] ||
-                                            !ad['action_flags']['remove'] ||
-                                            !ad['action_flags']
-                                                ['mark_as_sold'] ||
-                                            !ad['action_flags']
-                                                ['mark_as_inactive'])
-                                        ? Colors.red
-                                        : _isFeaturedEnabled(ad)
-                                            ? Colors.blue
-                                            : Colors.grey,
-                                  ),
-                                ),
-                              ),
+                              // TextButton(
+                              //   onPressed: _isFeaturedEnabled(ad)
+                              //       ? () => _makeFeatured(ad['_id'])
+                              //       : null,
+                              //   child: Text(
+                              //     'FEATURED',
+                              //     style: TextStyle(
+                              //       color: (!ad['isActive'] ||
+                              //               !ad['action_flags']['edit'] ||
+                              //               !ad['action_flags']['remove'] ||
+                              //               !ad['action_flags']
+                              //                   ['mark_as_sold'] ||
+                              //               !ad['action_flags']
+                              //                   ['mark_as_inactive'])
+                              //           ? Colors.red
+                              //           : _isFeaturedEnabled(ad)
+                              //               ? Colors.blue
+                              //               : Colors.grey,
+                              //     ),
+                              //   ),
+                              // ),
+// TextButton(
+//   onPressed: _isFeaturedEnabled(ad) 
+//       ? () => _makeFeatured(ad['_id'])
+//       : null,
+//   child: Text(
+//     'FEATURED',
+//     style: TextStyle(
+//       color: ad['action_flags']['featured']
+//           ? Colors.blue
+//           : !ad['isActive'] ||
+//             !ad['action_flags']['edit'] ||
+//             !ad['action_flags']['remove'] ||
+//             !ad['action_flags']['mark_as_sold'] ||
+//             !ad['action_flags']['mark_as_inactive']
+//               ? Colors.red
+//               : Colors.grey,
+//     ),
+//   ),
+// ),
+
+TextButton(
+  onPressed: ad['action_flags']['featured']
+      ? () async {
+          try {
+            final success = await _myAdsService.makeFeatured(ad['_id']);
+            if (success) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Ad featured successfully'),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              // Refresh the ads list to show updated status
+              await _loadMyAds(); // Make sure you have this method to refresh the ads
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Failed to feature ad'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      : null,  // Disable if not featured
+  child: Text(
+    'FEATURED',
+    style: TextStyle(
+      color: ad['action_flags']['featured']
+          ? Colors.blue  // Blue when featured is true
+          : !ad['isActive'] ||
+            !ad['action_flags']['edit'] ||
+            !ad['action_flags']['remove'] ||
+            !ad['action_flags']['mark_as_sold'] ||
+            !ad['action_flags']['mark_as_inactive']
+              ? Colors.red
+              : Colors.grey,
+    ),
+  ),
+),
+
+
+
+
+
+
                               if (!ad['isActive'] &&
                                   ad['action_flags']['publish'])
                                 TextButton(
@@ -483,6 +613,12 @@ class _MyAddsState extends State<MyAdds> with SingleTickerProviderStateMixin {
                                                 'Ad published successfully')),
                                       );
                                       _loadMyAds(); // Reload the ads list
+                                       // Add navigation here after successful publish
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+        (route) => false,
+      );
                                     } catch (e) {
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(

@@ -9,8 +9,10 @@ import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:math' show sin, pi;
 
 class SubCategoryPostsScreen extends StatefulWidget {
   final String category;
@@ -175,6 +177,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
         final data = json.decode(response.body);
         if (data['data'] != null && data['data'] is List) {
           final List<dynamic> jsonList = data['data'];
+          log('First item featured_at: ${jsonList.isNotEmpty ? jsonList[0]['featured_at'] : 'no items'}');
           final List<ProductModel> newPosts = jsonList
               .map((item) => ProductModel(
                     id: item['_id']?.toString(),
@@ -203,6 +206,16 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                     storage: item['storage']?.toString() ?? '',
                     ram: item['ram']?.toString() ?? '',
                     material: item['material']?.toString() ?? '',
+                    publishedAt: item['published_at']?.toString() ?? '',
+                    assets: item['assets'] != null
+                        ? List<Map<String, dynamic>>.from(item['assets'])
+                        : [], // Make sure to parse
+                    featured_at: item['featured_at']?.toString() ??
+                        '', // Update this line
+                    valid_till: item['valid_till']?.toString() ??
+                        '', // Update this 
+                        state: item['state']?.toString() ?? '',
+                      
                   ))
               .toList();
 
@@ -446,6 +459,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                     padding: const EdgeInsets.all(8),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: constraints.maxWidth > 600 ? 3 : 2,
+                      //  mainAxisExtent: constraints.maxWidth > 600 ? 400 : 300,
                       childAspectRatio: constraints.maxWidth > 600 ? 0.9 : 0.7,
                       crossAxisSpacing: 4,
                       mainAxisSpacing: 4,
@@ -489,26 +503,43 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   final CartController cartController = Get.find<CartController>();
-  String formatDate(String? dateString) {
+  String _formatDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) {
-      return 'No date';
+      return 'Recently'; // Default text if date is null or empty
     }
 
     try {
-      // First try parsing the date
-      DateTime dateTime = DateTime.parse(dateString);
-      return DateFormat('dd MMM yyyy, hh:mm a').format(dateTime);
+      final DateTime dateTime = DateTime.parse(dateString);
+      final now = DateTime.now();
+      final difference = now.difference(dateTime);
+
+      if (difference.inDays == 0) {
+        if (difference.inHours == 0) {
+          if (difference.inMinutes == 0) {
+            return 'Just now';
+          }
+          return '${difference.inMinutes} minutes ago';
+        }
+        return '${difference.inHours} hours ago';
+      } else if (difference.inDays == 1) {
+        return 'Yesterday';
+      } else if (difference.inDays < 7) {
+        return '${difference.inDays} days ago';
+      } else {
+        return '${dateTime.day}/${dateTime.month}/${dateTime.year}';
+      }
     } catch (e) {
-      // If parsing fails, return a default message
-      return 'Invalid date';
+      return 'Recently'; // Return default text if date parsing fails
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    log('Product ID in details: ${widget.productModel.id}');
+    // log('Product ID in details: ${widget.productModel.id}');
+    // log('Building product card with ID: ${widget.productModel.id}');
+    // log('Assets: ${widget.productModel.assets}');
+    // log('Image URL: ${widget.productModel.getFirstImageUrl()}');
     return Card(
-      //  color:const Color.fromARGB(255, 126, 89, 87),
       elevation: 4,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -523,44 +554,67 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ProductDetails(productModel: widget.productModel),
                 ),
               );
-              // Navigate to product details
             },
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Product Image
+                // Image Container with Stack for Featured Badge
+                Stack(
+                  children: [
+                    // Image Container
+                    Container(
+                      padding: const EdgeInsets.all(0),
+                      height: 130,
+                      width: double.infinity,
+                      child: Builder(
+                        builder: (context) {
+                          final imageUrl =
+                              widget.productModel.getFirstImageUrl();
+                          log('Attempting to load image URL: $imageUrl');
+                          // Log the timestamp values for debugging
+                          log('Featured at: ${widget.productModel.featured_at}');
+                          log('Valid till: ${widget.productModel.valid_till}');
 
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(
-                      top: Radius.circular(12), bottom: Radius.circular(12)),
-                  child: widget.productModel.thumb != null &&
-                          widget.productModel.thumb!.isNotEmpty
-                      ? Image.network(
-                          widget.productModel.thumb!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              color: const Color.fromARGB(255, 235, 224, 232),
-                              child: const Center(
-                                child: Icon(
-                                  Icons.image_not_supported,
-                                  size: 120,
-                                  color: Color.fromARGB(255, 225, 97, 97),
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                      : Container(
-                          color: const Color.fromARGB(255, 181, 75, 75),
-                          child: const Center(
-                            child: Icon(
-                              Icons.image_not_supported,
-                              size: 120,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
+                          return Stack(
+                            children: [
+                              // Image
+                              imageUrl.isNotEmpty
+                                  ? Image.network(
+                                      imageUrl,
+                                      fit: BoxFit.fill,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        log('Error loading image: $error');
+                                        return const Center(
+                                          child: Icon(
+                                            Icons.error_outline,
+                                            size: 50,
+                                            color: Colors.grey,
+                                          ),
+                                        );
+                                      },
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      },
+                                    )
+                                  : const Center(
+                                      child: Icon(
+                                        Icons.image_not_supported,
+                                        size: 50,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                            ],
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
                 Flexible(
@@ -580,6 +634,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ),
                         const SizedBox(height: 2),
+                        if (widget.productModel.featured_at?.isNotEmpty == true)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF6A1B9A), // Deep Purple
+                                  Color(0xFFE91E63), // Pink
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              "FEATURED",
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Color.fromARGB(255, 242, 244, 246),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
                         Text(
                           '₹ ${widget.productModel.price ?? 'N/A'}',
                           style: const TextStyle(
@@ -587,19 +672,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 10),
-                        // Text(
-                        //   widget.productModel.id.toString(),
-                        //   maxLines: 1,
-                        //   overflow: TextOverflow.ellipsis,
-                        //   style: const TextStyle(fontSize: 14),
-                        // ),
-
                         const SizedBox(
                           height: 2,
                         ),
-
                         Row(
                           children: [
                             const Icon(Icons.location_on, size: 18),
@@ -615,46 +692,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              margin: EdgeInsets.only(left: 4),
-                              child: const Icon(
-                                Icons.access_time,
-                                size: 18,
-                                color: Color.fromARGB(255, 9, 2, 2),
-                              ),
-                            ),
+                            const Icon(Icons.access_time, size: 16),
                             const SizedBox(width: 4),
-                            Flexible(
+                            Expanded(
                               child: Text(
-                                formatDate(widget.productModel.posted_at),
+                                _formatDateTime(
+                                    widget.productModel.publishedAt),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color.fromARGB(255, 14, 3, 3),
+                                  fontWeight: FontWeight.bold,
+                                ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(255, 12, 0, 0),
-                                ),
                               ),
                             ),
-                            // Flexible(
-                            //   child: Text(
-                            //     widget.product.posted_at != null
-                            //         ? DateFormat('dd MMM yyyy, hh:mm a').format(
-                            //             DateTime.parse(
-                            //                 widget.product.posted_at!))
-                            //         : 'No date',
-                            //     maxLines: 1,
-                            //     overflow: TextOverflow.ellipsis,
-                            //     style: const TextStyle(
-                            //       fontSize: 14,
-                            //       fontWeight: FontWeight.bold,
-                            //       color: Color.fromARGB(255, 12, 0, 0),
-                            //     ),
-                            //   ),
-                            // ),
                           ],
                         ),
                       ],
@@ -664,77 +717,169 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
             ),
           ),
+
           Positioned(
-            top: 2,
-            right: 2,
+            top: 5,
+            right: 5,
             child: Container(
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 234, 233, 229),
+                color: const Color.fromARGB(255, 203, 203, 189),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: Colors.white,
+                  width: 3.0,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha((0.5 * 255).round()),
+                    blurRadius: 4,
+                    spreadRadius: 1,
+                  ),
+                ],
               ),
               child: GetBuilder<CartController>(
-                builder: (controller) => IconButton(
-                  onPressed: () {
-                    final productId = widget.productModel.id.toString();
-                    if (cartController.isFavourite(productId)) {
-                      cartController.removeFromFavourite(
-                        context,
-                        productId,
-                      );
-                    } else {
-                      cartController.addToFavourite(
-                        context,
-                        productId,
-                      );
-                    }
-                  },
-                  icon: Icon(
-                    Icons.favorite,
-                    color: cartController
+                builder: (cartController) => TweenAnimationBuilder(
+                  duration: Duration(milliseconds: 100),
+                  tween: Tween<double>(
+                    begin: 0,
+                    end: cartController
                             .isFavourite(widget.productModel.id.toString())
-                        ? Colors.pink
-                        : Colors.grey,
-                    size: 24,
+                        ? 1
+                        : 0,
                   ),
+                  builder: (context, double value, _) {
+                    return IconButton(
+                      onPressed: () {
+                        if (cartController
+                            .isFavourite(widget.productModel.id.toString())) {
+                          cartController.removeFromFavourite(
+                            context,
+                            widget.productModel.id.toString(),
+                          );
+                        } else {
+                          cartController.addToFavourite(
+                            context,
+                            widget.productModel.id.toString(),
+                          );
+                        }
+                      },
+                      icon: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (cartController
+                              .isFavourite(widget.productModel.id.toString()))
+                            ...List.generate(
+                              5,
+                              (index) => AnimatedOpacity(
+                                duration: const Duration(milliseconds: 100),
+                                opacity: value,
+                                child: Transform.scale(
+                                  scale: 1 + (index * 0.2) * value,
+                                  child: Transform.rotate(
+                                    angle: (index * 0.0) * value * 0.10,
+                                    child: Icon(
+                                      Icons.favorite,
+                                      color: HSLColor.fromAHSL(
+                                        1.0,
+                                        (index * 10.0 * value) % 20,
+                                        0.8,
+                                        0.5 + (value * 0.3),
+                                      )
+                                          .toColor()
+                                          .withOpacity(1 - (index * 0.15)),
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ).toList(),
+                          if (cartController
+                              .isFavourite(widget.productModel.id.toString()))
+                            ...List.generate(
+                              6,
+                              (index) => TweenAnimationBuilder(
+                                tween: Tween(begin: 0.0, end: 1.0),
+                                duration:
+                                    Duration(milliseconds: 1000 + index * 200),
+                                curve: Curves.easeInExpo,
+                                builder: (context, value, child) {
+                                  return Transform.translate(
+                                    offset: Offset(
+                                      sin(value * pi * 2) * 15,
+                                      -value * 50,
+                                    ),
+                                    child: Opacity(
+                                      opacity: 1 - value,
+                                      child: Transform.scale(
+                                        scale: 1 - value * 0.5,
+                                        child: Container(
+                                          width: 10,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            color: const Color.fromARGB(
+                                                    255, 246, 3, 226)
+                                                .withOpacity(0.9),
+                                            shape: BoxShape.circle,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.white
+                                                    .withOpacity(0.4),
+                                                blurRadius: 10,
+                                                spreadRadius: 2,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          Icon(
+                            Icons.favorite,
+                            color: TweenSequence<Color?>([
+                              TweenSequenceItem(
+                                weight: 1.0,
+                                tween: ColorTween(
+                                  begin: Colors.grey,
+                                  end: const Color.fromARGB(255, 205, 4, 241),
+                                ),
+                              ),
+                              TweenSequenceItem(
+                                weight: 1.0,
+                                tween: ColorTween(
+                                  begin: const Color.fromARGB(255, 213, 4, 250),
+                                  end: const Color.fromARGB(255, 6, 82, 157),
+                                ),
+                              ),
+                              TweenSequenceItem(
+                                weight: 1.0,
+                                tween: ColorTween(
+                                  begin: Colors.blue,
+                                  end: const Color.fromARGB(255, 160, 243, 7),
+                                ),
+                              ),
+                              TweenSequenceItem(
+                                weight: 1.0,
+                                tween: ColorTween(
+                                  begin: const Color.fromARGB(255, 247, 1, 112),
+                                  end: const Color.fromARGB(255, 241, 2, 2),
+                                ),
+                              ),
+                            ]).evaluate(AlwaysStoppedAnimation(value)),
+                            size: 20,
+                          )
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-              // child: IconButton(
-              //   onPressed: () {
-              //     if (cartController.isFavourite(widget.productModel.id.toString())) {
-              //       cartController.removeFromFavourite(
-              //           context, widget.productModel.id.toString());
-              //     } else {
-              //       cartController.addToFavourite(
-              //           context, widget.productModel.id.toString());
-              //     }
-              //     // cartController.addToCart(
-              //     //     context, productModel);
-              //   },
-              //   icon: Icon(
-              //     Icons.favorite,
-
-              //     // Icons
-              //     //     .add_shopping_cart_outlined,
-              //     color: cartController.isFavourite(widget.productModel.id.toString())
-              //         ? Colors.pink
-              //         : Colors.grey,
-              //     size: 20,
-              //   ),
-              // ),
-              // child: IconButton(
-              //   onPressed: () {
-              //     cartController.addToCart(context, widget.product);
-              //   },
-              //   icon: const Icon(
-              //     Icons.favorite_border_outlined,
-              //     // Icons
-              //     //     .add_shopping_cart_outlined,
-              //     color: Colors.black,
-              //     size: 16,
-              //   ),
-              // ),
             ),
           ),
+
+         
         ],
       ),
     );

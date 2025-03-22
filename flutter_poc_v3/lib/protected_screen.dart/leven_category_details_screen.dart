@@ -247,7 +247,7 @@ class _LevenCategoryDetailsScreen extends State<LevenCategoryDetailsScreen> {
         },
       ],
       'Properties': [
-        {'name': 'House Sale', 'findkey': 'House'},
+        {'name': 'House Sale', 'findkey': 'house'},
         {'name': 'House Rent', 'findkey': 'house_rent'},
         {'name': 'PG Guest', 'findkey': 'pg_guest'},
       ],
@@ -261,7 +261,8 @@ class _LevenCategoryDetailsScreen extends State<LevenCategoryDetailsScreen> {
         {'name': 'Computer & Laptop', 'findkey': 'Computer & Laptop'},
       ],
       'Bikes': [
-        {'name': 'Bikes', 'findkey': 'Honda'},
+        {'name': 'bikes', 'findkey': 'Honda'},
+        {'name': 'bikes', 'findkey': 'activa 6G'},
         {'name': 'Trucks', 'findkey': 'Trucks'},
         {'name': 'Scooters', 'findkey': 'Scooters'},
       ],
@@ -278,11 +279,11 @@ class _LevenCategoryDetailsScreen extends State<LevenCategoryDetailsScreen> {
         {'name': 'Jewellery', 'findkey': 'Jewellery'},
       ],
       'Pets': [
-        {'name': 'Pets', 'findkey': 'pets'},
+        {'name': 'pets', 'findkey': 'pets'},
         {'name': 'Fish', 'findkey': 'fish'},
         {'name': 'Birds', 'findkey': 'Birds'},
         {'name': 'Cats', 'findkey': 'Cats'},
-        {'name': 'Dogs', 'findkey': 'Dogs'},
+        {'name': 'dogs', 'findkey': 'dogs'},
       ],
       'Mobiles': [
         {'name': 'Mobile Phones', 'findkey': 'iPhone'},

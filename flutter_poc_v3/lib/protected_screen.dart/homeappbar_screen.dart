@@ -220,49 +220,52 @@ class _HomeappbarScreenState extends State<HomeappbarScreen>
             width: 100,
             height: 100,
           ),
-          const SizedBox(width: 10),
+          const SizedBox(width: 50),
           Icon(Icons.location_on, color: Colors.red),
-          SizedBox(width: 8),
+          SizedBox(width: 1),
           // Add this GetX widget for location display
-          GetX<LocationController>(
-            builder: (controller) => GestureDetector(
-              // Where you navigate to LocationScreen (usually in your bottom navigation or menu)
-              onTap: () async {
-                final result = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const LocationScreen()),
-                );
-
-                if (result != null && mounted) {
-                  final locationData = result['locationData'];
-                  final adPosts = result['adPosts'];
-
-                  // Update products
-                  setState(() {
-                    productsController.productModelList.clear();
-                    for (var post in adPosts) {
-                      productsController.productModelList
-                          .add(ProductModel.fromJson(post));
-                    }
-                  });
-                }
-              },
-
-              // onTap:() => {
-              //   navigator?.push(
-              //     MaterialPageRoute(
-              //       builder: (context) => LocationScreen(),
-              //     ),
-              //   ),
-
-              // } ,
-              child: Text(
-                '${controller.currentCity.value}, ${controller.currentState.value}',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w500,
+          Expanded(
+            child: GetX<LocationController>(
+              builder: (controller) => GestureDetector(
+                // Where you navigate to LocationScreen (usually in your bottom navigation or menu)
+                onTap: () async {
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const LocationScreen()),
+                  );
+            
+                  if (result != null && mounted) {
+                    final locationData = result['locationData'];
+                    final adPosts = result['adPosts'];
+            
+                    // Update products
+                    setState(() {
+                      productsController.productModelList.clear();
+                      for (var post in adPosts) {
+                        productsController.productModelList
+                            .add(ProductModel.fromJson(post));
+                      }
+                    });
+                  }
+                },
+            
+                // onTap:() => {
+                //   navigator?.push(
+                //     MaterialPageRoute(
+                //       builder: (context) => LocationScreen(),
+                //     ),
+                //   ),
+            
+                // } ,
+                child: Text(
+                  '${controller.currentCity.value}, ${controller.currentState.value}',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w500,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),
@@ -315,6 +318,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen>
                     color: Colors.black87,
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
                   ),
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,

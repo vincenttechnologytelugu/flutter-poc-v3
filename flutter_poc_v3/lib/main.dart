@@ -1,4 +1,6 @@
 // import 'package:flutter/foundation.dart';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
@@ -15,7 +17,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 late SharedPreferences sharedPreferences;
 void main() async {
-   WidgetsFlutterBinding.ensureInitialized();
+  WidgetsFlutterBinding.ensureInitialized();
+   // Force error reporting
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+  };
+  try{
+    sharedPreferences = await SharedPreferences.getInstance();
+  //  WidgetsFlutterBinding.ensureInitialized();
   Get.put(LocationController(),);
   Get.put(ProductsController());
  
@@ -24,7 +33,9 @@ void main() async {
         ChangeNotifierProvider(create: (_) => PackageProvider()),
       ],
     child: const MyApp()));
-  sharedPreferences = await SharedPreferences.getInstance();
+}catch(e){
+log('Initialization error: $e');
+}
 }
 
 class MyApp extends StatefulWidget {

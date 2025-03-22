@@ -16,6 +16,7 @@ import 'dart:developer';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -366,6 +367,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  Future<void> requestLocationPermission() async {
+  final status = await Permission.location.request();
+  if (status.isGranted) {
+    // Permission granted, proceed with location functionality
+  } else if (status.isDenied) {
+    // Handle denied permission
+  }
+}
+
   void _onRegistrationSuccess() async {
     final locationController = Get.find<LocationController>();
     final productsController = Get.find<ProductsController>();
@@ -411,17 +421,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       backgroundColor: const Color.fromARGB(255, 234, 223, 223),
+     
       body: Stack(
         children: [
           // Background image
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage("assets/images/bg1.png"),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
+          // Container(
+          //   decoration: const BoxDecoration(
+          //     image: DecorationImage(
+          //       image: AssetImage("assets/images/bg1.png"),
+          //       fit: BoxFit.cover,
+          //     ),
+          //   ),
+          // ),
           SingleChildScrollView(
             child: Form(
               key: _formKey,
@@ -432,7 +444,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Padding(
                       padding: const EdgeInsets.only(top: 60, left: 20),
                       child: Text("Welcome\nCreate your Account",
-                          style: TextStyle(fontSize: 30, color: Colors.white)),
+                          style: TextStyle(fontSize: 30, color: const Color.fromARGB(255, 16, 6, 6))),
                     ),
                     textFieldDefaultGap,
                     textFieldDefaultGap,
@@ -459,40 +471,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                       decoration: const InputDecoration(
                         hintText: "First_name",
-                        hintStyle: TextStyle(color: Colors.white),
-                        labelStyle: TextStyle(color: Colors.white),
+                        hintStyle: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                        labelStyle: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         label: Text(
                           "First_name",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
                         prefixIcon: Icon(
                           Icons.person_2_outlined,
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 53, 6, 240),
                         ),
                         counterText: "",
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11)),
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
                         enabledBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
+                          errorBorder: OutlineInputBorder(
+                            // Add this for error state
+                            borderSide: BorderSide(
+                               color: Color.fromARGB(255, 23, 11, 11),
+                                width: 1.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        focusedErrorBorder: OutlineInputBorder(
+                          // Add this for focused error state
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 23, 11, 11),
+                              width: 2.0),
+                        ),
                       ),
-                      style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.white,
+                      style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                      cursorColor: const Color.fromARGB(255, 21, 12, 12),
                       cursorHeight: 20,
                       cursorWidth: 2,
                       cursorRadius: Radius.circular(10),
                     ),
                     textFieldDefaultGap,
                     TextFormField(
-                      style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.white,
+                      style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                      cursorColor: const Color.fromARGB(255, 12, 7, 7),
                       cursorHeight: 20,
                       cursorWidth: 2,
                       cursorRadius: Radius.circular(10),
@@ -520,31 +545,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         hintText: "Last_name",
                         label: Text(
                           "Last_name",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
                         prefixIcon: Icon(
                           Icons.person_2_outlined,
-                          color: Colors.white,
+                          color: Color.fromARGB(255, 53, 6, 240),
                         ),
                         counterText: "",
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                           borderRadius: BorderRadius.all(Radius.circular(15)),
                         ),
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
+                                  errorBorder: OutlineInputBorder(
+                            // Add this for error state
+                            borderSide: BorderSide(
+                               color: Color.fromARGB(255, 23, 11, 11),
+                                width: 1.0),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(15))),
+                        focusedErrorBorder: OutlineInputBorder(
+                          // Add this for focused error state
+                          borderSide: BorderSide(
+                            color: Color.fromARGB(255, 23, 11, 11),
+                              width: 2.0),
+                        ),
                       ),
                     ),
                     textFieldDefaultGap,
                     TextFormField(
-                      style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.white,
+                      style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                      cursorColor: const Color.fromARGB(255, 8, 3, 3),
                       cursorHeight: 20,
                       cursorWidth: 2,
                       cursorRadius: Radius.circular(10),
@@ -573,39 +611,39 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                       decoration: const InputDecoration(
                         hintText: "Enter Email",
-                        hintStyle: TextStyle(color: Colors.white),
-                        labelStyle: TextStyle(color: Colors.white),
+                        hintStyle: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                        labelStyle: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         label: Text(
                           "Email",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
                         prefixIcon: Icon(
                           Icons.email_outlined,
-                          color: Colors.white,
+                         color: Color.fromARGB(255, 53, 6, 240),
                         ),
                         counterText: "",
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
                         focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white, width: 2),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                         ),
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
                         errorBorder: OutlineInputBorder(
                             // Add this for error state
                             borderSide: BorderSide(
-                                color: Color.fromARGB(255, 244, 242, 248),
+                               color: Color.fromARGB(255, 23, 11, 11),
                                 width: 1.0),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
                         focusedErrorBorder: OutlineInputBorder(
                           // Add this for focused error state
                           borderSide: BorderSide(
-                              color: Color.fromARGB(255, 239, 239, 244),
+                            color: Color.fromARGB(255, 23, 11, 11),
                               width: 2.0),
                         ),
                         // errorStyle: TextStyle(
@@ -615,8 +653,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                     textFieldDefaultGap,
                     TextFormField(
-                      style: TextStyle(color: Colors.white),
-                      cursorColor: Colors.white,
+                      style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
+                      cursorColor: const Color.fromARGB(255, 19, 9, 9),
                       cursorHeight: 20,
                       cursorWidth: 2,
                       cursorRadius: Radius.circular(10),
@@ -657,16 +695,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration: InputDecoration(
                         hintText: "Enter Password",
                         hintStyle: TextStyle(
-                          color: Colors.white,
+                         color: Color.fromARGB(255, 23, 11, 11),
                         ),
                         label: const Text(
                           "Password",
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: TextStyle(color: Color.fromARGB(255, 23, 11, 11)),
                         prefixIcon: const Icon(
                           Icons.password_outlined,
-                          color: Colors.white,
+                        color: Color.fromARGB(255, 53, 6, 240),
                         ),
                         suffixIcon: GestureDetector(
                             onTap: () {
@@ -677,31 +715,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               vissiblePassword
                                   ? Icons.visibility_off_outlined
                                   : Icons.visibility_outlined,
-                              color: Colors.white,
+                            color: Color.fromARGB(255, 23, 11, 11),
                             )),
                         counterText: "",
                         border: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.white),
+                          borderSide: BorderSide(color: Color.fromARGB(255, 23, 11, 11)),
                         ),
                         focusedBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
                         enabledBorder: OutlineInputBorder(
                             borderSide:
-                                BorderSide(color: Colors.white, width: 2),
+                                BorderSide(color: Color.fromARGB(255, 23, 11, 11), width: 2),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
                         errorBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: const Color.fromARGB(255, 250, 248, 248),
+                              color: Color.fromARGB(255, 23, 11, 11),
                                 width: 1.0),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),
                         focusedErrorBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                                color: const Color.fromARGB(255, 245, 242, 242),
+                               color: Color.fromARGB(255, 23, 11, 11),
                                 width: 2.0),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(15))),

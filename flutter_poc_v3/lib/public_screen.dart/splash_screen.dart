@@ -86,16 +86,16 @@ class _SplashScreenState extends State<SplashScreen> {
     body: Stack(
       children: [
         // Animated background gradient
-        AnimatedContainer(
-          duration: const Duration(seconds: 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [const Color.fromARGB(255, 249, 3, 151), const Color.fromARGB(255, 252, 251, 251)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
+        // AnimatedContainer(
+        //   duration: const Duration(seconds: 10),
+        //   decoration: BoxDecoration(
+        //     gradient: LinearGradient(
+        //       colors: [const Color.fromARGB(255, 249, 3, 151), const Color.fromARGB(255, 252, 251, 251)],
+        //       begin: Alignment.topLeft,
+        //       end: Alignment.bottomRight,
+        //     ),
+        //   ),
+        // ),
         
         Center(
           child: Column(

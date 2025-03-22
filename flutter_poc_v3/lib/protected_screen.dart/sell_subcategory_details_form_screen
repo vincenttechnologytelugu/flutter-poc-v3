@@ -13,17 +13,22 @@ import 'package:mime/mime.dart';
 // At the top of your file, add this import
 import 'package:flutter_poc_v3/protected_screen.dart/uploading_screen.dart';
 
+import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/custom_text_form_field.dart';
 
 class SellSubcategoryDetailsFormScreen extends StatefulWidget {
   final String category;
   final String subcategory;
   final Color categoryColor;
+ 
 
   const SellSubcategoryDetailsFormScreen({
     Key? key,
     required this.category,
     required this.subcategory,
     required this.categoryColor,
+   
   }) : super(key: key);
 
   @override
@@ -39,7 +44,7 @@ class _SellSubcategoryDetailsFormScreenState
     extends State<SellSubcategoryDetailsFormScreen> {
 
       late Map<String, TextEditingController> controllers;
-   
+     bool isLoading = false;  // Add this line
   final _formKey = GlobalKey<FormState>();
     String selectedType = 'Type'; // Add this line at the class level
   String selectedFurnishing = 'Furnishing'; // Add this variable
@@ -53,7 +58,94 @@ bool _isSubmitDisabled = false;
 
 
 
+// Create a reusable function to show state selection popup
+Future<String?> showStateSelectionDialog(BuildContext context) async {
+  final TextEditingController searchController = TextEditingController();
+  List<String> indianStates = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+    'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
+    'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur', 'Meghalaya', 'Mizoram',
+    'Nagaland', 'Odisha', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu',
+    'Telangana', 'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli',
+    'Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep',
+    'Puducherry'
+  ];
+  List<String> filteredStates = indianStates;
 
+  return showDialog<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return StatefulBuilder(
+        builder: (context, setState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Container(
+              width: double.maxFinite,
+              constraints: const BoxConstraints(maxHeight: 500),
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'Select State',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search State',
+                      prefixIcon: const Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredStates = indianStates
+                            .where((state) => state.toLowerCase()
+                                .contains(value.toLowerCase()))
+                            .toList();
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: filteredStates.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          title: Text(filteredStates[index]),
+                          onTap: () {
+                            Navigator.pop(context, filteredStates[index]);
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    },
+  );
+}
 
 
 
@@ -236,12 +328,22 @@ void initState() {
     'description': TextEditingController(),
     'brand': TextEditingController(),
     'year': TextEditingController(),
-    // 'kmDriven': TextEditingController(),
+
     'ownerType': TextEditingController(),
     'fuelType': TextEditingController(),
     'transmission': TextEditingController(),
     'make':TextEditingController(),
-    "model":TextEditingController()
+    "model":TextEditingController(),
+     'state': TextEditingController(),
+     'location': TextEditingController(),
+   
+    //  'mileage': TextEditingController(),
+
+
+
+     "pet_category":TextEditingController(),
+     "breed":TextEditingController(),
+     "vaccinationType":TextEditingController(),
 
   };
 }
@@ -252,9 +354,13 @@ void initState() {
 
 
 void _submitForm() async {
+  
   FocusScope.of(context).unfocus();
 
   if (_formKey.currentState!.validate()) {
+      setState(() {
+      isLoading = true;
+    });
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -313,6 +419,17 @@ void _submitForm() async {
         'ownerType': controllers['ownerType']?.text?.trim() ?? '',
         'fuelType': controllers['fuelType']?.text?.trim() ?? '',
         'transmission': controllers['transmission']?.text?.trim() ?? '',
+        'state':controllers['state']?.text?.trim() ?? '',
+        'location':controllers['location']?.text?.trim() ?? '',
+        'brand': controllers['brand']?.text?.trim() ?? '',
+        // 'mileage': int.parse(controllers['mileage']?.text ?? '0'),
+
+
+        'pet_category':controllers['category']?.text?.trim() ?? '',
+        'breed':controllers['title']?.text?.trim() ?? '',
+        'vaccinationType':controllers['vaccinationType']?.text?.trim() ?? '',
+        
+        
       };
 
       final response = await http.post(
@@ -323,7 +440,9 @@ void _submitForm() async {
         },
         body: json.encode(formData),
       );
-
+  setState(() {
+        isLoading = false;
+      });
       print('Response status: ${response.statusCode}');
       print('Response body: ${response.body}');
 
@@ -369,11 +488,15 @@ void _submitForm() async {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const UploadingScreen(),
+                builder: (context) => const UploadingScreen(
+                 
+                ),
               ),
             );
             
-          } else {
+          }
+          
+           else {
              // Check if widget is still mounted
             if (!mounted) return;
             print('Response data structure: $responseData');
@@ -385,21 +508,73 @@ void _submitForm() async {
           print('Error parsing response: $e');
           throw Exception('Error processing server response: $e');
         }
+      } 
+//       else {
+//  // Check if widget is still mounted
+//             if (!mounted) return;
+//         print('Server error response: ${response.body}');
+     
+//       }
+//     } catch (e) {
+//        // Check if widget is still mounted
+//             if (!mounted) return;
+//       print('Error in _submitForm: $e');
+    
+//     }
+//   }
+// }
+else if (response.statusCode == 401) {
+        // Add this new condition for subscription limit
+        final errorResponse = json.decode(response.body);
+        if (!mounted) return;
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Subscription Limit Reached Take New Subscription',
+              style: TextStyle(
+                color: Colors.red,
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+
+              )
+              
+              ),
+              content: Text(errorResponse['message'] ?? 'Subscription limit reached'),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                     Navigator.of(context).pushAndRemoveUntil(
+  MaterialPageRoute(builder: (context) => const PackageScreen()), // New route
+  (route) => false, // Predicate to stop removal (but returns false, so all are removed)
+);
+                  },
+                ),
+              ],
+            );
+          },
+        );
       } else {
- // Check if widget is still mounted
-            if (!mounted) return;
-        print('Server error response: ${response.body}');
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Error: ${response.body}')),
-        // );
+        // Keep your existing error handling
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${response.body}'),
+          ),
+        );
       }
     } catch (e) {
-       // Check if widget is still mounted
-            if (!mounted) return;
-      print('Error in _submitForm: $e');
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Error: $e')),
-      // );
+      setState(() {
+        isLoading = false;
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+        ),
+      );
+
     }
   }
 }
@@ -431,9 +606,28 @@ Future<String?> getAdpostId() async {
   Widget build(BuildContext context) {
       
     return Scaffold(
+      backgroundColor: Colors.teal.shade50,
       appBar: AppBar(
-        title: Text('Post in ${widget.subcategory}'),
-         automaticallyImplyLeading: false, // Disable back button
+        backgroundColor: Colors.deepPurple.shade200,
+        title: Text('Post in ${widget.subcategory}',
+
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'Roboto',
+          fontStyle: FontStyle.italic,
+          decoration: TextDecoration.underline,
+          decorationColor: Colors.black,
+          decorationStyle: TextDecorationStyle.solid,
+
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+          
+
+        )
+        
+        
+        ),
+         automaticallyImplyLeading: true, // Disable back button
       ),
       body: Form(
         key: _formKey,
@@ -449,42 +643,24 @@ Future<String?> getAdpostId() async {
                  SizedBox(height: 20),
 
 ElevatedButton(
-  // readOnly: _isSubmitDisabled,
+ 
   onPressed: _isSubmitDisabled ? null : _submitForm,
-  child: Text('Submit'),
+  child: Text('Submit',
+
+  ),
   style: ElevatedButton.styleFrom(
     backgroundColor: _isSubmitDisabled ? Colors.red : null, // Optional: visual feedback
-   padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+  
+    minimumSize: Size(double.infinity, 50),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(200),
+    ),
+
   ),
+ 
 ),
 
 
-//               ElevatedButton(
-//   // onPressed: _submitForm,
-//   //  onPressed: _isFormReadOnly ? null : _submitForm, // Disable button if form is read-only
-//   style: ElevatedButton.styleFrom(
-//     backgroundColor: Colors.blue,
-//     padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
-//   ),
-//   child: Text(
-//     'Submit',
-//     style: TextStyle(
-//       color: Colors.white,
-//       fontSize: 16,
-//     ),
-//   ),
-// ),
-    // _buildMediaUploadSection(),
-
-
-              // ElevatedButton(
-              //   onPressed: () {
-              //     if (_formKey.currentState!.validate()) {
-              //       // Handle form submission
-              //     }
-              //   },
-              //   child: Text('Submit'),
-              // ),
               SizedBox(height: 20),
              
       
@@ -540,6 +716,37 @@ ElevatedButton(
       children: [
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['thumb'],
+          decoration:
+              InputDecoration(labelText: 'thumb', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+         TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['condition'],
+          decoration:
+              InputDecoration(labelText: 'condition', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+          TextFormField(
+             controller: controllers['Category'],
+           readOnly: _isFormReadOnly, // Add this line
+          decoration: InputDecoration(labelText: 'category',
+            hintText:
+                'category of your item',border: OutlineInputBorder(),
+          
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter a category';
+            }
+            return null;
+          },
+        ),
+        TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['title'],
           decoration: InputDecoration(labelText: 'Title',
             hintText:
                 'Mention the key features of your item (e.g. brand, model, age, type)',
@@ -552,6 +759,7 @@ ElevatedButton(
             return null;
           },
         ),
+        SizedBox(height: 20),
 TextFormField(
   controller: controllers['price'],
    readOnly: _isFormReadOnly, // Add this line
@@ -570,8 +778,27 @@ TextFormField(
     return null;
   },
 ),
+  SizedBox(height: 20),
+TextFormField(
+  controller: controllers['year'],
+   readOnly: _isFormReadOnly, // Add this line
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'year *',
+    border: OutlineInputBorder(),
+  ),
+  validator: (value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter year';
+    }
+    if (int.tryParse(value) == null) {
+      return 'Please enter a valid year';
+    }
+    return null;
+  },
+),
 
-
+SizedBox(height: 20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'BHK'),
@@ -583,6 +810,7 @@ TextFormField(
             return null;
           },
         ),
+        SizedBox(height: 20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Bathrooms'),
@@ -594,6 +822,7 @@ TextFormField(
             return null;
           },
         ),
+        SizedBox(height: 20),
        TextFormField(
          readOnly: _isFormReadOnly, // Add this line
           // readOnly: true,
@@ -676,19 +905,21 @@ TextFormField(
             return null;
           },
         ),
-            TextFormField(
-               readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Super Buildup area sqft *'),
-          validator: (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter a Super Buildup area sqft';
-            }
-            return null;
-          },
-        ),
+        SizedBox(height:20),
+        //     TextFormField(
+        //        readOnly: _isFormReadOnly, // Add this line
+        //   decoration: InputDecoration(labelText: 'Super Buildup area sqft *'),
+        //   validator: (value) {
+        //     if (value == null || value.isEmpty) {
+        //       return 'Please enter a Super Buildup area sqft';
+        //     }
+        //     return null;
+        //   },
+        // ),
          TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Carpet area sqft *'),
+          decoration: InputDecoration(labelText: 'area *'),
+        
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter Carpet area sqft';
@@ -696,49 +927,56 @@ TextFormField(
             return null;
           },
         ),
+        SizedBox(height:20),
          TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Maintenance(Monthly)'),
         
         ),
-
+SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Total Floors'),
+          decoration: InputDecoration(labelText: 'floorNumber'),
           keyboardType: TextInputType.number,
           validator: (value) {
             if (value == null || value.isEmpty) {
-              return 'Please enter number of Total Floors';
+              return 'Please enter number of  Floor';
             }
             return null;
           },
         ),
+        SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Car Parking'),
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.text,
          
         ),
+          SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Floor Number'),
+          decoration: InputDecoration(labelText: 'totalFloors'),
           keyboardType: TextInputType.number,
         
         ),
+          SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Facing'),
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.text,
          
         ),
+        
+          SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           decoration: InputDecoration(labelText: 'Project Name'),
          
         ),
-
+  SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
+            controller: controllers['location'],
           decoration: InputDecoration(labelText: 'Location'),
           validator: (value) {
             if (value == null || value.isEmpty) {
@@ -747,9 +985,11 @@ TextFormField(
             return null;
           },
         ),
+          SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'City'),
+            controller: controllers['city'],
+          decoration: InputDecoration(labelText: 'city'),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter a city';
@@ -757,9 +997,10 @@ TextFormField(
             return null;
           },
         ),
+          SizedBox(height:20),
          TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'State'),
+          decoration: InputDecoration(labelText: 'state'),
           validator: (value) {
             if (value == null || value.isEmpty) {
               return 'Please enter a State';
@@ -767,7 +1008,7 @@ TextFormField(
             return null;
           },
         ),
-
+  SizedBox(height:20),
 
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
@@ -867,6 +1108,7 @@ TextFormField(
           return null;
         },
       ),
+       SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           //  readOnly: true,
@@ -949,9 +1191,12 @@ TextFormField(
             return null;
           },
         ),
+
+          SizedBox(height:20),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Description',
+            controller: controllers['description'],
+          decoration: InputDecoration(labelText: 'description',
               hintText: 'Include condition, features and reason for selling',
           
           ),
@@ -963,6 +1208,8 @@ TextFormField(
             return null;
           },
         ),
+        // Add more form fields as needed
+        SizedBox(height: 20),
       ],
     );
   }
@@ -1543,9 +1790,19 @@ TextFormField(
   Widget _buildBikesForm() {
     return Column(
       children: [
+
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Title',
+          controller: controllers['thumb'],
+          decoration:
+              InputDecoration(labelText: 'thumb', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
+        TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+           controller: controllers['title'],
+          decoration: InputDecoration(labelText: 'title',
             hintText:
                 'Mention the key features of your item (e.g. brand, model, age, type)',
           ),
@@ -1556,6 +1813,14 @@ TextFormField(
             return null;
           },
         ),
+TextFormField(
+           readOnly: _isFormReadOnly, // Add this line
+          controller: controllers['condition'],
+          decoration:
+              InputDecoration(labelText: 'condition', border: OutlineInputBorder()),
+          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        ),
+        SizedBox(height: 10),
 TextFormField(
    readOnly: _isFormReadOnly, // Add this line
 
@@ -1610,11 +1875,12 @@ TextFormField(
 ),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'City'),
+           controller: controllers['city'],
+          decoration: InputDecoration(labelText: 'city'),
         ),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'State'),
+          decoration: InputDecoration(labelText: 'state'),
         ),
                 TextFormField(
                    readOnly: _isFormReadOnly, // Add this line
@@ -1739,13 +2005,16 @@ TextFormField(
         //   decoration: InputDecoration(labelText: 'fuelType'),
         // ),
            TextFormField(
-             readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Category'),
+             readOnly: _isFormReadOnly,
+              // Add this line
+              controller:controllers['category'],
+          decoration: InputDecoration(labelText: 'category'),
         ),
         
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Description',
+      controller:controllers['description'],
+          decoration: InputDecoration(labelText: 'description',
               hintText: 'Include condition, features and reason for selling',
           ),
           maxLines: 3,
@@ -1764,11 +2033,11 @@ Widget _buildCommercialVehiclesSparesForm(){
       children: [
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'Prise'),
+          decoration: InputDecoration(labelText: 'prise'),
         ),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
-          decoration: InputDecoration(labelText: 'City'),
+          decoration: InputDecoration(labelText: 'city'),
         ),
 
  TextFormField(
@@ -2033,34 +2302,57 @@ Widget _buildCommercialVehiclesSparesForm(){
            readOnly: _isFormReadOnly, // Add this line
           controller: controllers['city'],
           decoration:
-              InputDecoration(labelText: 'City', border: OutlineInputBorder()),
+              InputDecoration(labelText: 'city', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['state'],
-          decoration:
-              InputDecoration(labelText: 'State', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
+        // Usage in your form:
+TextFormField(
+  controller: controllers['state'], // Using t
+  readOnly: true, // Make it read-only since we're using popup
+  decoration: InputDecoration(
+    labelText: 'State',
+    hintText: 'Select State',
+    prefixIcon: const Icon(Icons.location_city),
+    suffixIcon: const Icon(Icons.arrow_drop_down),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+  onTap: () async {
+    final selectedState = await showStateSelectionDialog(context);
+    if (selectedState != null) {
+      setState(() {
+      controllers['state']?.text = selectedState;
+      });
+    }
+  },
+),
+
+        // TextFormField(
+        //    readOnly: _isFormReadOnly, // Add this line
+        //   controller: controllers['state'],
+        //   decoration:
+        //       InputDecoration(labelText: 'state', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
         SizedBox(height: 10),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           controller: controllers['location'],
           decoration: InputDecoration(
-              labelText: 'Location', border: OutlineInputBorder()),
+              labelText: 'location', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
         ),
         SizedBox(height: 10),
         
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['verifiedSeller'],
-          decoration: InputDecoration(
-              labelText: 'verifiedSeller', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
+        // TextFormField(
+        //    readOnly: _isFormReadOnly, // Add this line
+        //   controller: controllers['verifiedSeller'],
+        //   decoration: InputDecoration(
+        //       labelText: 'verifiedSeller', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
         SizedBox(height: 10),
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
@@ -2190,7 +2482,52 @@ TextFormField(
                                             'Tata',
                                             'Mahindra',
                                             'Toyota',
-                                            'Honda'
+                                            'Honda',
+                                            'Volkswagen',
+                                            'BMW',
+                                            'Mercedes-Benz',
+                                            'Audi',
+                                            'Jaguar',
+                                            'Porsche',
+                                            'Lamborghini',
+                                            'Ferrari',
+                                            'Rolls-Royce',
+                                            'Maserati',
+                                            'Bugatti',
+                                            'McLaren',
+                                            'Fiat',
+                                            'Ford',
+                                            'Chevrolet',
+                                            'Nissan',
+                                            'Kia',
+                                            'Suzuki',
+                                            'Mitsubishi',
+                                            'Subaru',
+                                            'Land Rover',
+                                            'Jeep',
+                                            'Aston Martin',
+                                            'Lexus',
+                                            'MINI',
+                                            'Volvo',
+                                            'Daewoo',
+                                            'Daihatsu',
+                                            'Isuzu',
+                                            'Mazda',
+                                            'Perodua',
+                                            'Proton',
+                                            'SsangYong',
+                                            'SsangYong',
+                                            'Skoda',
+                                            'Renault',
+                                            'Geely',
+                                            'Great Wall',
+                                            'Haval',
+                                            'JAC',
+                                            'Lifan',
+                                            'Nio',
+                                            'Nissan',
+
+                                            
                                           ], onBrandSelected: (brand) {
                                             if (controllers['brand'] != null) {
                                               controllers['brand']!.text =
@@ -2284,7 +2621,7 @@ TextFormField(
         TextFormField(
            readOnly: _isFormReadOnly, // Add this line
           controller: controllers['model'],
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.text,
           decoration:
               InputDecoration(labelText: 'Model', border: OutlineInputBorder()),
           validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
@@ -2309,26 +2646,36 @@ TextFormField(
   },
 ),
         SizedBox(height: 10),
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['odoReading'],
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-              labelText: 'Odometer Reading', border: OutlineInputBorder()),
        
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        TextFormField(
+        controller: controllers['mileage'],
+        readOnly: _isFormReadOnly,
+        keyboardType: TextInputType.number,
+        decoration: InputDecoration(
+          labelText: 'Km Driven(Mileage) *',
+          border: OutlineInputBorder(),
+          hintText: 'Km Driven(Mileage)',
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter mileage';
+          }
+          if (int.tryParse(value) == null) {
+            return 'Please enter a valid number';
+          }
+          return null;
+        },
+      ),
         SizedBox(height: 10),
 
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['inWarranty'],
-          decoration: InputDecoration(
-              labelText: 'In Warranty', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-       
-        SizedBox(height: 10),
+        // TextFormField(
+        //    readOnly: _isFormReadOnly, // Add this line
+        //   controller: controllers['inWarranty'],
+        //   decoration: InputDecoration(
+        //       labelText: 'In Warranty', border: OutlineInputBorder()),
+        //   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+        // ),
+ 
         // Replace the transmission type text field with this:
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -2540,57 +2887,716 @@ TextFormField(
   Widget _buildPetsForm(){
     return Column(
       children: [
-          TextFormField(
-             readOnly: _isFormReadOnly, // Add this line
-            controller: controllers['city'],
-     
-            decoration: InputDecoration(
-              labelText: 'City', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+CustomTextFormField(
+      labelText: 'Thumb',
+      hintText: 'Please enter the thumb url',
+      prefixIcon: Icons.search,
+      readOnly: _isFormReadOnly,
+      controller: controllers['thumb']!,
+    ),
+    const SizedBox(height: 10),
+    CustomTextFormField(
+      labelText: 'Title',
+     hintText:
+            'Mention the key features of your item (e.g. brand, model, age, type)',
+      prefixIcon: Icons.title,
+      readOnly: _isFormReadOnly,
+      controller: controllers['title']!,
+    ),
+    const SizedBox(height: 10),
+    CustomTextFormField(
+labelText: 'city',
+      hintText: 'Please enter the city',
+      prefixIcon: Icons.location_city,
+      readOnly: _isFormReadOnly,
+      controller: controllers['city']!,
+    ),
+    const SizedBox(height: 10),
+  
+    CustomTextFormField(
+      labelText: 'location',
+      hintText: 'Please enter the location',
+      prefixIcon: Icons.location_city,
+      readOnly: _isFormReadOnly,
+      controller: controllers['location']!,
+    ),
+    const SizedBox(height: 10),
+    CustomTextFormField(
+      labelText: 'price',
+      hintText: 'Please enter the price',
+      prefixIcon: Icons.price_change,
+      readOnly: _isFormReadOnly,
+      controller: controllers['price']!,
+    ),
+    const SizedBox(height: 10),
 
-          ),
-          SizedBox(height: 10),
-        
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-            controller: controllers['state'],
-        
-            decoration: InputDecoration(
-              labelText: 'State', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
 
-          ),
-          SizedBox(height: 10),
-           TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['location'],
-          decoration: InputDecoration(
-              labelText: 'Location', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
-        SizedBox(height: 10),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
          
+//           Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['thumb'],
+//   decoration: InputDecoration(
+//     labelText: 'Thumb',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText:
+//                 'Please enter the thumb url',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.search,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.star_border,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+
+
+// ),
+// ),
+
+
+// SizedBox(height: 10),
+
+
+
+//           Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['title'],
+//   decoration: InputDecoration(
+//     labelText: 'Title',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText:
+//                 'Mention the key features of your item (e.g. brand, model, age, type)',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.search,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.star_border,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
+
+
+
+
+
+
+
+// SizedBox(height: 10),
+
+//    Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['city'],
+//   decoration: InputDecoration(
+//     labelText: 'City',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText: 'Enter your city...',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.location_city,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.star_border,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
+          
+    
+//           SizedBox(height: 10),
         
+       
         TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-            controller: controllers['vaccinationType'],
-
-            decoration: InputDecoration(
-              labelText: 'Vaccination Type', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-
-          ),
-          SizedBox(height: 10),
-         
-        
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-            controller: controllers['location'],
-
+  controller: controllers['state'], // Using t
+  readOnly: true, // Make it read-only since we're using popup
   decoration: InputDecoration(
-              labelText: 'Location', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-          ),
+    labelText: 'State',
+    hintText: 'Select State',
+    prefixIcon: const Icon(Icons.location_city),
+    suffixIcon: const Icon(Icons.arrow_drop_down),
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+  ),
+  onTap: () async {
+    final selectedState = await showStateSelectionDialog(context);
+    if (selectedState != null) {
+      setState(() {
+      controllers['state']?.text = selectedState;
+      });
+    }
+  },
+),
+        SizedBox(height: 10),
+//           Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['location'],
+//   decoration: InputDecoration(
+//     labelText: 'Location',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText: 'Enter your location',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.location_city,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.location_on,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
+         
+//     SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['vaccinationType'],
+  decoration: InputDecoration(
+    labelText: 'Vaccination Type',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+     
+    ),
+    hintText: 'Select Vaccination Type',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize:14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.vaccines,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+    child:  IconButton(
+  icon: FaIcon(FontAwesomeIcons.syringe, color: Colors.white, size: 15),
+  onPressed: () {
+    // print("Syringe Icon Clicked!");
+  },
+)
+      // child: Icon(
+      //   Icons.star_border,
+      //   color: Colors.white,
+      //   size: 18,
+      // ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+     shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+  
+   
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+   
+         
+        
+     
           
         
         
@@ -2600,38 +3606,1123 @@ TextFormField(
       
        
         SizedBox(height: 10),
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['category'],
-          decoration: InputDecoration(
-              labelText: 'Category', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+      Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['category'],
+  decoration: InputDecoration(
+    labelText: 'category',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
         ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+    hintText: 'Enter your pets category',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.pets,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.pets,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
         SizedBox(height: 10),
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['breed'],
-          decoration: InputDecoration(
-              labelText: 'Breed', border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-        ),
 
-       
+
+
+
+
+
+  Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['pet_category'],
+  decoration: InputDecoration(
+    labelText: 'Pet Category',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
+        ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+    hintText: 'Enter your pet category',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+     Icons.pets,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.pets,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+
+SizedBox(height: 10),
+
+
+
+
+
+        
+      Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['breed'],
+  decoration: InputDecoration(
+    labelText: 'Breed',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
+        ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+    hintText: 'Enter your city...',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+     Icons.pets,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.pets,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+       SizedBox(height: 10),
+
+  Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['condition'],
+  decoration: InputDecoration(
+    labelText: 'Condition',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
+        ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+    hintText:'Enter Condition, e.g. New, Used, etc.',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.location_city,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.location_on,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+SizedBox(height: 10),
+
+
+// Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['make'],
+//   decoration: InputDecoration(
+//     labelText: 'Make',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText: 'Enter Make',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//      Icons.pets,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.pets,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
        
       
       
         SizedBox(height: 10),
-        TextFormField(
-           readOnly: _isFormReadOnly, // Add this line
-          controller: controllers['description'],
-          maxLines: 3,
-          decoration: InputDecoration(
-              labelText: 'Description', 
-              
-              
-              border: OutlineInputBorder()),
-          validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+
+          Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+
+  readOnly: _isFormReadOnly,
+  controller: controllers['year'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Year',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
         ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+    hintText: 'Enter Year ',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.location_city,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.location_on,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+SizedBox(height: 10),
+//           Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['model'],
+//   decoration: InputDecoration(
+//     labelText: 'Model',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText: 'Enter your model',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.location_city,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.location_on,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
+SizedBox(height: 10),
+
+//  Container(
+//   decoration: BoxDecoration(
+//     gradient: LinearGradient(
+//       colors: [
+//         Colors.deepPurple[100]!,
+//         Colors.purple[200]!,
+//         Colors.deepPurple[200]!,
+//       ],
+//       begin: Alignment.topCenter,
+//       end: Alignment.bottomCenter,
+//     ),
+//     borderRadius: BorderRadius.circular(40.0),
+//     boxShadow: [
+//       BoxShadow(
+//         color: Colors.deepPurple[200]!.withOpacity(0.3),
+//         blurRadius: 35.0,
+//         offset: Offset(0, 8),
+//       ),
+//     ],
+//   ),
+//   child:
+//   TextFormField(
+//   readOnly: _isFormReadOnly,
+//   controller: controllers['price'],
+//   keyboardType: TextInputType.number,
+//   decoration: InputDecoration(
+//     labelText: 'Price',
+//     labelStyle: TextStyle(
+//       color: Colors.deepPurple[300],
+//       fontWeight: FontWeight.w600,
+//       letterSpacing: 1.2,
+//       fontSize: 14.0,
+//       shadows: [
+//         Shadow(
+//           color: Colors.deepPurple[100]!,
+//           offset: Offset(0, 2),
+//           blurRadius: 4,
+//         ),
+//       ],
+//       fontFamily: 'Roboto',
+//       fontStyle: FontStyle.italic,
+//     ),
+    
+//     hintText: 'Enter your price',
+//     hintStyle: TextStyle(
+//       color: Colors.deepPurple[200],
+//       fontStyle: FontStyle.italic,
+//       fontSize: 14.0,
+//     ),
+//     prefixIcon: Icon(
+//       Icons.location_city,
+//       color: Colors.deepPurple[400],
+//       size: 20,
+//     ),
+//     filled: true,
+//     fillColor: Colors.white,
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     enabledBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide.none,
+//     ),
+//     focusedBorder: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(20.0),
+//       borderSide: BorderSide(
+//         color: Colors.deepPurple[400]!,
+//         width: 2.0,
+//         style: BorderStyle.solid,
+//       ),
+//     ),
+//     contentPadding: EdgeInsets.symmetric(
+//       vertical: 18.0,
+//       horizontal: 20.0,
+//     ),
+//     // Unique gradient background effect
+//     floatingLabelBehavior: FloatingLabelBehavior.auto,
+//     suffixIcon: Container(
+//       margin: EdgeInsets.all(4.0),
+//       padding: EdgeInsets.all(6.0),
+//       decoration: BoxDecoration(
+//         gradient: LinearGradient(
+//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+//           begin: Alignment.topLeft,
+//           end: Alignment.bottomRight,
+//         ),
+//         shape: BoxShape.circle,
+//       ),
+//       child: Icon(
+//         Icons.location_on,
+//         color: Colors.white,
+//         size: 18,
+//       ),
+//     ),
+//   ),
+//   style: TextStyle(
+//     fontSize: 20.0,
+  
+//     color: Colors.deepPurple[800],
+//     fontWeight: FontWeight.w500,
+//     letterSpacing: 0.5,
+//     shadows: [
+//       Shadow(
+//         color: Colors.deepPurple[100]!,
+//         offset: Offset(0, 0.1),
+//         blurRadius: 1,
+//       ),
+//     ],
+//     fontFamily: 'Roboto', // Custom font family
+//   ),
+//   cursorColor: Colors.deepPurple[400],
+//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//   // Adding a subtle animation
+//   keyboardAppearance: Brightness.light,
+// ),
+// ),
+
+
+
+
+
+
+
+
+
+ SizedBox(height: 10),
+       Container(
+  decoration: BoxDecoration(
+    gradient: LinearGradient(
+      colors: [
+        Colors.deepPurple[100]!,
+        Colors.purple[200]!,
+        Colors.deepPurple[200]!,
+      ],
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+    ),
+    borderRadius: BorderRadius.circular(40.0),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.deepPurple[200]!.withOpacity(0.3),
+        blurRadius: 35.0,
+        offset: Offset(0, 8),
+      ),
+    ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['description'],
+  maxLines: 3,
+   textInputAction: TextInputAction.done,
+                    onEditingComplete: () {
+                      FocusScope.of(context).unfocus();
+                    },
+  decoration: InputDecoration(
+    labelText: 'Description',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      shadows: [
+        Shadow(
+          color: Colors.deepPurple[100]!,
+          offset: Offset(0, 2),
+          blurRadius: 4,
+        ),
+      ],
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    
+   hintText: 'Include condition, features and reason for selling',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.description,
+      color: Colors.deepPurple[400],
+      size: 20,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+        style: BorderStyle.solid,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.star_border,
+        color: Colors.white,
+        size: 18,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+  
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto', // Custom font family
+  ),
+  cursorColor: Colors.deepPurple[400],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+
+ SizedBox(height: 10),
+       
+      //   TextFormField(
+      //   controller: controllers['mileage'],
+      //   readOnly: _isFormReadOnly,
+      //   keyboardType: TextInputType.number,
+      //   decoration: InputDecoration(
+      //     labelText: 'contact number*',
+      //     border: OutlineInputBorder(),
+      //     hintText: 'Enter your contact number',
+      //   ),
+      //   validator: (value) {
+      //     if (value == null || value.isEmpty) {
+      //       return 'Please enter your contact number';
+      //     }
+      //     if (int.tryParse(value) == null) {
+      //       return 'Please enter a valid number';
+      //     }
+      //     return null;
+      //   },
+      // ),
+        SizedBox(height: 10),
+
+
     
   
 

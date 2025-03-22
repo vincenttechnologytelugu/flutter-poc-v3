@@ -1,5 +1,4 @@
-// lib/models/asset_model.dart
-
+// In product_model.dart
 class AssetModel {
   final String url;
   final String type;
@@ -13,12 +12,16 @@ class AssetModel {
     required this.createdAt,
   });
 
-  factory AssetModel.fromJson(Map<String, dynamic> map) {
+  // Updated fromJson to handle the nested response structure
+  factory AssetModel.fromJson(Map<String, dynamic> json) {
+    // Handle the nested 'data' structure
+    final data = json['data'] as Map<String, dynamic>? ?? json;
+    
     return AssetModel(
-      url: map['url'] ?? '',
-      type: map['type'] ?? '',
-      id: map['_id'] ?? '',
-      createdAt: map['created_at'] ?? '',
+      url: data['path'] ?? '', // Changed from 'url' to 'path'
+      type: 'image/jpeg', // Default type since it's not in response
+      id: data['_id'] ?? '',
+      createdAt: DateTime.now().toIso8601String(), // Default since it's not in response
     );
   }
 }

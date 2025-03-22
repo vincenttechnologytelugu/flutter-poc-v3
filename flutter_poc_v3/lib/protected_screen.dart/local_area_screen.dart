@@ -120,6 +120,7 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
           'Koti',
           'LB Nagar',
           'Himayatnagar',
+          'Miyapur'
         ];
       case 'Pune':
         return [
@@ -244,6 +245,20 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
           'Rourkela',
           'Berhampur',
         ];
+        case 'Miyapur':
+        return [
+          'Miyapur',
+          'Gachibowli',
+          'Kukatpally',
+          'Khajaguda',
+        ];
+      case 'Kerala':
+        return [
+          'Thiruvananthapuram',
+          'Kochi',
+          'Kozhikode',
+          'Kollam',
+        ];
       case 'West Bengal':
         return ['Kolkata', 'Howrah', 'Dum Dum', 'Siliguri'];
 
@@ -360,18 +375,7 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
     }
   }
 
-// // local_area_screen.dart
-// void onLocationSelected(String city, String state) {
-//   final LocationController locationController = Get.find();
-//   locationController.setManualLocation(city, state);
-//   Get.back(); // Navigate back after selection
-// }
 
-// void onCurrentLocationPressed() async {
-//   final LocationController locationController = Get.find();
-//   await locationController.updateToCurrentLocation();
-//   Get.back(); // Navigate back after updating
-// }
 
   void _filterAreas() {
     setState(() {

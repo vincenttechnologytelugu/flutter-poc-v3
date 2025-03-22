@@ -68,7 +68,8 @@
 <string>This app needs access to location when open to show nearby content.</string>
 <key>NSLocationAlwaysUsageDescription</key>
 <string>This app needs access to location when in the background.</string>
-
+ <key>FLTEnableImpeller</key>
+ <false />
 
 </dict>
 </plist>

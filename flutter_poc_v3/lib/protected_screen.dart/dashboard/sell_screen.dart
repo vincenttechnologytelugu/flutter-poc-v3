@@ -443,6 +443,8 @@
 //   }
 // }
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/category_item.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/delay_animation.dart';
@@ -458,7 +460,7 @@ class SellScreen extends StatefulWidget {
 class _SellScreenState extends State<SellScreen> {
   final List<Map<String, dynamic>> items = [
     {"icon": Icons.directions_car, "caption": "Cars", "color": Colors.blue},
-    {"icon": Icons.home, "caption": "Property", "color": Colors.green},
+    {"icon": Icons.home, "caption": "properties", "color": Colors.green},
     {"icon": Icons.phone_android, "caption": "Mobiles", "color": Colors.orange},
     {"icon": Icons.work, "caption": "Jobs", "color": Colors.purple},
     {"icon": Icons.shopping_bag, "caption": "Fashion", "color": Colors.pink},

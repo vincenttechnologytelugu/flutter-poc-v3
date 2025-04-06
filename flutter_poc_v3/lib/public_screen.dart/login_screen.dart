@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
@@ -6,7 +8,7 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 
 //import 'package:flutter_poc_v3/main.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/uploading_screen.dart';
+
 
 import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
 
@@ -44,40 +46,79 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
+  
     super.initState();
     checkLoginStatus();
   }
-  // In your login_screen.dart or auth_controller.dart
 
-  // void handleDummyLogin() {
-  //   // Dummy credentials
-  //   const String dummyEmail = "test@example.com";
-  //   const String dummyPassword = "password123";
 
-  //   if (_emailController.text == dummyEmail &&
-  //       _passwordController.text == dummyPassword) {
-  //     // Show success message
-  //     setState(() {
-  //       loginMessage = "Login successful!";
-  //     });
 
-  //     // Navigate to home screen
-  //     Navigator.pushReplacement(
-  //       context,
-  //       MaterialPageRoute(builder: (context) => const HomeScreen()),
-  //     );
-  //   } else {
-  //     // Show error message
-  //     setState(() {
-  //       loginMessage =
-  //           "Invalid credentials. Use test@example.com / password123";
-  //     });
-  //   }
-  // }
+
+ Future<void> checkAuthAndNavigate() async {
+    try {
+      // Add a minimum delay for splash screen
+      await Future.delayed(const Duration(seconds: 1));
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token != null) {
+        // Validate token and get user details
+        final authService = AuthService();
+        final isValid = await authService.validateAndUpdateAuthUser(token);
+
+        if (mounted) {
+          if (isValid) {
+            // The auth user object is already saved in SharedPreferences by validateAndUpdateAuthUser
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()
+              ),
+              (Route<dynamic> route) => false,
+            );
+              
+            
+          }
+ 
+           else {
+            // Clear invalid token
+            await prefs.remove('token');
+            await prefs.remove('user_data');
+            
+
+            Navigator.pushReplacement(
+            
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          }
+        }
+      } else {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
+      }
+    } catch (e) {
+      // Handle any errors
+      log('Error in checkAuthAndNavigate: $e');
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+      }
+    }
+  }
+
+ 
 
   Future<bool> handleLocationPermission(BuildContext context) async {
     bool serviceEnabled;
     LocationPermission permission;
+  
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -109,6 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<Position?> getCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
+        // ignore: deprecated_member_use
         desiredAccuracy: LocationAccuracy.high,
       );
       return position;
@@ -124,10 +166,22 @@ class _LoginScreenState extends State<LoginScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      if (token == null) {
-        log('No token found');
-        return;
-      }
+      // if (token == null) {
+      //   log('No token found');
+      //   return;
+      // }
+//         if (token == null) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Token Not Found")),
+//         );
+       
+// // 
+// Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+//         return;
+//       }
 
       // Make API call to get user details
       final response = await http.get(
@@ -154,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (mounted) {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => const SplashScreen()),
+            MaterialPageRoute(builder: (context) => const HomeScreen()),
             (route) => false, // This removes all previous routes
           );
         }
@@ -243,6 +297,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await prefs.setString('user_state', responseData['state'] ?? '');
 
           // Request location permission
+        
           bool hasLocationPermission = await handleLocationPermission(context);
           if (!hasLocationPermission) {
             setState(() {
@@ -284,6 +339,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
           // Now proceed with user data refresh and navigation
           await refreshUserDataFromApi();
+  // Call the mixin method with context
+      await checkAuthAndNavigate();
         } else {
           throw Exception('Session token not received from server');
         }
@@ -333,94 +390,10 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
     log('Saved subscription rules: ${userData['active_subscription_rules']}');
   }
   
-  // Navigate to next screen
-  // Navigator.pushReplacement(
-  //   context,
-  //   MaterialPageRoute(builder: (context) => const UploadingScreen()),
-  // );
+ 
 }
 
 
-//   Future<void> loginUser(String email, String password) async {
-//     setState(() {
-//       isLoading = true;
-//       loginMessage = null;
-//     });
-
-//     try {
-//       final response = await http.post(
-//         Uri.parse('http://13.200.179.78/authentication/login'),
-//         headers: <String, String>{
-//           'Content-Type': 'application/json; charset=UTF-8',
-//         },
-//         body: jsonEncode(<String, String>{
-//           'email': email,
-//           'password': password,
-//         }),
-//       );
-
-//       log('Response Status Code: ${response.statusCode}');
-//       log('Response Body: ${response.body}');
-
-//       if (response.statusCode == 200 || response.statusCode == 201) {
-//         final responseData = jsonDecode(response.body);
-
-//         // Get session token from response
-//         final token = responseData['session'];
-//         if (token != null && token.toString().isNotEmpty) {
-//           // Store login data in SharedPreferences
-//           final prefs = await SharedPreferences.getInstance();
-//           // Store the token
-//           await prefs.setString('token', token);
-
-//           setState(() {
-//             loginMessage = 'Login successful! Redirecting to home...';
-//             isLoading = false;
-//           });
-//           // Replace Fluttertoast with SnackBar
-//           void showMessage(String message, bool isError) {
-//             if (mounted) {
-//               ScaffoldMessenger.of(context).showSnackBar(
-//                 SnackBar(
-//                   content: Text("login success"),
-//                   backgroundColor: isError ? Colors.red : Colors.green,
-//                   duration: const Duration(seconds: 3),
-//                 ),
-//               );
-//             }
-//           }
-
-// // Then update your login method to use this:
-//           try {
-//             // ... login logic ...
-//             showMessage('Login successful! Redirecting to home...', false);
-//           } catch (e) {
-//             showMessage(e.toString(), true);
-//           }
-
-//           refreshUserDataFromApi();
-//         } else {
-//           throw Exception('Session token not received from server');
-//         }
-//       } else {
-//         final errorData = jsonDecode(response.body);
-//         throw Exception(errorData['message'] ?? 'Login failed');
-//       }
-//     } catch (e) {
-//       setState(() {
-//         loginMessage = 'Error: ${e.toString()}';
-//         isLoading = false;
-//       });
-
-//       Fluttertoast.showToast(
-//         msg: e.toString(),
-//         toastLength: Toast.LENGTH_LONG,
-//         gravity: ToastGravity.BOTTOM,
-//         backgroundColor: Colors.red,
-//         textColor: Colors.white,
-//       );
-//     }
-//   }
 
   Future<void> handleAuthSuccess() async {
     final LocationController locationController =
@@ -477,6 +450,20 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: AppBar(
+      backgroundColor: Colors.transparent, // Make AppBar transparent
+      elevation: 0, // Remove shadow
+      leading: IconButton(
+        icon: const Icon(
+          Icons.close,
+          color: Color.fromARGB(255, 43, 33, 33), // Match your existing text color
+          size: 30,
+        ),
+        onPressed: () {
+          Navigator.pop(context); // This will navigate back to previous screen
+        },
+      ),
+    ),
       body: Container(
          color: const Color.fromARGB(255, 234, 223, 223),
         // Background: Solid magenta as per the image description
@@ -524,20 +511,20 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
 
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      color: const Color(0xFFD81B60), // Slightly darker magenta
+                      color: const Color.fromARGB(255, 180, 169, 173), // Slightly darker magenta
                       border: Border.all(color: Colors.white, width: 2),
                     ),
-                    child: Image.asset(
-                      "assets/images/sales1.jpg",
-                      width: 80,
-                      height: 80,
-                      fit: BoxFit.fill,
-                    ),
-                    // child: const Icon(
-                    //   Icons.person,
-                    //   size: 60,
-                    //   color: Colors.white, // White (#FFFFFF)
+                    // child: Image.asset(
+                    //   "assets/images/sales1.jpg",
+                    //   width: 80,
+                    //   height: 80,
+                    //   fit: BoxFit.fill,
                     // ),
+                    child: const Icon(
+                      Icons.person,
+                      size: 100,
+                      color: Colors.white, // White (#FFFFFF)
+                    ),
                   ),
                   const SizedBox(height: 24),
                   // Title: Welcome Back!
@@ -577,15 +564,17 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   // User ID Input Field
                   TextFormField(
                     
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                     style: const TextStyle(
                       color: Color.fromARGB(
                           255, 25, 11, 11), // Light gray (#D3D3D3)
                       fontSize: 23.0,
                     ),
                     controller: _emailController,
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.text, // Specify appropriate keyboard type
+  textInputAction: TextInputAction.next, // Add this
+  autofocus: false,
+                  
                     onEditingComplete: () {
                       FocusScope.of(context).nextFocus();
                     },
@@ -639,7 +628,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const SizedBox(height: 16),
                   // Password Input Field
                   TextFormField(
-                    textAlign: TextAlign.center,
+                    textAlign: TextAlign.start,
                     style: const TextStyle(
                       color: Color.fromARGB(
                           255, 25, 11, 11), // Light gray (#D3D3D3)
@@ -647,6 +636,9 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                     ),
                     controller: _passwordController,
                     obscureText: !visiblePassword,
+                   keyboardType: TextInputType.text, // Specify appropriate keyboard type
+  
+  autofocus: false,
                     textInputAction: TextInputAction.done,
                     onEditingComplete: () {
                       FocusScope.of(context).unfocus();
@@ -714,7 +706,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const SizedBox(height: 24),
                   // Login Button
                   SizedBox(
-                    width: double.infinity,
+                   
                     child: ElevatedButton(
                       onPressed: isLoading
                           ? null
@@ -730,21 +722,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                                 );
                               }
                             },
-                      // style: ElevatedButton.styleFrom(
-                      //   backgroundColor: Color.fromARGB(255, 233, 67, 164), // Slightly darker magenta
-                      //   foregroundColor: Colors.white, // White (#FFFFFF)
-                      // //  shape: RoundedRectangleBorder(
-                      // //     borderRadius: BorderRadius.circular(10),
-                      // //     side: const BorderSide(
-                      // //        color: Color.fromARGB(
-                      // //           255, 215, 215, 231), // Slightly darker magenta
-                      // //       width: 1,
-                      // //     ),
-                      // //   ),
-                      //   // padding: const EdgeInsets.symmetric(vertical: 16),
-                      //   // shadowColor: Colors.black.withOpacity(0.3),
-                      //   // elevation: 5,
-                      // ),
+                    
                         style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 const Color.fromARGB(255, 219, 9, 205),
@@ -781,9 +759,8 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                       "Create an account",
                       style: TextStyle(
                         color: Color.fromARGB(255, 8, 19, 238),
-                        fontSize: 16,
-                        decoration: TextDecoration.underline,
-                        decorationThickness: 1.5,
+                        fontSize: 20,
+                       
                         decorationColor: Colors.white,
                       ),
                     ),

@@ -74,6 +74,7 @@ class AllCategoriesScreen extends StatelessWidget {
                         boxShadow: [
                           BoxShadow(
                             color: const Color.fromARGB(255, 57, 37, 183)
+                                // ignore: deprecated_member_use
                                 .withOpacity(0.1),
                             spreadRadius: 1,
                             blurRadius: 10,

@@ -40,6 +40,24 @@ class _HomeScreenState extends State<HomeScreen> {
 final Color unselectedColor = Color.fromARGB(255, 250, 247, 252);
 final Color backgroundColor = Color.fromARGB(255, 240, 107, 31);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Add this helper method in your widget class
 Color getIconColor(int index) {
   return currentIndex == index ? selectedColor : unselectedColor;
@@ -109,6 +127,7 @@ Widget _buildNavItem(IconData icon, String label, int index) {
     loadUserData();
       //  _getCurrentLocation(); // Add this line
        _checkLocationPermission();
+
   }
 
 
@@ -166,6 +185,7 @@ Widget _buildNavItem(IconData icon, String label, int index) {
   Future<void> _getCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
+        // ignore: deprecated_member_use
         desiredAccuracy: LocationAccuracy.high
       );
       await _updateLocation(position);

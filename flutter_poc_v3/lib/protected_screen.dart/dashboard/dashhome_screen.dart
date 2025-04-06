@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/category_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/search_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/introduction_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/notifications_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
 
 class DashhomeScreen extends StatefulWidget {
@@ -146,7 +147,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => IntroductionScreen(),
+                        builder: (context) => NotificationsScreen(),
                       ),
                     );
                   },

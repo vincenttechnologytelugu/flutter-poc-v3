@@ -68,7 +68,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
     }
   }
 
-  String _formatDate(String dateString) {
+  String formatDate(String dateString) {
     try {
       // Parse ISO 8601 format string to DateTime
       DateTime dateTime = DateTime.parse(dateString);
@@ -83,59 +83,6 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
       return 'Invalid date';
     }
   }
-
-  // Future<void> _loadPosts() async {
-  //   if (isLoading) return;
-
-  //   setState(() {
-  //     isLoading = true;
-  //   });
-
-  //   try {
-  //     final Uri uri = Uri.parse(widget.apiUrl).replace(
-  //       queryParameters: {
-  //         ...Uri.parse(widget.apiUrl).queryParameters,
-  //         'page': page.toString(),
-  //         'psize': pageSize.toString(),
-
-  //       },
-  //     );
-
-  //     log('Loading posts from: $uri');
-
-  //     final response = await http.get(uri);
-  //     log('Response status: ${response.statusCode}');
-  //     log('Response body: ${response.body}');
-
-  //     if (response.statusCode == 200) {
-  //       final Map<String, dynamic> responseData = json.decode(response.body);
-  //       final List<dynamic> data = responseData['data'] ?? [];
-
-  //       final List<ProductModel> newPosts =
-  //           data.map((json) => ProductModel.fromJson(json)).toList();
-
-  //       setState(() {
-  //         productModel.addAll(newPosts);
-  //         hasMore = newPosts.length == pageSize;
-  //         isLoading = false;
-  //       });
-
-  //       log('Number of posts loaded: ${newPosts.length}');
-  //       log('Total posts: ${productModel.length}');
-  //     } else {
-  //       log('Error: ${response.statusCode}');
-  //       setState(() {
-  //         isLoading = false;
-  //       });
-  //     }
-  //   } catch (e, stackTrace) {
-  //     log('Exception: $e');
-  //     log('Stack trace: $stackTrace');
-  //     setState(() {
-  //       isLoading = false;
-  //     });
-  //   }
-  // }
 
   Future<void> _loadPosts() async {
     if (isLoading) return;
@@ -157,14 +104,16 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
       final queryParams = {
         'page': page.toString(),
         'psize': pageSize.toString(),
+
         'city': currentCity,
         'state': currentState,
+
         // Add any other existing query parameters from the original URL
         ...Uri.parse(widget.apiUrl).queryParameters,
       };
 
       // Remove null or empty values
-      queryParams.removeWhere((key, value) => value == null || value.isEmpty);
+      queryParams.removeWhere((key, value) => value.isEmpty);
 
       final Uri uri = Uri.parse(widget.apiUrl).replace(
         queryParameters: queryParams,
@@ -274,7 +223,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.grey.withOpacity(0.1),
+                            // color: Colors.grey.withOpacity(0.1),
+                            color: Colors.grey.withAlpha((0.1 * 255).round()),
                             spreadRadius: 5,
                             blurRadius: 10,
                             offset: const Offset(0, 3),
@@ -417,13 +367,12 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                     //     ? Image.network(
                                     //         post.thumb!,
                                     //         fit: BoxFit.cover,
-                                    child: post.thumbnailUrl != null &&
-                                            post.thumbnailUrl.isNotEmpty
+                                    child: post.thumbnailUrl.isNotEmpty
                                         ? Image.network(
-                                            'http://13.200.179.78/${post.thumbnailUrl!}',
+                                            'http://13.200.179.78/${post.thumbnailUrl}',
                                             height: 200,
                                             width: double.infinity,
-                                            fit: BoxFit.cover,
+                                            fit: BoxFit.fill,
                                             errorBuilder:
                                                 (context, error, stackTrace) {
                                               return Center(
@@ -515,8 +464,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                   // ),
 
                                   Positioned(
-                                    top: 5,
-                                    right: 5,
+                                    top: 12,
+                                    right: 12,
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
@@ -603,14 +552,19 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                                         0.3),
                                                               )
                                                                   .toColor()
-                                                                  .withOpacity(1 -
-                                                                      (index *
-                                                                          0.15)),
+                                                                  // .withOpacity(1 -
+                                                                  //     (index *
+                                                                  //         0.15)),
+                                                                  .withAlpha(((1 -
+                                                                              (index * 0.15)) *
+                                                                          255)
+                                                                      .round()),
                                                               size: 20,
                                                             ),
                                                           ),
                                                         ),
                                                       ),
+                                                      // ignore: unnecessary_to_list_in_spreads
                                                     ).toList(),
                                                   if (cartController
                                                       .isFavourite(
@@ -657,15 +611,18 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                                             246,
                                                                             3,
                                                                             226)
-                                                                        .withOpacity(
-                                                                            0.9),
+                                                                        // .withOpacity(
+                                                                        //     0.9),
+                                                                        .withAlpha((0.9 *
+                                                                                255)
+                                                                            .round()),
                                                                     shape: BoxShape
                                                                         .circle,
                                                                     boxShadow: [
                                                                       BoxShadow(
                                                                         color: Colors
                                                                             .white
-                                                                            .withOpacity(0.4),
+                                                                            .withAlpha((0.4 * 255).round()),
                                                                         blurRadius:
                                                                             10,
                                                                         spreadRadius:
@@ -738,84 +695,75 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                     ),
                                   ),
 
-  Builder(
-                                            builder: (context) {
-                                              // More detailed debug prints
-                                              log('Raw product data: ${jsonEncode(post.toJson())}'); // Add toJson() method if not exists
-                                              log('Featured at: ${post.featured_at}');
-                                              log('Valid till: ${post.valid_till}');
-                                              log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
+                                  Builder(
+                                    builder: (context) {
+                                      // More detailed debug prints
+                                      log('Raw product data: ${jsonEncode(post.toJson())}'); // Add toJson() method if not exists
+                                      log('Featured at: ${post.featured_at}');
+                                      log('Valid till: ${post.valid_till}');
+                                      log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
 
-                                              // Simplified featured check
-                                              bool isFeatured = false;
-                                              if (post.featured_at != null &&
-                                                  post.valid_till != null) {
-                                                final now = DateTime.now()
-                                                        .millisecondsSinceEpoch ~/
-                                                    1000;
-                                                isFeatured = post
-                                                            .featured_at! <=
-                                                        now &&
-                                                   post.valid_till! >= now;
-                                                log('Time check: $now is between ${post.featured_at} and ${post.valid_till}');
-                                              }
+                                      // Simplified featured check
+                                      bool isFeatured = false;
+                                      if (post.featured_at != null &&
+                                          post.valid_till != null) {
+                                        final now = DateTime.now()
+                                                .millisecondsSinceEpoch ~/
+                                            1000;
+                                        isFeatured = post.featured_at! <= now &&
+                                            post.valid_till! >= now;
+                                        log('Time check: $now is between ${post.featured_at} and ${post.valid_till}');
+                                      }
 
-                                              log('Is Featured: $isFeatured');
+                                      log('Is Featured: $isFeatured');
 
-                                              if (!isFeatured)
-                                                return const SizedBox.shrink();
+                                      if (!isFeatured) {
+                                        return const SizedBox.shrink();
+                                      }
 
-                                              return Positioned(
-                                                top: 10,
-                                                left: 10,
-                                                child: Container(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 8,
-                                                      vertical: 4),
-                                                  decoration: BoxDecoration(
-                                                    gradient:
-                                                        const LinearGradient(
-                                                      colors: [
-                                                        Color(
-                                                            0xFF6A1B9A), // Deep Purple
-                                                        Color(
-                                                            0xFFE91E63), // Pink
-                                                      ],
-                                                      begin: Alignment.topLeft,
-                                                      end:
-                                                          Alignment.bottomRight,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            12),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(0.3),
-                                                        blurRadius: 4,
-                                                        offset:
-                                                            const Offset(0, 2),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: const Text(
-                                                    'FEATURED',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 12,
-                                                      letterSpacing: 0.5,
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            },
+                                      return Positioned(
+                                        top: 10,
+                                        left: 10,
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color(
+                                                    0xFF6A1B9A), // Deep Purple
+                                                Color(0xFFE91E63), // Pink
+                                              ],
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    // .withOpacity(0.3),
+                                                    .withAlpha(
+                                                        (0.3 * 255).round()),
+                                                spreadRadius: 1,
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ],
                                           ),
-
-
-
+                                          child: const Text(
+                                            'FEATURED',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                               Padding(
@@ -827,34 +775,103 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
+                                        // Expanded(
+                                        //   child: Text(
+                                        //     post.title ?? 'No Title',
+                                        //     style: const TextStyle(
+                                        //       fontSize: 18,
+                                        //       fontWeight: FontWeight.bold,
+                                        //     ),
+                                        //     maxLines: 2,
+                                        //     overflow: TextOverflow.ellipsis,
+                                        //   ),
+                                        // ),
                                         Expanded(
                                           child: Text(
-                                            post.title ?? 'No Title',
+                                            (post.title ?? 'No Title')
+                                                .toUpperCase(),
                                             style: const TextStyle(
-                                              fontSize: 18,
+                                              fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                             ),
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        Text(
-                                          '₹${post.price ?? 'N/A'}',
-                                          style: const TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.red,
-                                            // color: Color.fromARGB(
-                                            //     255, 243, 6, 176),
+
+                                        // Text(
+                                        //   '₹${post.price ?? 'N/A'}',
+                                        //   style: const TextStyle(
+                                        //     fontSize: 20,
+                                        //     fontWeight: FontWeight.bold,
+                                        //     color: Color.fromARGB(255, 3, 151, 20),
+                                        //     // color: Color.fromARGB(
+                                        //     //     255, 243, 6, 176),
+                                        //   ),
+                                        // ),
+
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 10, horizontal: 16),
+                                          decoration: BoxDecoration(
+                                            gradient: const LinearGradient(
+                                              colors: [
+                                                Color.fromARGB(255, 255, 0, 0),
+                                                Color.fromARGB(255, 255, 0, 0)
+                                              ], // Green gradient
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                            ),
+                                            borderRadius: BorderRadius.only(
+                                                bottomRight:
+                                                    Radius.circular(20),
+                                                topLeft: Radius.circular(20)),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                // color: Colors.black.withOpacity(0.15),
+                                                color: Colors.black.withAlpha(
+                                                    (0.15 * 255).round()),
+                                                blurRadius: 8,
+                                                offset: const Offset(0, 3),
+                                              ),
+                                            ],
                                           ),
-                                        ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text(
+                                                post.price != null
+                                                    ? '₹${NumberFormat('#,##0', 'en_IN').format(post.price)}'
+                                                    : 'N/A',
+                                                style: const TextStyle(
+                                                  fontSize: 20,
+                                                  fontWeight: FontWeight.w900,
+                                                  color: Colors.white,
+                                                  letterSpacing: 1.2,
+                                                ),
+                                              )
+
+                                              // Text(
+                                              //   post.price != null ? '₹${post.price}' : 'N/A',
+                                              //   style: const TextStyle(
+                                              //     fontSize: 20,
+                                              //     fontWeight: FontWeight.bold,
+                                              //     color: Colors.white,
+                                              //     letterSpacing: 1.2,
+                                              //   ),
+                                              // ),
+                                            ],
+                                          ),
+                                        )
                                       ],
                                     ),
                                     const SizedBox(height: 12),
                                     Row(
                                       children: [
-                                        Icon(Icons.location_on,
-                                            size: 16, color: Colors.grey[600]),
+                                        Icon(Icons.location_on_outlined,
+                                            size: 18,
+                                            color: const Color.fromARGB(
+                                                255, 18, 17, 17)),
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(
@@ -868,8 +885,9 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                     item.isNotEmpty)
                                                 .join(', '),
                                             style: TextStyle(
-                                              color: Colors.grey[600],
-                                              fontSize: 14,
+                                              color: const Color.fromARGB(
+                                                  255, 23, 22, 22),
+                                              fontSize: 16,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -902,14 +920,16 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                         Icon(
                                             Icons
                                                 .calendar_today, // Using calendar icon for published date
-                                            size: 16,
-                                            color: Colors.grey[600]),
+                                            size: 18,
+                                            color: const Color.fromARGB(
+                                                255, 18, 17, 17)),
                                         const SizedBox(width: 4),
                                         Text(
                                           'Published: ${post.published_at != null ? DateFormat('MMM dd, yyyy').format(DateTime.parse(post.published_at!)) : 'Not available'}',
                                           style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 14,
+                                            color: const Color.fromARGB(
+                                                255, 23, 22, 22),
+                                            fontSize: 16,
                                           ),
                                         ),
                                       ],

@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 
 class Package {
   final String name;
+  // ignore: non_constant_identifier_names
   final int image_attachments;
   
   // Add other fields as needed
 
   Package({
     required this.name,
+    // ignore: non_constant_identifier_names
     required this.image_attachments,
   });
 }

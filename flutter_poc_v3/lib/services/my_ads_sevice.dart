@@ -1,10 +1,33 @@
 // lib/services/my_ads_service.dart
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyAdsService {
+void handleUnauthorized(BuildContext context) {
+  // Clear stored credentials
+  SharedPreferences.getInstance().then((prefs) {
+    prefs.remove('token');
+    prefs.remove('user_data');
+    
+  
+    // Navigator.of(context).push(
+    //   MaterialPageRoute(
+    //     builder: (context) => const LoginScreen(),
+    //   ),
+      
+    // );
+
+  });
+}
+
+
+
   static const String baseUrl = 'http://13.200.179.78';
 
   Future<String?> _getToken() async {
@@ -19,10 +42,20 @@ class MyAdsService {
     };
   }
 
-  Future<List<dynamic>> getMyAds() async {
+
+
+
+  
+
+  Future<List<dynamic>> getMyAds(BuildContext context) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+      if (token == null) {
+  handleUnauthorized(context);
+  throw Exception('');
+}
+
 
       final response = await http.get(
         Uri.parse('$baseUrl/adposts/my_ads'),
@@ -39,10 +72,14 @@ class MyAdsService {
     }
   }
 
-  Future<bool> removeAd(String adpostId) async {
+  Future<bool> removeAd(BuildContext context, String adpostId) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('No token found');
+      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/adposts/remove'),
@@ -56,10 +93,14 @@ class MyAdsService {
     }
   }
 
-  Future<Map<String, dynamic>> markAsInactive(String adId) async {
+  Future<Map<String, dynamic>> markAsInactive(BuildContext context, String adId) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('');
+      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/adposts/mark_as_inactive'),
@@ -113,10 +154,14 @@ class MyAdsService {
   //   }
   // }
 
-  Future<Map<String, dynamic>> publishAd(String adpostId) async {
+  Future<Map<String, dynamic>> publishAd(BuildContext context, String adpostId) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('');
+      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/adposts/publish'),
@@ -133,10 +178,14 @@ class MyAdsService {
     }
   }
 
-  Future<Map<String, dynamic>> markAsSold(String adpostId) async {
+  Future<Map<String, dynamic>> markAsSold( BuildContext context, String adpostId) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('No token found');
+      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/adposts/mark_as_sold'),
@@ -153,11 +202,15 @@ class MyAdsService {
     }
   }
 
-  Future<Map<String, dynamic>> updateAd(
+  Future<Map<String, dynamic>> updateAd(BuildContext context,
       String adpostId, Map<String, dynamic> updates) async {
     try {
       final token = await _getToken();
-      if (token == null) throw Exception('No token found');
+      // if (token == null) throw Exception('No token found');
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('');
+      }
 
       final response = await http.post(
         Uri.parse('$baseUrl/adposts/update'),
@@ -180,10 +233,14 @@ class MyAdsService {
   }
 
   // In my_ads_service.dart
-  Future<bool> makeFeatured(String adId) async {
+  Future<bool> makeFeatured(BuildContext context, String adId) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token') ?? '';
+         if (token == null) {
+        handleUnauthorized(context);
+        throw Exception('');
+      }
 
       final response = await http.post(
         Uri.parse('http://13.200.179.78/adposts/make_featured'),

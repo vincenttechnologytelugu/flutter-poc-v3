@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously, deprecated_member_use
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/asset_model.dart';
-import 'package:flutter_poc_v3/models/product_model.dart' show ProductModel;
+
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/my_adds.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,7 +17,7 @@ import 'package:chewie/chewie.dart';
 import 'package:http/http.dart' as http;
 
 class UploadingScreen extends StatefulWidget {
-  const UploadingScreen({Key? key}) : super(key: key);
+  const UploadingScreen({super.key});
 
   @override
   State<UploadingScreen> createState() => _UploadingScreenState();
@@ -44,6 +47,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
     final prefs = await SharedPreferences.getInstance();
     final keys = prefs.getKeys();
     log('All SharedPreferences keys: $keys');
+    // ignore: avoid_function_literals_in_foreach_calls
     keys.forEach((key) {
       log('Key: $key, Value: ${prefs.get(key)}');
     });
@@ -214,6 +218,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
         log('Uploaded asset ID: ${asset.id}');
 
         String fileExtension = file.path.split('.').last.toLowerCase();
+        // ignore: unused_local_variable
         bool isImage = ['jpg', 'jpeg', 'png'].contains(fileExtension);
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -575,6 +580,11 @@ class _UploadingScreenState extends State<UploadingScreen> {
                 isVideo
                     ? 'Please select MP4 video files only'
                     : 'Please select JPEG or PNG image files only',
+                     style: GoogleFonts.montserrat(
+            fontSize: 16,
+            color: Colors.grey[700],
+            height: 1.5,
+          ),
               ),
               actions: [
                 TextButton(
@@ -582,14 +592,26 @@ class _UploadingScreenState extends State<UploadingScreen> {
                     Navigator.of(context)
                         .pop(true); // Return true when OK is pressed
                   },
-                  child: Text('OK'),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text('OK', style: TextStyle(color: Colors.green))),
                 ),
                 TextButton(
                   onPressed: () {
                     Navigator.of(context)
                         .pop(false); // Return false when Cancel is pressed
                   },
-                  child: Text('Cancel'),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.2),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    child: Text('Cancel', style: TextStyle(color: Colors.red))),
                 ),
               ],
             );
@@ -601,7 +623,9 @@ class _UploadingScreenState extends State<UploadingScreen> {
   // Modify your video preview widget
   Widget _buildVideoPreview() {
     if (_isVideoLoading) {
+
       return Container(
+        padding: EdgeInsets.all(0),
         height: 200,
         child: Center(child: CircularProgressIndicator()),
       );
@@ -625,6 +649,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
     return Stack(
       children: [
         Container(
+          padding: EdgeInsets.all(0),
           height: 200,
           child: _chewieController != null
               ? Chewie(controller: _chewieController!)
@@ -811,7 +836,28 @@ class _UploadingScreenState extends State<UploadingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Upload Media'),
+        backgroundColor: const Color.fromARGB(255, 239, 146, 7),
+        centerTitle: true,
+        title: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 40),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 239, 146, 7),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: const Color.fromARGB(255, 241, 241, 243),
+              width: 1,
+            ),
+          ),
+          child:  Text('Upload Media',
+          style: TextStyle(
+            color: const Color.fromARGB(255, 244, 240, 240),
+            fontSize: 25,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1,
+
+          ),
+          
+          )),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -822,23 +868,53 @@ class _UploadingScreenState extends State<UploadingScreen> {
               'Package Limits:',
               style: Theme.of(context).textTheme.titleLarge,
             ),
-            Text('Maximum Images: $maxImages'),
-            Text('Maximum Videos: $maxVideos'),
+           Text(
+              'Maximum Images: $maxImages',
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              'Maximum Videos: $maxVideos',
+              style: GoogleFonts.roboto(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
 
             const SizedBox(height: 20),
 
             ElevatedButton(
+              // style: ButtonStyle(
+              //   backgroundColor: WidgetStateProperty.all<Color>(
+              //     selectedImages.length < maxImages ? Colors.blue : Colors.grey,
+
+              //   ),
+              // ),
               onPressed: pickImage,
-              child: Text('Pick Image (${selectedImages.length}/$maxImages)'),
+              child: Text('Pick Images (${selectedImages.length}/$maxImages)',
+              style: GoogleFonts.rosarivo(textStyle: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 17, 2, 2), 
+              fontWeight: FontWeight.bold, letterSpacing: 1),)
+              ),
             ),
 
             const SizedBox(height: 20),
 
             if (maxVideos > 0)
               ElevatedButton(
+                // style: ButtonStyle(
+                //   backgroundColor: WidgetStateProperty.all<Color>(
+                //     selectedVideo == null ? Colors.blue : Colors.grey,
+                //   ),
+                // ),
                 onPressed: selectedVideo == null ? pickVideo : null,
                 child:
-                    Text('Pick Video ${selectedVideo != null ? '(1/1)' : ''}'),
+                    Text('Pick Video ${selectedVideo != null ? '(1/1)' : ''}',
+                      style: GoogleFonts.rosarivo(textStyle: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 17, 2, 2), 
+              fontWeight: FontWeight.bold, letterSpacing: 1),)
+                    
+                    ),
               ),
 
             // For video button
@@ -918,10 +994,10 @@ class _UploadingScreenState extends State<UploadingScreen> {
                 height: 250,
 
                 decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 114, 104, 104),
+                  color: const Color.fromARGB(255, 248, 151, 151),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
+                      color: const Color.fromARGB(255, 247, 245, 245).withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
                       offset: Offset(0, 3),
@@ -954,10 +1030,10 @@ class _UploadingScreenState extends State<UploadingScreen> {
         );
 
         // Delay navigation slightly to show the animation
-        Future.delayed(Duration(milliseconds: 10000), () {
+        Future.delayed(Duration(milliseconds: 3000), () {
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MyAdds()),
+            MaterialPageRoute(builder: (context) => MyAdds(showDialogAfterSubmit: true,)),
             (route) => false,
           );
         });
@@ -972,6 +1048,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
         elevation: 5,
       ),
       child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 0),
         width: double.infinity,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,

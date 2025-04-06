@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
@@ -9,7 +11,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
+
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:math' show sin, pi;
@@ -200,7 +202,7 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                     year: int.tryParse(item['year']?.toString() ?? '0'),
                     kilometers:
                         int.tryParse(item['kilometers']?.toString() ?? '0'),
-                    fuelType: item['fuel_type']?.toString() ?? '',
+                    fuelType: item['fuelType']?.toString() ?? '',
                     transmission: item['transmission']?.toString() ?? '',
                     model: item['model']?.toString() ?? '',
                     storage: item['storage']?.toString() ?? '',
@@ -212,10 +214,44 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                         : [], // Make sure to parse
                     featured_at: item['featured_at']?.toString() ??
                         '', // Update this line
-                    valid_till: item['valid_till']?.toString() ??
-                        '', // Update this 
-                        state: item['state']?.toString() ?? '',
-                      
+                    valid_till:
+                        item['valid_till']?.toString() ?? '', // Update this
+                    state: item['state']?.toString() ?? '',
+                    electronics_category:
+                        item['electronics_category']?.toString() ?? '',
+                    product: item['product']?.toString() ?? '',
+                    operatingSystem: item['operatingSystem']?.toString() ?? '',
+                    camera: item['camera']?.toString() ?? '',
+                    screenSize: item['screenSize']?.toString() ?? '',
+                    color: item['color']?.toString() ?? '',
+                    battery: item['battery']?.toString() ?? '',
+                    floorNumber: item['floorNumber']?.toString() ?? '',
+                    totalFloors: item['totalFloors']?.toString() ?? '',
+                    type:item['type']?.toString() ?? '',
+                    ownerType: item['ownerType']?.toString() ?? '',
+                    company: item['company']?.toString() ?? '',
+                    industry: item['industry']?.toString() ?? '',
+                    position: item['position']?.toString() ?? '',
+                    experienceLevel: item['experienceLevel']?.toString() ?? '',
+                    salary:item['salary'],
+                    // salary: item['salary']?.toString() ?? '',
+                    jobType: item['jobType']?.toString() ?? '',
+                    qualifications: item['qualifications']?.toString() ?? '',
+                    contact_info: item['contact_info']?.toString() ?? '',
+                     pet_category:item['pet_category']?.toString() ?? '',
+                     vaccinationType: item['vaccinationType']?.toString() ?? '',
+                     breed: item['breed']?.toString() ?? '',
+                     
+                     dimensions:int.tryParse(item['dimensions']?.toString() ?? '0'),
+                     hobby_category:item['hobby_category']?.toString() ?? '',
+                     fashion_category: item['fashion_category']?.toString() ?? '',
+                     size: item['size']?.toString() ?? '',
+
+
+                    
+                    
+
+                  
                   ))
               .toList();
 
@@ -461,8 +497,8 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                       crossAxisCount: constraints.maxWidth > 600 ? 3 : 2,
                       //  mainAxisExtent: constraints.maxWidth > 600 ? 400 : 300,
                       childAspectRatio: constraints.maxWidth > 600 ? 0.9 : 0.7,
-                      crossAxisSpacing: 4,
-                      mainAxisSpacing: 4,
+                      crossAxisSpacing: 1,
+                      mainAxisSpacing: 1,
                     ),
                     itemCount: posts.length + (isLoading ? 1 : 0),
                     itemBuilder: (context, index) {
@@ -540,7 +576,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     // log('Assets: ${widget.productModel.assets}');
     // log('Image URL: ${widget.productModel.getFirstImageUrl()}');
     return Card(
-      elevation: 4,
+      elevation: 10,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -557,6 +593,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             },
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // Image Container with Stack for Featured Badge
                 Stack(
@@ -595,8 +632,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       },
                                       loadingBuilder:
                                           (context, child, loadingProgress) {
-                                        if (loadingProgress == null)
+                                        if (loadingProgress == null) {
                                           return child;
+                                        }
                                         return const Center(
                                           child: CircularProgressIndicator(),
                                         );
@@ -609,6 +647,40 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         color: Colors.grey,
                                       ),
                                     ),
+
+                              // Featured Badge
+                              if (widget.productModel.featured_at?.isNotEmpty ==
+                                  true)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    gradient: const LinearGradient(
+                                      colors: [
+                                        Color(0xFF6A1B9A), // Deep Purple
+                                        Color(0xFFE91E63), // Pink
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.3),
+                                        blurRadius: 4,
+                                        offset: const Offset(0, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Text(
+                                    "FEATURED",
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Color.fromARGB(255, 242, 244, 246),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                             ],
                           );
                         },
@@ -620,12 +692,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 Flexible(
                   flex: 2,
                   child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                    padding: EdgeInsets.only(left: 9, right: 5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.productModel.title ?? 'No Title',
+                          (widget.productModel.title ?? 'No Title')
+                              .toUpperCase(),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
@@ -634,55 +707,80 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                         ),
                         const SizedBox(height: 2),
-                        if (widget.productModel.featured_at?.isNotEmpty == true)
-                          Container(
+                        Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 2),
+                                vertical: 6, horizontal: 8),
                             decoration: BoxDecoration(
-                              gradient: const LinearGradient(
+                              gradient: LinearGradient(
                                 colors: [
-                                  Color(0xFF6A1B9A), // Deep Purple
-                                  Color(0xFFE91E63), // Pink
-                                ],
+                                  // Color(0xFF046368),
+                                  Color.fromARGB(255, 97, 76, 181),
+                                  Color.fromARGB(255, 97, 76, 181),
+                                ], // Stylish gradient
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(
+                                  12), // Smooth rounded edges
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
+                                  color: Colors.black
+                                      .withOpacity(0.15), // Soft shadow effect
+                                  blurRadius: 6,
+                                  offset: Offset(2, 4),
                                 ),
                               ],
                             ),
-                            child: Text(
-                              "FEATURED",
+                            child:
+                                //  Text(
+                                //   "₹ ${productModel.price.toString()}",
+                                //   style: const TextStyle(
+                                //     color: Colors
+                                //         .white, // White text for contrast
+                                //     fontSize: 15,
+                                //     fontWeight: FontWeight.bold,
+                                //     fontFamily: 'Poppins',
+                                //     fontStyle: FontStyle.normal,
+                                //     letterSpacing:
+                                //         0.8, // Slight spacing for elegance
+                                //   ),
+                                //   overflow: TextOverflow.ellipsis,
+                                // ),
+
+                                Text(
+                              widget.productModel.price != null
+                                  ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
+                                  : 'N/A',
                               style: const TextStyle(
-                                fontSize: 12,
-                                color: Color.fromARGB(255, 242, 244, 246),
-                                fontWeight: FontWeight.bold,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w900,
+                                color: Colors.white,
+                                letterSpacing: 1.2,
+                                fontFamily: 'Poppins',
+                                fontStyle: FontStyle.normal,
                               ),
-                            ),
-                          ),
-                        Text(
-                          '₹ ${widget.productModel.price ?? 'N/A'}',
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 243, 6, 176),
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                              overflow: TextOverflow.ellipsis,
+                            )),
+
+                        // Text(
+                        //   '₹ ${widget.productModel.price ?? 'N/A'}',
+                        //   style: const TextStyle(
+                        //     color: Color.fromARGB(255, 243, 6, 176),
+                        //     fontWeight: FontWeight.bold,
+                        //     fontSize: 14,
+                        //   ),
+                        //   overflow: TextOverflow.ellipsis,
+                        // ),
                         const SizedBox(
                           height: 2,
                         ),
                         Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             const Icon(Icons.location_on, size: 18),
                             Expanded(
                               child: Text(
-                                '${widget.productModel.city ?? ''}, ${widget.productModel.location ?? ''}',
+                                '${widget.productModel.location ?? ''}, ${widget.productModel.city ?? ''}, ${widget.productModel.state ?? ''}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: const TextStyle(fontSize: 14),
@@ -717,7 +815,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
             ),
           ),
-
           Positioned(
             top: 5,
             right: 5,
@@ -792,6 +889,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ),
                                 ),
                               ),
+                              // ignore: unnecessary_to_list_in_spreads
                             ).toList(),
                           if (cartController
                               .isFavourite(widget.productModel.id.toString()))
@@ -878,8 +976,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
           ),
-
-         
         ],
       ),
     );

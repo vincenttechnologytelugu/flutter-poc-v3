@@ -371,16 +371,18 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_poc_v3/services/api_package.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:intl/intl.dart';
 
 class MyOrdersScreen extends StatefulWidget {
-  const MyOrdersScreen({Key? key}) : super(key: key);
+  const MyOrdersScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _MyOrdersScreenState createState() => _MyOrdersScreenState();
 }
 
@@ -410,6 +412,21 @@ class _MyOrdersScreenState extends State<MyOrdersScreen> {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      // if (token == null) {
+      //   return;
+      // }
+//         if (token == null) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Token Not Found")),
+//         );
+        
+// // 
+// Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+//         return;
+//       }
 
       final response = await http.get(
         Uri.parse('http://13.200.179.78/authentication/auth_user'),

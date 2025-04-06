@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
@@ -44,7 +46,238 @@ class _ProfileScreenState extends State<ProfileScreen> {
         refreshUserData();
       }
     });
+  //     // Add this to show the popup after a brief delay
+  // Future.delayed(const Duration(milliseconds: 100), () {
+  //   if (mounted) {
+  //     showSubscriptionDialog();
+  //   }
+  // });
   }
+
+
+
+
+
+// Add this method to show subscription dialog
+void showSubscriptionDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: true,
+    builder: (BuildContext context) {
+      return Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                children: [
+                  const Text(
+                    'Subscription Packages',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 240, 107, 31),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0,
+                    top: 0,
+                    child: IconButton(
+                      icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                height: 400,
+                child: ListView(
+                  children: [
+                    _buildPackageCard(
+                      'Free',
+                      '₹0',
+                      '1 Month',
+                      [
+                        '1 Post',
+                        '2 Image Attachments',
+                        'Basic Features',
+                        'No Contacts'
+                      ],
+                      false,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildPackageCard(
+                      'Silver',
+                      '₹1000',
+                      '3 Months',
+                      [
+                        '6 Posts',
+                        '4 Image Attachments',
+                        'Manual boost every 15 days',
+                        '5 Contacts'
+                      ],
+                      true,
+                    ),
+                    const SizedBox(height: 10),
+                    _buildPackageCard(
+                      'Gold',
+                      '₹1200',
+                      '6 Months',
+                      [
+                        '12 Posts',
+                        '4 Image Attachments',
+                        '1 Video Attachment',
+                        'Manual boost every 3 days',
+                        '12 Contacts'
+                      ],
+                      false,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
+// Add this helper method for building package cards
+Widget _buildPackageCard(String title, String price, String validity, List<String> features, bool isPopular) {
+  return Card(
+    elevation: isPopular ? 8 : 4,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(15),
+      side: isPopular
+          ? const BorderSide(color: Color.fromARGB(255, 240, 107, 31), width: 2)
+          : BorderSide.none,
+    ),
+    child: Container(
+      padding: const EdgeInsets.all(15),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isPopular)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 240, 107, 31),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'BEST VALUE',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                price,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 240, 107, 31),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '/ $validity',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          ...features.map((feature) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: Color.fromARGB(255, 240, 107, 31),
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        feature,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: isPopular 
+                    ? const Color.fromARGB(255, 240, 107, 31)
+                    : Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const InvoiceBillingScreen(),
+                  ),
+                );
+              },
+              child: const Text(
+                'Subscribe Now',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
+}
+
+
+
+
+
+
+
+
+
+
 
   @override
   void dispose() {
@@ -166,10 +399,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-      if (token == null) {
-        log('No token found');
-        return;
-      }
+//       if (token == null) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Token Not Found")),
+//         );
+      
+// // 
+// Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+//         return;
+//       }
 
       // Make API call to get user details
       final response = await http.get(
@@ -206,12 +447,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 242, 245, 247),
       appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: refreshUserDataFromApi,
+        title: const Text('Profile',
+         style: TextStyle(
+        fontFamily: 'Roboto', // Custom font family (you can change to a modern font)
+        fontWeight: FontWeight.w100, // Semi-bold font weight for modern look
+        fontSize: 30, // Larger font size for emphasis
+        color: Colors.blueAccent, // Modern text color
+        letterSpacing: 1.5, // Increased letter spacing for a modern feel
+        shadows: [
+          Shadow(
+            blurRadius: 1.0, // Light shadow for depth
+            color: Colors.black, // Soft shadow color
+            offset: Offset(1.0, 1.0), // Slight offset for a subtle depth effect
           ),
+        ],
+      ),
+        ),
+        actions: [
+Container(
+  decoration: BoxDecoration(
+    color: Color(0xFF2D3436),
+    shape: BoxShape.circle,
+    boxShadow: [
+      BoxShadow(
+        color: Color(0xFF2D3436).withOpacity(0.3),
+        blurRadius: 15,
+        spreadRadius: 2,
+        offset: Offset(0, 4),
+      ),
+    ],
+  ),
+  child: IconButton(
+    icon: const Icon(
+      Icons.refresh_rounded,
+      size: 28,
+      color: Color(0xFF00FF7F),
+    ),
+    onPressed: refreshUserDataFromApi,
+    splashColor: Color(0xFF00FF7F).withOpacity(0.2),
+    highlightColor: Color(0xFF00FF7F).withOpacity(0.1),
+  ),
+)
+
+
+
+
+          
+
+          // IconButton(
+          //   icon: const Icon(Icons.refresh),
+          //   onPressed: refreshUserDataFromApi,
+          // ),
         ],
       ),
       body: isLoading
@@ -411,10 +697,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       await SharedPreferences.getInstance();
                                   await prefs.clear();
                                   await AuthService.logout();
-                                  Navigator.of(context).pushReplacement(
+                                  // Navigator.of(context).pushReplacement(
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => const LoginScreen(),
+                                  //   ),
+                                  // );
+                                  Navigator.push(
+                                    context,
                                     MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                    ),
+                                        builder: (context) => LoginScreen()),
                                   );
                                 },
                               ),

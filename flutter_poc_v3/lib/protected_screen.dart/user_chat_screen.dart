@@ -1,10 +1,14 @@
 // user_chat_screen.dart
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
-import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
+import 'package:get/get.dart';
+
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -79,6 +83,21 @@ class _UserChatScreenState extends State<UserChatScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final currentUserId = prefs.getString('userId');
+      log('Load messages token: $token');
+      log('Load messages userId: $currentUserId');
+//        if (token == null) {
+//         ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Token Not Found")),
+//         );
+       
+// // 
+// Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+//         return;
+//       }
+
 
       final response = await http.post(
         Uri.parse('http://13.200.179.78/chat/messages'),
@@ -127,6 +146,26 @@ class _UserChatScreenState extends State<UserChatScreen> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
       final currentUserId = prefs.getString('userId');
+         if (token == null) {
+        // Check if context is still valid
+        if (!context.mounted) return;
+
+        Get.snackbar(
+          'Login Required',
+          'Please login to continue',
+          snackStyle: SnackStyle.FLOATING,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor:
+              const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
+          colorText: const Color.fromARGB(255, 12, 65, 0),
+          margin: const EdgeInsets.all(10),
+          duration: const Duration(seconds: 2),
+        );
+
+        // Use Get.to instead of Navigator
+        Get.to(() => const LoginScreen());
+        return;
+      }
 
       // Store the message content
       final messageContent = content;
@@ -319,6 +358,7 @@ Widget buildThumbImage(ProductModel product) {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        resizeToAvoidBottomInset: true, // Add this
       backgroundColor: const Color.fromARGB(255, 217, 221, 240),
       appBar: AppBar(
         elevation: 0, // Remove shadow
@@ -661,6 +701,9 @@ Widget buildThumbImage(ProductModel product) {
                   children: [
                     Expanded(
                       child: TextField(
+                         autofocus: false, // Add this
+                          enableInteractiveSelection: true, // Add this
+  keyboardType: TextInputType.text, // Specify keyboard type
                         controller: _messageController,
                         decoration: InputDecoration(
                           hintText: 'Type a message...',
@@ -814,24 +857,78 @@ class _MessageBubble extends StatefulWidget {
 
 class _MessageBubbleState extends State<_MessageBubble> {
 
-  String getMessageTime() {
-    final messageDate = widget.message.createdAt.toLocal();
-    final now = DateTime.now();
-    final difference = now.difference(messageDate);
+  // String getMessageTime() {
+  //   final messageDate = widget.message.createdAt.toLocal();
+  //   final now = DateTime.now();
+  //   final difference = now.difference(messageDate);
     
-    final timeFormat = DateFormat('hh:mm a'); // 12-hour format with AM/PM
+  //   final timeFormat = DateFormat('hh:mm a'); // 12-hour format with AM/PM
 
-    if (difference.inDays == 0) {
-      return 'Today ${timeFormat.format(messageDate)}';
-    } else if (difference.inDays == 1) {
-      return 'Yesterday ${timeFormat.format(messageDate)}';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else {
-      return DateFormat('MMM d, y').format(messageDate) + 
-             ' ${timeFormat.format(messageDate)}';
-    }
+  //   if (difference.inDays == 0) {
+  //     return 'Today ${timeFormat.format(messageDate)}';
+  //   } else if (difference.inDays == 1) {
+  //     return 'Yesterday ${timeFormat.format(messageDate)}';
+  //   } else if (difference.inDays < 7) {
+  //     return '${difference.inDays} days ago';
+  //   } else {
+  //     return '${DateFormat('MMM d, y').format(messageDate)} ${timeFormat.format(messageDate)}';
+  //   }
+  // }
+
+//   String getMessageTime() {
+//   final messageDate = widget.message.createdAt.toLocal();
+//   final now = DateTime.now();
+//   final difference = now.difference(messageDate);
+  
+//   // ignore: unused_local_variable
+//   final timeFormat = DateFormat('h:mm a');
+
+//   if (difference.inMinutes < 1) {
+//     return 'Just now';
+//   } else if (difference.inMinutes < 60) {
+//     final minutes = difference.inMinutes;
+//     return '$minutes ${minutes == 1 ? 'minute' : 'minutes'} ago';
+//   } else if (difference.inHours < 24) {
+//     final hours = difference.inHours;
+//     return '$hours ${hours == 1 ? 'hour' : 'hours'} ago';
+//   } else if (difference.inDays < 7) {
+//     final days = difference.inDays;
+//     return '$days ${days == 1 ? 'day' : 'days'} ago';
+//   } else if (difference.inDays < 30) {
+//     final weeks = (difference.inDays / 7).floor();
+//     return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
+//   } else if (difference.inDays < 365) {
+//     final months = (difference.inDays / 30).floor();
+//     return '$months ${months == 1 ? 'month' : 'months'} ago';
+//   } else {
+//     return DateFormat('MMMM d, y').format(messageDate); // Full month name, day and year
+//   }
+// }
+
+String getMessageTime() {
+  final messageDate = widget.message.createdAt.toLocal();
+  final now = DateTime.now();
+  final difference = now.difference(messageDate);
+  
+  final timeFormat = DateFormat('h:mm a'); // 12-hour format with AM/PM
+
+  if (difference.inMinutes < 1) {
+    return 'Just now';
+  } else if (difference.inMinutes < 60) {
+    return '${difference.inMinutes}m ago';
+  } else if (difference.inHours < 24) {
+    return '${difference.inHours}h ago';
+  } else if (difference.inDays == 1) {
+    return 'Yesterday at ${timeFormat.format(messageDate)}';
+  } else if (difference.inDays < 7) {
+    final dayName = DateFormat('EEEE').format(messageDate); // Full day name
+    return '$dayName at ${timeFormat.format(messageDate)}';
+  } else if (difference.inDays < 365) {
+    return DateFormat('MMM d').format(messageDate); // Month and day
+  } else {
+    return DateFormat('MMM d, y').format(messageDate); // Month, day and year
   }
+}
 
 
   bool shouldShowDate() {
@@ -1022,6 +1119,7 @@ class Conversation {
     required this.createdAt,
     required this.product,
     required this.isBuying,
+      
 
     // this.firstName,
     // this.lastName,
@@ -1059,6 +1157,7 @@ class Conversation {
             map['createdAt'] ?? DateTime.now().toIso8601String()),
         product: ProductModel.fromJson(adPost),
         isBuying: map['buyerId'] != null,
+        
       );
     }).toList();
   }

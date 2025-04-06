@@ -1,7 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/invoice_billing_screen.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -10,7 +13,7 @@ import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/favourite_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
-import 'dart:math' show sin, pi;
+import 'dart:math' show sin, cos, pi;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -87,7 +90,436 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       }
     });
 
+    // Add this to show the subscription dialog
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        showSubscriptionDialog(context);
+      }
+    });
+
     _scrollController.addListener(_scrollListener);
+  }
+
+// Add this method to show subscription dialog
+// void showSubscriptionDialog() {
+//   showDialog(
+//     context: context,
+//     barrierDismissible: true,
+//     builder: (BuildContext context) {
+//       return Dialog(
+//         shape: RoundedRectangleBorder(
+//           borderRadius: BorderRadius.circular(20),
+//         ),
+//         child: Container(
+//           padding: const EdgeInsets.all(20),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               Stack(
+//                 children: [
+//                   const Text(
+//                     'Subscription Packages',
+//                     style: TextStyle(
+//                       fontSize: 24,
+//                       fontWeight: FontWeight.bold,
+//                       color: Color.fromARGB(255, 240, 107, 31),
+//                     ),
+//                   ),
+//                   Positioned(
+//                     right: 0,
+//                     top: 0,
+//                     child: IconButton(
+//                       icon: const Icon(Icons.close),
+//                       onPressed: () => Navigator.pop(context),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//               const SizedBox(height: 20),
+//               SizedBox(
+//                 height: 400,
+//                 child: ListView(
+//                   children: [
+//                     _buildPackageCard(
+//                       'Free',
+//                       '₹0',
+//                       '1 Month',
+//                       [
+//                         '1 Post',
+//                         '2 Image Attachments',
+//                         'Basic Features',
+//                         'No Contacts'
+//                       ],
+//                       false,
+//                     ),
+//                     const SizedBox(height: 10),
+//                     _buildPackageCard(
+//                       'Silver',
+//                       '₹1000',
+//                       '3 Months',
+//                       [
+//                         '6 Posts',
+//                         '4 Image Attachments',
+//                         'Manual boost every 15 days',
+//                         '5 Contacts'
+//                       ],
+//                       true,
+//                     ),
+//                     const SizedBox(height: 10),
+//                     _buildPackageCard(
+//                       'Gold',
+//                       '₹1200',
+//                       '6 Months',
+//                       [
+//                         '12 Posts',
+//                         '4 Image Attachments',
+//                         '1 Video Attachment',
+//                         'Manual boost every 3 days',
+//                         '12 Contacts'
+//                       ],
+//                       false,
+//                     ),
+//                   ],
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       );
+//     },
+//   );
+// }
+
+// // Add this helper method for building package cards
+// Widget _buildPackageCard(String title, String price, String validity, List<String> features, bool isPopular) {
+//   return Card(
+//     elevation: isPopular ? 8 : 4,
+//     shape: RoundedRectangleBorder(
+//       borderRadius: BorderRadius.circular(15),
+//       side: isPopular
+//           ? const BorderSide(color: Color.fromARGB(255, 240, 107, 31), width: 2)
+//           : BorderSide.none,
+//     ),
+//     child: Container(
+//       padding: const EdgeInsets.all(15),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//             children: [
+//               Text(
+//                 title,
+//                 style: const TextStyle(
+//                   fontSize: 20,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//               if (isPopular)
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+//                   decoration: BoxDecoration(
+//                     color: const Color.fromARGB(255, 240, 107, 31),
+//                     borderRadius: BorderRadius.circular(12),
+//                   ),
+//                   child: const Text(
+//                     'BEST VALUE',
+//                     style: TextStyle(
+//                       color: Colors.white,
+//                       fontSize: 12,
+//                       fontWeight: FontWeight.bold,
+//                     ),
+//                   ),
+//                 ),
+//             ],
+//           ),
+//           const SizedBox(height: 10),
+//           Row(
+//             crossAxisAlignment: CrossAxisAlignment.end,
+//             children: [
+//               Text(
+//                 price,
+//                 style: const TextStyle(
+//                   fontSize: 24,
+//                   fontWeight: FontWeight.bold,
+//                   color: Color.fromARGB(255, 240, 107, 31),
+//                 ),
+//               ),
+//               const SizedBox(width: 5),
+//               Text(
+//                 '/ $validity',
+//                 style: TextStyle(
+//                   fontSize: 14,
+//                   color: Colors.grey[600],
+//                 ),
+//               ),
+//             ],
+//           ),
+//           const SizedBox(height: 15),
+//           ...features.map((feature) => Padding(
+//                 padding: const EdgeInsets.only(bottom: 8),
+//                 child: Row(
+//                   children: [
+//                     const Icon(
+//                       Icons.check_circle,
+//                       color: Color.fromARGB(255, 240, 107, 31),
+//                       size: 20,
+//                     ),
+//                     const SizedBox(width: 8),
+//                     Expanded(
+//                       child: Text(
+//                         feature,
+//                         style: const TextStyle(fontSize: 14),
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               )),
+//           const SizedBox(height: 10),
+//           SizedBox(
+//             width: double.infinity,
+//             child: ElevatedButton(
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: isPopular
+//                     ? const Color.fromARGB(255, 240, 107, 31)
+//                     : Colors.blue,
+//                 padding: const EdgeInsets.symmetric(vertical: 12),
+//                 shape: RoundedRectangleBorder(
+//                   borderRadius: BorderRadius.circular(10),
+//                 ),
+//               ),
+//               onPressed: () {
+//                 Navigator.push(
+//                   context,
+//                   MaterialPageRoute(
+//                     builder: (context) => const InvoiceBillingScreen(),
+//                   ),
+//                 );
+//               },
+//               child: const Text(
+//                 'Subscribe Now',
+//                 style: TextStyle(
+//                   fontSize: 16,
+//                   fontWeight: FontWeight.bold,
+//                 ),
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     ),
+//   );
+// }
+
+// Function to show the subscription dialog
+  void showSubscriptionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          backgroundColor: backgroundColor,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
+                  children: [
+                    Center(
+                      child: Text(
+                        'Subscription Packages',
+                        style: GoogleFonts.poppins(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: IconButton(
+                        icon: const Icon(Icons.close, color: primaryColor),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ),
+                  ],
+                ),
+                const Divider(color: Colors.grey, height: 20),
+                SizedBox(
+                  height: 400,
+                  child: ListView(
+                    children: [
+                      _buildPackageCard(
+                        context,
+                        'Free',
+                        '₹0',
+                        '1 Month',
+                        [
+                          '1 Post',
+                          '2 Image Attachments',
+                          'Basic Features',
+                          'No Contacts',
+                        ],
+                        false,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildPackageCard(
+                        context,
+                        'Silver',
+                        '₹1000',
+                        '3 Months',
+                        [
+                          '6 Posts',
+                          '4 Image Attachments',
+                          'Manual boost every 15 days',
+                          '5 Contacts',
+                        ],
+                        true,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildPackageCard(
+                        context,
+                        'Gold',
+                        '₹1200',
+                        '6 Months',
+                        [
+                          '12 Posts',
+                          '4 Image Attachments',
+                          '1 Video Attachment',
+                          'Manual boost every 3 days',
+                          '12 Contacts',
+                        ],
+                        false,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+// Helper method to build package cards
+  Widget _buildPackageCard(
+    BuildContext context,
+    String title,
+    String price,
+    String validity,
+    List<String> features,
+    bool isPopular,
+  ) {
+    return Card(
+      color: isPopular ? const Color(0xFFFFF3E0) : Colors.white,
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: primaryColor,
+                  ),
+                ),
+                if (isPopular)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: primaryColor,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      'BEST VALUE',
+                      style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                AnimatedPrice(price: price),
+                const SizedBox(width: 5),
+                Text(
+                  '/ $validity',
+                  style: GoogleFonts.poppins(
+                    fontSize: 16,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            ...features.map(
+              (feature) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.check_circle,
+                      color: primaryColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        feature,
+                        style: GoogleFonts.poppins(
+                          fontSize: 14,
+                          color: textColor,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            AnimatedSubscribeButton(
+              onPressed: () {
+                // Replace with your navigation logic, e.g., InvoiceBillingScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const InvoiceBillingScreen(),
+                  ),
+                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const Scaffold(body: Center(child: Text('Invoice Screen'))),
+                //   ),
+                // );
+              },
+              isPopular: isPopular,
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
 // Add this method to load products based on location
@@ -95,13 +527,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     if (city.isEmpty || state.isEmpty) return;
 
     try {
-       
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-        headers: {
-           
-          'Content-Type': 'application/json'
-          },
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200 && mounted) {
@@ -115,7 +543,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                 .add(ProductModel.fromJson(post));
           }
         });
-      }else if (response.statusCode == 401) {
+      } else if (response.statusCode == 401) {
         log('Error: Token expired. Please log in again.');
       }
     } catch (e) {
@@ -124,15 +552,11 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
   }
 
 // Add this method to handle location updates
-  void _updateProductsForLocation(String city, String state) async {
+  void updateProductsForLocation(String city, String state) async {
     try {
-    
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-        headers: {
-        
-          
-          'Content-Type': 'application/json'},
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.statusCode == 200 && mounted) {
@@ -161,14 +585,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
 
     if (city.isNotEmpty && state.isNotEmpty) {
       try {
-       
         final response = await http.get(
           Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
-          headers: {
-
-         
-            
-            'Content-Type': 'application/json'},
+          headers: {'Content-Type': 'application/json'},
         );
 
         if (response.statusCode == 200 && mounted) {
@@ -256,7 +675,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     final state = prefs.getString('state') ?? '';
 
     try {
-     
       final response = await http.get(
         Uri.parse('http://13.200.179.78/adposts?city=$city&state=$state'),
       );
@@ -271,33 +689,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     }
   }
 
-// String _formatDate(String dateString) {
-//   try {
-//     // Parse ISO 8601 format string to DateTime
-//     DateTime dateTime = DateTime.parse(dateString);
-
-//     // Convert to local time zone
-//     dateTime = dateTime.toLocal();
-
-//     // Format the date
-//     return DateFormat('EEE, MMM d, yyyy').format(dateTime);
-//   } catch (e) {
-//     print('Error parsing date: $e');
-//     return 'Invalid date';
-//   }
-// }
-// Add this helper function to format the date string
-// String _formatDate(String dateString) {
-//   try {
-//     final DateTime date = DateTime.parse(dateString);
-//     return '${date.day}/${date.month}/${date.year}';
-//   } catch (e) {
-//     return '';
-//   }
-// }
-
-// Add this helper function at the class level
-  // Update the _formatDateTime function with null safety
   String _formatDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) {
       return 'Recently'; // Default text if date is null or empty
@@ -489,6 +880,10 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
   //     }
   //   }
   // }
+// Define color constants
+  static const primaryColor = Color.fromARGB(255, 240, 107, 31);
+  static const backgroundColor = Color(0xFFF5F5F5);
+  static const textColor = Colors.black87;
 
   Future<void> loadMoreData() async {
     if (isLoadingMore || !hasMoreData) return;
@@ -554,20 +949,301 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.only(top: 5),
-            child:  Text(
-              "Updated Suggestions",
-              // style: TextStyle(color: Color.fromARGB(255, 1, 69, 38),
-           
-              
-              // ),
-                style: GoogleFonts.tenorSans(
-    textStyle: TextStyle(color: const Color.fromARGB(255, 1, 44, 30), letterSpacing: .5),
-   
-    fontWeight: FontWeight.w500,
-    fontStyle: FontStyle.normal,
-  ),
+            child: Text(
+              "Updated Ads",
+              style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                    color: const Color.fromARGB(255, 4, 74, 50),
+                    letterSpacing: .1),
+                fontSize: 15,
+                fontWeight: FontWeight.w800,
+                fontStyle: FontStyle.normal,
+              ),
             )),
         actions: [
+          // TweenAnimationBuilder<double>(
+          //   tween: Tween(begin: 0, end: 2 * pi),
+          //   duration: const Duration(seconds: 3),
+          //   builder: (context, value, child) {
+          //     return Transform.rotate(
+          //       angle: value,
+          //       child: Container(
+          //         padding: const EdgeInsets.all(2),
+          //         decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(30),
+          //           gradient: SweepGradient(
+          //             colors: const [
+          //               Color(0xFFFF6B6B),
+          //               Color(0xFF4ECDC4),
+          //               Color(0xFFFFBE0B),
+          //               Color(0xFF7400B8),
+          //               Color(0xFFFF6B6B),
+          //             ],
+          //             stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+          //             transform: GradientRotation(value),
+          //           ),
+          //         ),
+          //         child: child,
+          //       ),
+          //     );
+          //   },
+          //   child: Container(
+          //     padding: const EdgeInsets.all(8),
+          //     decoration: BoxDecoration(
+          //       color: Colors.white,
+          //       borderRadius: BorderRadius.circular(28),
+          //     ),
+          //     child: IconButton(
+          //       icon: const Icon(
+          //         Icons.card_membership,
+          //         color: Color.fromARGB(255, 4, 74, 50),
+          //         size: 28,
+          //       ),
+          //       onPressed: () => showSubscriptionDialog(context),
+          //     ),
+          //   ),
+          // ),
+          // Positioned(
+          //   top: -5,
+          //   right: -5,
+          //   child: Container(
+          //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          //     decoration: BoxDecoration(
+          //       gradient: const LinearGradient(
+          //         colors: [Colors.black87, Colors.black54],
+          //         begin: Alignment.topLeft,
+          //         end: Alignment.bottomRight,
+          //       ),
+          //       borderRadius: BorderRadius.circular(12),
+          //       boxShadow: [
+          //         BoxShadow(
+          //           color: Colors.black.withOpacity(0.2),
+          //           blurRadius: 4,
+          //           offset: const Offset(0, 2),
+          //         ),
+          //       ],
+          //     ),
+          //     child: Row(
+          //       mainAxisSize: MainAxisSize.min,
+          //       children: [
+          //         // Silver Text Animation
+          //         TweenAnimationBuilder<double>(
+          //           tween: Tween(begin: 0, end: 1),
+          //           duration: const Duration(seconds: 2),
+          //           builder: (context, value, child) {
+          //             return Transform.scale(
+          //               scale: 0.8 + (value * 0.2),
+          //               child: ShaderMask(
+          //                 shaderCallback: (bounds) => LinearGradient(
+          //                   colors: [
+          //                     Colors.grey.shade300,
+          //                     Colors.white,
+          //                     Colors.grey.shade300,
+          //                   ],
+          //                   stops: [0.0, value, 1.0],
+          //                 ).createShader(bounds),
+          //                 child: Text(
+          //                   'Silver',
+          //                   style: GoogleFonts.rajdhani(
+          //                     textStyle: TextStyle(
+          //                       color: Colors.white,
+          //                       fontSize: 14,
+          //                       fontWeight: FontWeight.w600,
+          //                       letterSpacing: value * 1.5,
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ),
+          //             );
+          //           },
+          //         ),
+          //         const Text(
+          //           ' • ',
+          //           style: TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 14,
+          //           ),
+          //         ),
+          //         // Gold Text Animation
+          //         TweenAnimationBuilder<double>(
+          //           tween: Tween(begin: 0, end: 1),
+          //           duration: const Duration(seconds: 2),
+          //           builder: (context, value, child) {
+          //             return Transform.scale(
+          //               scale: 1.0 + (sin(value * pi * 2) * 0.1),
+          //               child: ShaderMask(
+          //                 shaderCallback: (bounds) => LinearGradient(
+          //                   colors: const [
+          //                     Color(0xFFFFD700),
+          //                     Color(0xFFFFC000),
+          //                     Color(0xFFFFD700),
+          //                   ],
+          //                   stops: [0.0, value, 1.0],
+          //                 ).createShader(bounds),
+          //                 child: Text(
+          //                   'Gold',
+          //                   style: GoogleFonts.cinzelDecorative(
+          //                     textStyle: TextStyle(
+          //                       color: Colors.white,
+          //                       fontSize: 14,
+          //                       fontWeight: FontWeight.bold,
+          //                       letterSpacing: value * 1.5,
+          //                     ),
+          //                   ),
+          //                 ),
+          //               ),
+          //             );
+          //           },
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+
+          Stack(
+            clipBehavior: Clip.none, // Allows children to overflow
+            children: [
+              TweenAnimationBuilder<double>(
+                tween: Tween(begin: 0, end: 2 * pi),
+                duration: const Duration(seconds: 3),
+                builder: (context, value, child) {
+                  return Transform.rotate(
+                    angle: value,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(30),
+                        gradient: SweepGradient(
+                          colors: const [
+                            Color(0xFFFF6B6B),
+                            Color(0xFF4ECDC4),
+                            Color(0xFFFFBE0B),
+                            Color(0xFF7400B8),
+                            Color(0xFFFF6B6B),
+                          ],
+                          stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
+                          transform: GradientRotation(value),
+                        ),
+                      ),
+                      child: child,
+                    ),
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.card_membership,
+                      color: Color.fromARGB(255, 4, 74, 50),
+                      size: 28,
+                    ),
+                    onPressed: () => showSubscriptionDialog(context),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 6,
+                right: 55,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.black87, Colors.black54],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Silver Text Animation
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(seconds: 2),
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: 0.8 + (value * 0.2),
+                            child: ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors: [
+                                  Colors.grey.shade300,
+                                  Colors.white,
+                                  Colors.grey.shade300,
+                                ],
+                                stops: [0.0, value, 1.0],
+                              ).createShader(bounds),
+                              child: Text(
+                                'Silver',
+                                style: GoogleFonts.rajdhani(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: value * 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const Text(
+                        ' • ',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                      // Gold Text Animation
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(seconds: 2),
+                        builder: (context, value, child) {
+                          return Transform.scale(
+                            scale: 1.0 + (sin(value * pi * 2) * 0.1),
+                            child: ShaderMask(
+                              shaderCallback: (bounds) => LinearGradient(
+                                colors: const [
+                                  Color(0xFFFFD700),
+                                  Color(0xFFFFC000),
+                                  Color(0xFFFFD700),
+                                ],
+                                stops: [0.0, value, 1.0],
+                              ).createShader(bounds),
+                              child: Text(
+                                'Gold',
+                                style: GoogleFonts.cinzelDecorative(
+                                  textStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: value * 1.5,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
           GetBuilder<CartController>(builder: (cartController) {
             return Stack(
               children: [
@@ -651,25 +1327,23 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                       },
                       child: Card(
                         elevation: 2,
-                        color: const Color.fromARGB(255, 245, 242, 242),
+                        // color: const Color.fromARGB(255, 245, 242, 242),
+                        color: const Color.fromARGB(255, 242, 247, 243),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
                         margin: const EdgeInsets.all(4),
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(6.0),
+                              padding: const EdgeInsets.all(1.0),
                               child: SizedBox(
                                 height: 105,
                                 child: Stack(
                                   children: [
-                                   
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(20),
                                       child: Stack(
                                         children: [
-                                        
-
                                           product.thumbnailUrl.isNotEmpty
                                               ? Image.network(
                                                   'http://13.200.179.78/${product.thumbnailUrl}',
@@ -757,15 +1431,13 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                     ],
                                                   ),
                                                 ),
-
-                                          
                                           Builder(
                                             builder: (context) {
                                               // More detailed debug prints
-                                              log('Raw product data: ${jsonEncode(product.toJson())}'); // Add toJson() method if not exists
-                                              log('Featured at: ${product.featured_at}');
-                                              log('Valid till: ${product.valid_till}');
-                                              log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
+                                              // log('Raw product data: ${jsonEncode(product.toJson())}'); // Add toJson() method if not exists
+                                              // log('Featured at: ${product.featured_at}');
+                                              // log('Valid till: ${product.valid_till}');
+                                              // log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
 
                                               // Simplified featured check
                                               bool isFeatured = false;
@@ -778,13 +1450,14 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                             .featured_at! <=
                                                         now &&
                                                     product.valid_till! >= now;
-                                                log('Time check: $now is between ${product.featured_at} and ${product.valid_till}');
+                                                // log('Time check: $now is between ${product.featured_at} and ${product.valid_till}');
                                               }
 
-                                              log('Is Featured: $isFeatured');
+                                              // log('Is Featured: $isFeatured');
 
-                                              if (!isFeatured)
+                                              if (!isFeatured) {
                                                 return const SizedBox.shrink();
+                                              }
 
                                               return Positioned(
                                                 top: 10,
@@ -813,7 +1486,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: Colors.black
-                                                            .withOpacity(0.3),
+                                                            .withAlpha(
+                                                                77), // 0.3 * 255 ≈ 77
+
                                                         blurRadius: 4,
                                                         offset:
                                                             const Offset(0, 2),
@@ -939,6 +1614,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                             ),
                                                           ),
                                                         ),
+                                                        // ignore: unnecessary_to_list_in_spreads
                                                       ).toList(),
                                                     // Bubble floating animation
                                                     if (cartController
@@ -1082,22 +1758,30 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                               // crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
                                 Container(
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color.fromARGB(255, 243, 127, 12),
+                                    shape: BoxShape.circle,
+                                  ),
                                   margin: const EdgeInsets.only(left: 5),
                                   child: const Icon(
                                     Icons.access_time,
-                                    size: 15,
-                                    color: Color.fromARGB(255, 9, 2, 2),
+                                    size: 20,
+                                    color: Color.fromARGB(255, 243, 240, 240),
                                   ),
                                 ),
                                 const SizedBox(width: 4),
                                 Flexible(
                                   child: Text(
                                     'Posted: ${_formatDateTime(productModel.publishedAt)}', // Remove DateTime.parse here
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 15,
                                       fontWeight: FontWeight.bold,
                                       color: Color.fromARGB(255, 12, 3, 3),
                                       overflow: TextOverflow.ellipsis,
+                                      letterSpacing: 1,
+                                      fontFamily:
+                                          GoogleFonts.abhayaLibre().fontFamily,
                                     ),
                                   ),
                                 ),
@@ -1111,40 +1795,102 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                 //  crossAxisAlignment: CrossAxisAlignment.start,
                                 // mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text("₹ ${productModel.price.toString()}",
-                                      style: const TextStyle(
-                                          color:
-                                              Color.fromARGB(255, 55, 3, 245),
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
+                                  // Text("₹ ${productModel.price.toString()}",
+                                  //     style: const TextStyle(
+                                  //         color:
+                                  //             Color.fromARGB(255, 4, 63, 68),
+                                  //         fontSize: 18,
+                                  //         fontWeight: FontWeight.bold,
+                                  //         fontFamily: 'Poppins',
+                                  //         fontStyle: FontStyle.italic,
+                                  //         ),
+                                  //         overflow: TextOverflow.ellipsis,
+                                  //         ),
+                                  Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 6, horizontal: 8),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            // Color(0xFF046368),
+                                            Color.fromARGB(255, 97, 76, 181),
+                                            Color.fromARGB(255, 97, 76, 181),
+                                          ], // Stylish gradient
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                        borderRadius: BorderRadius.circular(
+                                            12), // Smooth rounded edges
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withAlpha(
+                                                38), // 0.15 * 255 ≈ 38
+                                            blurRadius: 6,
+                                            offset: Offset(2, 4),
+                                          ),
+                                        ],
+                                      ),
+                                      child:
+                                          //  Text(
+                                          //   "₹ ${productModel.price.toString()}",
+                                          //   style: const TextStyle(
+                                          //     color: Colors
+                                          //         .white, // White text for contrast
+                                          //     fontSize: 15,
+                                          //     fontWeight: FontWeight.bold,
+                                          //     fontFamily: 'Poppins',
+                                          //     fontStyle: FontStyle.normal,
+                                          //     letterSpacing:
+                                          //         0.8, // Slight spacing for elegance
+                                          //   ),
+                                          //   overflow: TextOverflow.ellipsis,
+                                          // ),
+
+                                          Text(
+                                        productModel.price != null
+                                            ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                                            : 'N/A',
+                                        style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w900,
+                                          color: Colors.white,
+                                          letterSpacing: 1.2,
                                           fontFamily: 'Poppins',
-                                          fontStyle: FontStyle.italic,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          ),
+                                          fontStyle: FontStyle.normal,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      )),
+
                                   Row(
                                     children: [
-                                      Icon(
-                                    Icons.title_sharp,
-                                    color: Colors.black,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(
-                                    width: 2,
-                                  ),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: const Color.fromARGB(
+                                              255, 243, 127, 12),
+                                        ),
+                                        child: Icon(
+                                          Icons.title_rounded,
+                                          color: const Color.fromARGB(
+                                              255, 245, 241, 241),
+                                          size: 18,
+                                        ),
+                                      ),
+                                      const SizedBox(
+                                        width: 3,
+                                      ),
                                       Expanded(
-                                       
                                         child: Text(
-                                          productModel.title.toString(),
+                                          productModel.title
+                                              .toString()
+                                              .toUpperCase(),
                                           style: const TextStyle(
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold,
-                                              fontFamily: 'Poppins',
-                                             
-                                              
-                                              overflow: TextOverflow.ellipsis,
-                                             
-                                              ),
+                                            color: Colors.black,
+                                            fontWeight: FontWeight.bold,
+                                            fontFamily: 'Poppins',
+                                            overflow: TextOverflow.ellipsis,
+                                            letterSpacing: 1,
+                                          ),
                                           maxLines: 1,
                                         ),
                                       ),
@@ -1161,50 +1907,71 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                   32, // Subtract total horizontal paddin
                               child: Row(
                                 children: [
-                                  const Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.black,
-                                    size: 20,
-                                  ),
-                                  const SizedBox(
-                                    width: 1,
-                                  ),
-                                  Flexible(
-                                    flex: 0,
-                                    child: Text(
-                                      productModel.location.toString(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
+                                  Container(
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: const Color.fromARGB(
+                                          255, 243, 127, 12),
                                     ),
-                                  ),
-                                  Flexible(
-                                    flex: 1,
-                                    child: Text(
-                                      productModel.city.toString(),
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
+                                    child: const Icon(
+                                      Icons.location_on_outlined,
+                                      color: Color.fromARGB(255, 251, 248, 248),
+                                      size: 20,
                                     ),
                                   ),
                                   const SizedBox(
                                     width: 2,
                                   ),
                                   Flexible(
-                                    flex: 2,
+                                    flex: 0,
                                     child: Text(
-                                      productModel.state.toString(),
+                                      // productModel.location.toString(),
+                                      "${productModel.location.toString()}, ",
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                        fontFamily: GoogleFonts.abhayaLibre()
+                                            .fontFamily,
+                                      ),
                                     ),
                                   ),
+                                  Flexible(
+                                    flex: 1,
+                                    child: Text(
+                                      // productModel.city.toString(),
+                                      "${productModel.city.toString()} ",
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                        fontFamily: GoogleFonts.abhayaLibre()
+                                            .fontFamily,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 2,
+                                  ),
+                                  // Flexible(
+                                  //   flex: 2,
+                                  //   child: Text(
+                                  //     productModel.state.toString(),
+                                  //     maxLines: 1,
+                                  //     overflow: TextOverflow.ellipsis,
+                                  //     style: TextStyle(
+                                  //       color: Colors.black,
+                                  //       fontWeight: FontWeight.w900,
+                                  //       letterSpacing: 1,
+                                  //       fontFamily: GoogleFonts.abhayaLibre()
+                                  //           .fontFamily,
+                                  //     ),
+                                  //   ),
+                                  // ),
                                 ],
                               ),
                             ),
@@ -1306,3 +2073,268 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
   //   super.dispose();
   // }
 }
+
+class _AnimatedBorderCard extends StatefulWidget {
+  final Widget child;
+  final bool isPopular;
+  final Color baseColor;
+
+  const _AnimatedBorderCard({
+    required this.child,
+    required this.isPopular,
+    required this.baseColor,
+  });
+
+  @override
+  _AnimatedBorderCardState createState() => _AnimatedBorderCardState();
+}
+
+class _AnimatedBorderCardState extends State<_AnimatedBorderCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return Container(
+          decoration: BoxDecoration(
+            gradient: widget.isPopular
+                ? LinearGradient(
+                    colors: [
+                      widget.baseColor,
+                      widget.baseColor.withOpacity(0.5),
+                      widget.baseColor.withOpacity(0.2),
+                    ],
+                    begin: Alignment(
+                      cos(_controller.value * 2 * pi),
+                      sin(_controller.value * 2 * pi),
+                    ),
+                    end: Alignment(
+                      cos((_controller.value + 0.5) * 2 * pi),
+                      sin((_controller.value + 0.5) * 2 * pi),
+                    ),
+                  )
+                : null,
+            color: widget.isPopular ? null : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: widget.baseColor.withOpacity(0.2),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Card(
+            elevation: 0,
+            color: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+            margin: const EdgeInsets.all(2),
+            child: widget.child,
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ShimmerText extends StatefulWidget {
+  final String text;
+  final TextStyle style;
+
+  const ShimmerText({
+    Key? key,
+    required this.text,
+    required this.style,
+  }) : super(key: key);
+
+  @override
+  State<ShimmerText> createState() => _ShimmerTextState();
+}
+
+class _ShimmerTextState extends State<ShimmerText>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (bounds) => LinearGradient(
+            colors: const [
+              Colors.white24,
+              Colors.white,
+              Colors.white24,
+            ],
+            stops: [
+              0.0,
+              _controller.value,
+              1.0,
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ).createShader(bounds),
+          child: Text(
+            widget.text,
+            style: widget.style,
+          ),
+        );
+      },
+    );
+  }
+}
+
+// Animated Price Widget with blinking effect
+class AnimatedPrice extends StatefulWidget {
+  final String price;
+
+  const AnimatedPrice({Key? key, required this.price}) : super(key: key);
+
+  @override
+  _AnimatedPriceState createState() => _AnimatedPriceState();
+}
+
+class _AnimatedPriceState extends State<AnimatedPrice>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = Tween<double>(begin: 0.5, end: 1.0).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _animation,
+      child: Text(
+        widget.price,
+        style: GoogleFonts.poppins(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: const Color.fromARGB(255, 136, 167, 1)),
+      ),
+    );
+  }
+}
+
+// Animated Subscribe Button with press effect
+class AnimatedSubscribeButton extends StatefulWidget {
+  final VoidCallback onPressed;
+  final bool isPopular;
+
+  const AnimatedSubscribeButton({
+    Key? key,
+    required this.onPressed,
+    this.isPopular = false,
+  }) : super(key: key);
+
+  @override
+  _AnimatedSubscribeButtonState createState() =>
+      _AnimatedSubscribeButtonState();
+}
+
+class _AnimatedSubscribeButtonState extends State<AnimatedSubscribeButton> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) {
+        setState(() => _isPressed = false);
+        widget.onPressed();
+      },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: Transform.scale(
+        scale: _isPressed ? 0.95 : 1.0,
+        child: Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            gradient: widget.isPopular
+                ? LinearGradient(
+                    colors: [
+                      const Color.fromARGB(255, 240, 107, 31),
+                      const Color.fromARGB(255, 255, 140, 0)
+                    ],
+                  )
+                : const LinearGradient(
+                    colors: [Colors.blue, Colors.blueAccent],
+                  ),
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 5,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Center(
+            child: Text(
+              'Subscribe Now',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+
+

@@ -97,24 +97,7 @@ class ProductsController extends GetxController {
     }
   }
 
-  //  Future<List<ProductModel>?> fetchProductsByLocation(String city, String state) async {
-  //   try {
-  //     // Your existing API call to fetch products
-  //     // Make sure to include city and state in the query
-  //     final response = await http.get(
-  //       Uri.parse("http://13.200.179.78/adposts?city=$city&state=$state"),
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> data = json.decode(response.body);
-  //       return data.map((json) => ProductModel.fromJson(json)).toList();
-  //     }
-  //     return null;
-  //   } catch (e) {
-  //     log('Error fetching products: $e');
-  //     return null;
-  //   }
-  // }
+ 
 
   Future<void> fetchProductsByLocation(String city, String state) async {
     try {
@@ -183,43 +166,7 @@ class ProductsController extends GetxController {
     }
   }
 
-  // Future<void> _tryFetchWithParams(Map<String, String> queryParams) async {
-  //   var uri = Uri.parse('http://13.200.179.78/adposts')
-  //       .replace(queryParameters: queryParams);
-
-  //   log('Trying URL: ${uri.toString()}');
-
-  //   try {
-  //     var response = await http.get(uri);
-
-  //     if (response.statusCode == 200) {
-  //       var jsonData = jsonDecode(response.body);
-
-  //       if (productModelList.isEmpty) {
-  //         if (jsonData is Map<String, dynamic> &&
-  //             jsonData.containsKey('data')) {
-  //           var productsData = jsonData['data'];
-  //           if (productsData is List) {
-  //             for (var item in productsData) {
-  //               productModelList.add(ProductModel.fromJson(item));
-  //             }
-  //           }
-  //         } else if (jsonData is List) {
-  //           for (var item in jsonData) {
-  //             productModelList.add(ProductModel.fromJson(item));
-  //           }
-  //         }
-
-  //         log('Found ${productModelList.length} products with params: $queryParams');
-  //       }
-  //     } else {
-  //       log('Request failed with status: ${response.statusCode}');
-  //       log('Response body: ${response.body}');
-  //     }
-  //   } catch (e) {
-  //     log('Error in _tryFetchWithParams: $e');
-  //   }
-  // }
+ 
   Future<void> _tryFetchWithParams(Map<String, String> queryParams) async {
     // Return early if no location parameters are provided
     if (queryParams.isEmpty) {
@@ -285,30 +232,11 @@ class ProductsController extends GetxController {
     update();
   }
 
-// Helper method to check if product location matches query params
-  bool _isLocationMatch(dynamic item, Map<String, String> queryParams) {
-    bool matches = true;
 
-    if (queryParams.containsKey('city') && item['city'] != null) {
-      matches = matches &&
-          item['city'].toString().toLowerCase() ==
-              queryParams['city']!.toLowerCase();
-    }
-
-    if (queryParams.containsKey('state') && item['state'] != null) {
-      matches = matches &&
-          item['state'].toString().toLowerCase() ==
-              queryParams['state']!.toLowerCase();
-    }
-
-    return matches;
-  }
-
-  // bool isLoading = false;
 
   getProductsByCategory(String categories) async {
     try {
-      bool isLoading = true;
+      // bool isLoading = true;
 
       update();
       productModelList.clear();
@@ -349,7 +277,7 @@ class ProductsController extends GetxController {
     } catch (e) {
       log('Error fetching categories: $e');
     } finally {
-      bool isLoading = false;
+      // bool isLoading = false;
       update();
     }
   }

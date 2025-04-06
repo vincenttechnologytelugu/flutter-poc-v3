@@ -1,4 +1,6 @@
 // lib/screens/deactivate_screen.dart
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
@@ -86,7 +88,7 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                           ElevatedButton(
                             onPressed: () async {
                               try {
-                                await _myAdsService.publishAd(widget.ad['_id']);
+                                await _myAdsService.publishAd(context,widget.ad['_id']);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content:

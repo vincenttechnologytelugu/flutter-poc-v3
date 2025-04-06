@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'city_screen.dart';
 
 class StateScreen extends StatefulWidget {
@@ -54,6 +55,7 @@ class _StateScreenState extends State<StateScreen> {
               decoration: InputDecoration(
                 hintText: 'Search State',
                 prefixIcon: const Icon(Icons.search),
+               
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -65,7 +67,14 @@ class _StateScreenState extends State<StateScreen> {
               itemCount: filteredStates.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(filteredStates[index]),
+                  title: Text(filteredStates[index],
+                    style:  TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                       fontFamily: GoogleFonts.sanchez().fontFamily,
+                    ),
+                  
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,

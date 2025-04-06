@@ -1,41 +1,81 @@
 // import 'package:flutter/foundation.dart';
+import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_provider.dart';
 
-
-
-
 import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 import 'package:get/get.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
+import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 
+
+Completer<AndroidMapRenderer?>? _initializedRendererCompleter;
+
+/// Initializes map renderer to the `latest` renderer type for Android platform.
+///
+/// The renderer must be requested before creating GoogleMap instances,
+/// as the renderer can be initialized only once per application context.
+Future<AndroidMapRenderer?> initializeMapRenderer() async {
+  if (_initializedRendererCompleter != null) {
+    return _initializedRendererCompleter!.future;
+  }
+
+  final Completer<AndroidMapRenderer?> completer =
+      Completer<AndroidMapRenderer?>();
+  _initializedRendererCompleter = completer;
+
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final GoogleMapsFlutterPlatform mapsImplementation =
+      GoogleMapsFlutterPlatform.instance;
+  if (mapsImplementation is GoogleMapsFlutterAndroid) {
+    unawaited(mapsImplementation
+        .initializeWithRenderer(AndroidMapRenderer.latest)
+        .then((AndroidMapRenderer initializedRenderer) =>
+            completer.complete(initializedRenderer)));
+  } else {
+    completer.complete(null);
+  }
+
+  return completer.future;
+}
 
 late SharedPreferences sharedPreferences;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-   // Force error reporting
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  // Force error reporting
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.presentError(details);
   };
-  try{
+  // AndroidMapRenderer mapRenderer = AndroidMapRenderer.platformDefault;
+  // final GoogleMapsFlutterPlatform mapsImplementation =
+  //     GoogleMapsFlutterPlatform.instance;
+  // if (mapsImplementation is GoogleMapsFlutterAndroid) {
+  //   initializeMapRenderer();
+  // }
+  try {
     sharedPreferences = await SharedPreferences.getInstance();
-  //  WidgetsFlutterBinding.ensureInitialized();
-  Get.put(LocationController(),);
-  Get.put(ProductsController());
- 
-  runApp(MultiProvider(
-     providers: [
-        ChangeNotifierProvider(create: (_) => PackageProvider()),
-      ],
-    child: const MyApp()));
-}catch(e){
-log('Initialization error: $e');
-}
+    //  WidgetsFlutterBinding.ensureInitialized();
+    Get.put(
+      LocationController(),
+    );
+    Get.put(ProductsController());
+
+    runApp(MultiProvider(providers: [
+      ChangeNotifierProvider(create: (_) => PackageProvider()),
+    ], child: const MyApp()));
+  } catch (e) {
+    log('Initialization error: $e');
+  }
 }
 
 class MyApp extends StatefulWidget {
@@ -71,10 +111,10 @@ class _MyAppState extends State<MyApp> {
           // tested with just a hot reload.
           // scaffoldBackgroundColor: Colors.white,
           // primarySwatch: Colors.blue,
-    //        inputDecorationTheme: const InputDecorationTheme(
-    //   filled: true,
-    //   fillColor: Colors.white,
-    // ),
+          //        inputDecorationTheme: const InputDecorationTheme(
+          //   filled: true,
+          //   fillColor: Colors.white,
+          // ),
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
@@ -167,5 +207,52 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+}
+
+
+class MapSample extends StatefulWidget {
+  const MapSample({super.key});
+
+  @override
+  State<MapSample> createState() => MapSampleState();
+}
+
+class MapSampleState extends State<MapSample> {
+  final Completer<GoogleMapController> _controller =
+      Completer<GoogleMapController>();
+
+  static const CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.4746,
+  );
+
+  static const CameraPosition _kLake = CameraPosition(
+      bearing: 192.8334901395799,
+      target: LatLng(37.43296265331129, -122.08832357078792),
+      tilt: 59.440717697143555,
+      zoom: 19.151926040649414);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: GoogleMap(
+        mapType: MapType.hybrid,
+        initialCameraPosition: _kGooglePlex,
+        onMapCreated: (GoogleMapController controller) {
+          _controller.complete(controller);
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _goToTheLake,
+        label: const Text('To the lake!'),
+        icon: const Icon(Icons.directions_boat),
+      ),
+    );
+  }
+
+  Future<void> _goToTheLake() async {
+    final GoogleMapController controller = await _controller.future;
+    await controller.animateCamera(CameraUpdate.newCameraPosition(_kLake));
   }
 }

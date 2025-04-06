@@ -568,6 +568,8 @@
 //   }
 // }
 
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 // import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/all_categories_screen.dart';
@@ -589,8 +591,8 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen>
     with SingleTickerProviderStateMixin {
-  double _leftPosition = 3; // Start position for the left side
-  double _rightPosition = 200; // Start position for the right side
+  final double _leftPosition = 3; // Start position for the left side
+  final double _rightPosition = 200; // Start position for the right side
 
   // Scaling factor for the button when it is pressed or hovered
   double _scale = 1.0;

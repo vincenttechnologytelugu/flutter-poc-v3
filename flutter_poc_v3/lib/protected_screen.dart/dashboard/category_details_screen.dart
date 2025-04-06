@@ -6,6 +6,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/location_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CategoryDetailsScreen extends StatefulWidget {
   final ProductModel productModel;
@@ -30,12 +31,22 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
   ];
 
   final List<Map<String, dynamic>> yearRanges = [
-    {'title': '2025-2024', 'year': '2024,2025'},
-    {'title': '2023-2022', 'year': '2022,2023'},
-    {'title': '2021-2020', 'year': '2020,2021'},
-    {'title': '2019-2018', 'year': '2018,2019'},
-    {'title': '2017-2016', 'year': '2016,2017'},
-    {'title': '2015-2012', 'year': '2012,2013,2014,2015'},
+    {'title': '2025', 'year': '2025'},
+    {'title': '2024', 'year': '2024'},
+    {'title': '2023', 'year': '2023'},
+    {'title': '2022', 'year': '2022'},
+    {'title': '2021', 'year': '2021'},
+    {'title': '2020', 'year': '2020'},
+    {'title': '2019', 'year': '2019'},
+    {'title': '2018', 'year': '2018'},
+        {'title': '2017', 'year': '2017'},
+    {'title': '2016', 'year': '2016'},
+ 
+    {'title': '2015', 'year': '2015'},
+    {'title': '2014', 'year': '2014'},
+    {'title': '2013', 'year': '2013'},
+    {'title': '2012', 'year': '2012'},
+    // {'title': '2015-2012', 'year': '2012,2013,2014,2015'},
   ];
 
   final List<Map<String, dynamic>> carBrands = [
@@ -76,6 +87,26 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
     {'name': 'Subaru', 'icon': Icons.directions_car, 'findkey': 'subaru'},
    
     {'name': 'Tesla', 'icon': Icons.directions_car, 'findkey': 'tesla'},
+    
+  
+    {'name': 'Nissan', 'icon': Icons.directions_car, 'findkey': 'nissan'},
+    {'name': 'Chevrolet', 'icon': Icons.directions_car, 'findkey': 'chevrolet'},
+    {'name': 'Dodge', 'icon': Icons.directions_car, 'findkey': 'dodge'},
+    {'name': 'Jeep', 'icon': Icons.directions_car, 'findkey': 'jeep'},
+    {'name': 'Chrysler', 'icon': Icons.directions_car, 'findkey': 'chrysler'},
+    {'name': 'Buick', 'icon': Icons.directions_car, 'findkey': 'buick'},
+    {'name': 'GMC', 'icon': Icons.directions_car, 'findkey': 'gmc'},
+    {'name': 'Ram', 'icon': Icons.directions_car, 'findkey': 'ram'},
+    {'name': 'Lincoln', 'icon': Icons.directions_car, 'findkey': 'lincoln'},
+    {'name': 'Cadillac', 'icon': Icons.directions_car, 'findkey': 'cadillac'},
+    {'name': 'Saturn', 'icon': Icons.directions_car, 'findkey': 'saturn'},
+    {'name': 'Pontiac', 'icon': Icons.directions_car, 'findkey': 'pontiac'},
+    {'name': 'Oldsmobile', 'icon': Icons.directions_car, 'findkey': 'oldsmobile'},
+    {'name': 'Scion', 'icon': Icons.directions_car, 'findkey': 'scion'},
+    {'name': 'Smart', 'icon': Icons.directions_car, 'findkey': 'smart'},
+    {'name': 'Alfa Romeo', 'icon': Icons.directions_car, 'findkey': 'alfa_romeo'},
+  
+     {'name': 'Ferrari', 'icon': Icons.directions_car, 'findkey': 'ferrari'},
   ];
 
   // // Category subcategories map
@@ -300,12 +331,15 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                   },
                 ),
                 TabBar(
+                  
                   controller: _tabController,
                   tabs: const [
                     Tab(
-                        icon: Icon(Icons.currency_rupee),
-                        text: 'Budget & Brand'),
-                    Tab(icon: Icon(Icons.calendar_today), text: 'Year'),
+                        icon: Icon(Icons.currency_rupee, size: 24, color: Color.fromARGB(255, 233, 2, 249)),
+                        text: 'Budget & Brand',),
+                    Tab(icon: Icon(Icons.calendar_today,size: 24, color: Color.fromARGB(255, 233, 2, 249)), text: 'Year',
+                    
+                    ),
                   ],
                 ),
               ],
@@ -318,7 +352,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                const Color.fromARGB(255, 184, 52, 12)
+                const Color.fromARGB(255, 245, 243, 243)
                     .withAlpha((0.9 * 255).round()),
                 Colors.white,
               ],
@@ -333,14 +367,17 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                 Text(
                       'Search by Budget',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                         style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                    color: const Color.fromARGB(255, 252, 2, 2),
+                    letterSpacing: .5,
+                    
+                    fontSize: 24,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                     ),
                     const SizedBox(height: 20),
                     GridView.builder(
@@ -356,22 +393,29 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                       itemCount: budgetRanges.length,
                       itemBuilder: (context, index) {
                         final budget = budgetRanges[index];
+                       
                         return Container(
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
                                 const Color.fromARGB(255, 227, 229, 241),
-                                const Color(0xFF1A237E),
+                                const Color.fromARGB(255, 215, 217, 238),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: const Color.fromARGB(255, 28, 53, 1),
+                              
+                              style: BorderStyle.solid,
+                              width: 1,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color:
-                                    Colors.black.withAlpha((0.9 * 255).round()),
-                                blurRadius: 8,
+                                    Colors.black.withAlpha((0.5 * 255).round()),
+                                blurRadius: 4,
                                 offset: const Offset(0, 4),
                               ),
                             ],
@@ -380,6 +424,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                             onPressed: () => navigateToCategoryPosts(
                               priceStart: budget['start'],
                               priceEnd: budget['end'],
+                             
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.transparent,
@@ -391,9 +436,10 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                             child: Text(
                               budget['title'],
                               style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                fontSize: 17,
+                                fontWeight: FontWeight.w800,
+                                color: Color.fromARGB(255, 28, 53, 1),
+                                
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -415,22 +461,30 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                         ),
                         child: Text(
                           'View All ${widget.productModel.category}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                     color: const Color.fromARGB(255, 236, 7, 133),
+                    letterSpacing: .5,
+                    
+                    fontSize: 20,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const Text(
+                     Text(
                       'Popular Brands',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                      style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                     color: const Color.fromARGB(255, 252, 2, 2),
+                    letterSpacing: .5,
+                    
+                    fontSize: 24,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                     ),
                     const SizedBox(height: 20),
                     GridView.builder(
@@ -462,7 +516,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                   end: Alignment.bottomRight,
                                   colors: [
                                     Colors.white,
-                                    Colors.grey.shade50,
+                                    const Color.fromARGB(255, 247, 245, 245),
                                   ],
                                 ),
                               ),
@@ -472,14 +526,14 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                   Container(
                                     padding: const EdgeInsets.all(12),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF1A237E)
+                                      color: const Color.fromARGB(255, 39, 6, 227)
                                           .withAlpha((0.3 * 255).round()),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Icon(
                                       brand['icon'],
                                       size: 32,
-                                      color: Colors.white70,
+                                      color: const Color.fromARGB(179, 12, 10, 10),
                                       // color: const Color(0xFF1A237E),
                                     ),
                                   ),
@@ -490,7 +544,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                                     style: const TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF1A237E),
+                                      color: Color.fromARGB(255, 1, 51, 23),
                                     ),
                                   ),
                                 ],
@@ -514,10 +568,15 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                         ),
                         child: Text(
                           'View All ${widget.productModel.category}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                         style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                     color: const Color.fromARGB(255, 236, 7, 133),
+                    letterSpacing: .5,
+                    
+                    fontSize: 20,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                         ),
                       ),
                     ),
@@ -530,14 +589,17 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                     Text(
                       'Search by Year',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        letterSpacing: 0.5,
-                      ),
+                    style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                     color: const Color.fromARGB(255, 252, 2, 2),
+                    letterSpacing: .5,
+                    
+                    fontSize: 24,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                     ),
                     const SizedBox(height: 20),
                     GridView.builder(
@@ -558,17 +620,23 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                             gradient: LinearGradient(
                               colors: [
                                 const Color.fromARGB(255, 195, 198, 211),
-                                const Color(0xFF1A237E),
+                                const Color.fromARGB(255, 244, 244, 246),
                               ],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                              color: const Color.fromARGB(255, 28, 53, 1),
+                              
+                              style: BorderStyle.solid,
+                              width: 1,
+                            ),
                             boxShadow: [
                               BoxShadow(
                                 color:
-                                    Colors.black.withAlpha((0.9 * 255).round()),
-                                blurRadius: 8,
+                                    Colors.black.withAlpha((0.5 * 255).round()),
+                                blurRadius: 4,
                                 offset: const Offset(0, 4),
                               ),
                             ],
@@ -589,7 +657,7 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                                 color: Color.fromARGB(255, 28, 53, 1),
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -611,10 +679,15 @@ class _CategoryDetailsScreenState extends State<CategoryDetailsScreen>
                         ),
                         child: Text(
                           'View All ${widget.productModel.category}',
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
+                         style: GoogleFonts.tenorSans(
+                textStyle: TextStyle(
+                     color: const Color.fromARGB(255, 236, 7, 133),
+                    letterSpacing: .5,
+                    
+                    fontSize: 20,),
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.normal,
+              ),
                         ),
                       ),
                     ),

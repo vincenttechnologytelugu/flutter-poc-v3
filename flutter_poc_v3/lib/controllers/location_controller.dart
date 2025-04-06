@@ -6,7 +6,7 @@
 import 'dart:developer';
 
 // import 'package:flutter_poc_v3/protected_screen.dart/responsive_products_screen.dart';
-import 'package:flutter_poc_v3/controllers/products_controller.dart';
+
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -133,7 +133,9 @@ Future<void> updateToCurrentLocation() async {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     return await Geolocator.getCurrentPosition(
+      // ignore: deprecated_member_use
       desiredAccuracy: LocationAccuracy.high,
+      // ignore: deprecated_member_use
       timeLimit: const Duration(seconds: 20),
     );
   }
@@ -142,7 +144,7 @@ Future<void> updateToCurrentLocation() async {
 
 
 // In location_controller.dart
-void setManualLocation(String city, String state) {
+void setManualLocation(String city, String state, {String? area}) {
 
      isManuallySelected.value = true;  // Set manual flag
   isManualSelection.value = true;
@@ -200,11 +202,19 @@ void setManualLocation(String city, String state) {
 
  
  
-void updateLocation({ String city="",  String state=""}) {
+void updateLocation({ String city="",  String state=""})async {
+    final prefs = await SharedPreferences.getInstance();
+  // final token = prefs.getString('token');
+  
    currentCity.value = city;
     currentState.value = state;
       shouldRefreshProducts.value = true;  // Add this line
        // Refresh the products list or trigger a rebuild
+
+         // Preserve token
+  // if (token != null) {
+  //   await prefs.setString('token', token);
+  // }
    
       update();
     log('LocationController updated - city: $city, state: $state');

@@ -1,4 +1,6 @@
 // lib/screens/edit_my_ad_screen.dart
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 
@@ -6,16 +8,17 @@ import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 class EditMyAdScreen extends StatefulWidget {
   final Map<String, dynamic> ad;
 
-   EditMyAdScreen({Key? key, required this.ad}) : super(key: key);
+   const EditMyAdScreen({super.key, required this.ad});
 
   @override
+  // ignore: library_private_types_in_public_api
   _EditMyAdScreenState createState() => _EditMyAdScreenState();
 }
 
 class _EditMyAdScreenState extends State<EditMyAdScreen> {
   final _formKey = GlobalKey<FormState>();
   final MyAdsService _myAdsService = MyAdsService();
-  Map<String, dynamic> _editedFields = {};
+  final Map<String, dynamic> _editedFields = {};
   bool _isLoading = false;
 
   final List<String> restrictedFields = [
@@ -98,7 +101,8 @@ class _EditMyAdScreenState extends State<EditMyAdScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await _myAdsService.updateAd(widget.ad['_id'], _editedFields);
+
+      await _myAdsService.updateAd(context,widget.ad['_id'], _editedFields, );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ad updated successfully')),
       );

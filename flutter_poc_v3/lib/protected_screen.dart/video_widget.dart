@@ -5,6 +5,7 @@ class VideoWidget extends StatefulWidget {
   const VideoWidget({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _VideoWidgetState createState() => _VideoWidgetState();
 }
 

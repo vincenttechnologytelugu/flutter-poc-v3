@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 import 'dart:developer';
 
@@ -5,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -32,6 +35,19 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       final token = prefs.getString('token');
 
       log('Fetching with token: $token');
+      //  if (token == null) {
+
+      //   //  error = 'No authentication token found';
+      //    ScaffoldMessenger.of(context).showSnackBar(
+      //     const SnackBar(content: Text("Token Not Found")),
+      //   );
+      //   Navigator.push(
+      //     context,
+      //     MaterialPageRoute(builder: (context) => LoginScreen()),
+      //   );
+        
+      //   return;
+      // }
 
       final response = await http.get(
         Uri.parse('http://13.200.179.78/favourite_adposts'),

@@ -48,6 +48,7 @@ class ApiService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final token = responseData['session'];
+        // ignore: unused_local_variable
         final userData = responseData['user'];
         // Debug log
         log('Login Response: ${response.body}');

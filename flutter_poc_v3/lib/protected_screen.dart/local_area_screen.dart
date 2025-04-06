@@ -1,9 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class LocalAreaScreen extends StatefulWidget {
@@ -366,9 +369,26 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
         return ['Udaipur', 'Jaipur', 'Jodhpur', 'Kota'];
       case 'Jodhpur':
         return ['Jodhpur', 'Udaipur', 'Jaipur', 'Kota'];
+          case 'tiruvuru':
+        return ['tiruvuru'];
 
       case 'Kota':
         return ['Kota', 'Udaipur', 'Jaipur', 'Jodhpur'];
+        case 'vissannapeta':
+        return ['kalagara', 'ramachandrapuram', 'putrela', 'korlamanda',
+
+       
+'Chandrupatla', 'Kondaparva', 'Maremanda', 'Narasapuram', 'Tata Kuntla', 'Tella Devarapalle', 'Vemireddipalle', 'Vissannapeta'	
+
+        
+        ];
+        case "Hindupur":
+        return ['Hindupur', 
+        'Bevina Halli',
+'Brahmanapalli', 'Chennampalli', 'Chinthalapalle', 'Chowdahalli', 
+'Doddaballapur', 'Gundlahalli', 'Hindupur', 'Honnali', 'Kambadur', 'Karnataka', 'Kothapalle', 'Maddikera', 'Madhugiri', 'Madhugiri Taluk', 'Madhugiri Town', 'Nallur', 'Narasimharajapura', 'Narasimharajapura Taluk', 'Narasimharajapura Town'
+        ];
+        
 
       default:
         return ['Area 1', 'Area 2', 'Area 3'];
@@ -438,7 +458,11 @@ class _LocalAreaScreenState extends State<LocalAreaScreen> {
               itemCount: filteredAreas.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(filteredAreas[index]),
+                  title: Text(filteredAreas[index], style:  TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                       fontFamily: GoogleFonts.sanchez().fontFamily,
+                    ),),
                   onTap: () => _updateLocation(filteredAreas[index]),
                 );
               },

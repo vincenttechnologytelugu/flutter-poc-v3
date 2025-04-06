@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
@@ -44,11 +45,20 @@ class UpdateProfileScreenState extends State<UpdateProfileScreen> {
   Future<void> updateProfileDetails() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-
-    if (token == null) {
-      log('No token found');
-      return;
-    }
+ log('No token found');
+//     if (token == null) {
+//       ScaffoldMessenger.of(context).showSnackBar(
+//         const SnackBar(
+//           content: Text('Token not found. Please log in again.'),
+//         ),
+//       );
+//               Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+     
+//       return;
+//     }
 
     try {
       final response = await http.post(

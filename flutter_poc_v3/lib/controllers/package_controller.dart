@@ -1,5 +1,9 @@
 // lib/controllers/package_controller.dart
 
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'dart:convert';
@@ -16,10 +20,10 @@ class PackageController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    getPackages();
+    getPackages(Get.context!);
   }
 
-  Future<void> getPackages() async {
+  Future<void> getPackages(BuildContext context) async {
     try {
       isLoading = true;
       update();
@@ -27,11 +31,28 @@ class PackageController extends GetxController {
       // Get the token from SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+    
 
-      if (token == null) {
-        error = 'No authentication token found';
-        return;
-      }
+//       if (token == null) {
+
+//         //  error = 'No authentication token found Please login again';
+//          ScaffoldMessenger.of(context).showSnackBar(
+//           const SnackBar(content: Text("Token Not Found")),
+//         );
+//         // Navigator.pushReplacement(
+//         //   context,
+//         //   MaterialPageRoute(builder: (context) => LoginScreen()),
+//         // );
+//         Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+        
+//         return;
+//       }
+
+
+
 
       final response = await http.get(
         Uri.parse('http://13.200.179.78/packages'),
@@ -59,7 +80,8 @@ class PackageController extends GetxController {
 
         log('Packages loaded: ${packages.length}');
       } else {
-        error = 'Failed to load packages: ${response.statusCode}';
+        // error = 'Failed to load packages need to login again ${response.statusCode}';
+         error = 'Failed to load packages need to login again';
         log(error!);
       }
     } catch (e) {

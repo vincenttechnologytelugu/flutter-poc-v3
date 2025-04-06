@@ -1,4 +1,5 @@
   import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'local_area_screen.dart';
 
 class CityScreen extends StatefulWidget {
@@ -99,10 +100,11 @@ class _CityScreenState extends State<CityScreen> {
         ];
         
         case 'Andhra Pradesh':
-        return ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Tirupati', 'Nellore',
+        return ['Visakhapatnam', 'vijayawada', 'Guntur', 'Tirupati', 'Nellore',
         'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
         'Vijayanagaram', 'Eluru', 'Adoni', 'Chittoor', 'Nandyal', 'Kavali',
-        'Nellore', 'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada','gudivada'
+        'Nellore', 'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
+        'gudivada','vissannapeta','tiruvuru','mangalagiri',"Hindupur"
        
 
 
@@ -111,7 +113,29 @@ class _CityScreenState extends State<CityScreen> {
         case 'Telangana':
         return ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam',
 
-        'Ranga Reddy', 'Nalgonda', 'Khammam', 'Warangal', 'Nizamabad', 'Karimnagar','Miyapur','Gachibowli'
+        'Ranga Reddy', 'Nalgonda', 'Warangal',  'Miyapur','Gachibowli',
+    
+
+'Mahbubnagar', 'Suryapet', 'Medchal', 'Siddipet', 'Adilabad', 'Nirmal',
+        'Jagitial', 'Mancherial', 'Kamareddy', 'Vikarabad', 'Zaheerabad',
+        'Medak', 'Jangaon','Sircilla', 'Bodhan', 'Miryalaguda', 'Ramagundam',
+        'Nalgonda', 'Adilabad', 'Siddipet', 'Miryalaguda', 'Jagitial', 'Mancherial', 'Kamareddy', 'Vikarabad', 'Zaheerabad',
+'Bhongir',
+
+
+'Tandur',
+
+'Wanaparthy',
+
+
+'Gadwal',"Nagarkurnool", "Nirmal", "Luxettipet", 
+"Peddapalli", "Koratla", "Bellampalli", "Manuguru", "Kothagudem", "Suryapet", "Huzurnagar", "Bhadrachalam", "Medchal", "Shadnagar", "Dubbak", "Choutuppal", "Ibrahimpatnam", "Amangal", "Kandukur"
+
+
+
+    
+
+
 
         
         ];
@@ -251,7 +275,12 @@ class _CityScreenState extends State<CityScreen> {
         ];
         case 'Ladakh':
         return ['Leh', 'Kargil', 'Naharlagun', 'Bareilly', 'Rampur', 'Lucknow'];
-        
+        case 'Hindupur':
+        return ['Hindupur', 'Ananthapur', 'Kadiri', 'Kalyandurg', 'Peddapappur'];
+        case 'krishna':
+        return [
+          'Nuzvid'
+        ];
        
       
      
@@ -300,7 +329,11 @@ class _CityScreenState extends State<CityScreen> {
               itemCount: filteredCities.length,
               itemBuilder: (context, index) {
                 return ListTile(
-                  title: Text(filteredCities[index]),
+                  title: Text(filteredCities[index],  style:  TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                       fontFamily: GoogleFonts.sanchez().fontFamily,
+                    ),),
                   onTap: () {
                     Navigator.push(
                       context,

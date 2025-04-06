@@ -286,7 +286,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen>
     );
   }
 
-  Widget _buildLocationWidget() {
+  Widget buildLocationWidget() {
     return Obx(() {
       return GestureDetector(
         onTap: () async {
@@ -331,7 +331,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen>
     });
   }
 
-  Future<void> _handleLocationSelection(Map<String, String> result) async {
+  Future<void> handleLocationSelection(Map<String, String> result) async {
     final LocationController locationController =
         Get.find<LocationController>();
 
@@ -349,7 +349,7 @@ class _HomeappbarScreenState extends State<HomeappbarScreen>
     return; // Add return statement to avoid the error
   }
 
-  Future<void> _handleCurrentLocation() async {
+  Future<void> handleCurrentLocation() async {
     await locationController.saveLocation('', '', isManual: false);
     await checkLocationPermission();
   }

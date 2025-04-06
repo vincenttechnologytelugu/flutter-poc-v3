@@ -47,9 +47,17 @@ class ResetPasswordScreenState extends State<ResetPasswordScreen> {
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('token');
 
-        if (token == null) {
-          throw Exception('No authentication token found');
-        }
+//         if (token == null) {
+// ScaffoldMessenger.of(context).showSnackBar(
+//   const SnackBar(content: Text("Token Not Found navigate to login")),
+// );
+//             Navigator.push(
+//   context,
+//   MaterialPageRoute(builder: (context) => LoginScreen()),
+// );
+//           throw Exception('No authentication token found');
+          
+//         }
 
         log('Sending password update request...');
 

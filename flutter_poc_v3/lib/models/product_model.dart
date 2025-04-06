@@ -5,10 +5,16 @@ import 'package:intl/intl.dart';
 
 class ProductModel {
 
+
+  
+
+   // ignore: non_constant_identifier_names
    final String? published_at;
   final String publishedAt; // Add this field
   
+    // ignore: non_constant_identifier_names
     final dynamic featured_at;  // Add this line
+  // ignore: non_constant_identifier_names
   dynamic valid_till; // Change type to dynamic to handle both int and String
   final ActionFlags? actionFlags;
   final String? id;
@@ -21,7 +27,7 @@ class ProductModel {
   final String? fuel;
   final String? transmission;
   final int? mileage;
-  final int? ownerType;
+  final String? ownerType;
   final String? condition;
   final String? description;
   final String? category;
@@ -32,6 +38,7 @@ class ProductModel {
  
   
 
+  // ignore: non_constant_identifier_names
   final String? electronics_category;
 
   // Properties specific
@@ -46,26 +53,26 @@ class ProductModel {
   final String? totalFloors;
 
   // Mobile specific
-  final String? storage;
+  final dynamic storage;
   final String? ram;
-  final String? screenSize;
-  final String? camera;
+  final dynamic screenSize;
+  final dynamic camera;
 
-  final String? battery;
+  final dynamic battery;
   final String? processor;
-  final String? operatingSystem;
+  final dynamic operatingSystem;
 
   // Jobs specific
   final String? position;
   final String? company;
-  final String? salary;
+  final int? salary;
   final String? experienceLevel;
   final String? jobType;
   final String? industry;
   final String? qualifications;
   // ignore: non_constant_identifier_names
   final String? contact_info;
-  final String? warranty;
+  final dynamic warranty;
 //  final int? featured_at; // Unix timestamp in seconds
 
   // Pets specific
@@ -95,7 +102,7 @@ class ProductModel {
 
   final String? product;
 
-  final String? color;
+  final dynamic color;
   // ignore: non_constant_identifier_names
   final String? fashion_category;
   final String? size;
@@ -126,11 +133,15 @@ class ProductModel {
   String? createdAt;
   String? lastUpdated;
   bool? isActive;
+  // ignore: non_constant_identifier_names
   String? posted_by;
+  // ignore: non_constant_identifier_names
   int? created_at;
+  // ignore: non_constant_identifier_names
   int? last_updated_at;
   // final int? valid_till;
   
+  // ignore: non_constant_identifier_names
   int? deleted_at;
   int? assetId;
 
@@ -163,6 +174,7 @@ class ProductModel {
 
   ProductModel({
    
+    // ignore: non_constant_identifier_names
     this.published_at,
  required this.publishedAt, // Add this
     this.assetId,
@@ -255,12 +267,18 @@ class ProductModel {
     this.isActive,
     this.convesationId,
     required this.icon,
+    // ignore: non_constant_identifier_names
     this.posted_by,
+    // ignore: non_constant_identifier_names
     this.created_at,
+    // ignore: non_constant_identifier_names
     this.last_updated_at,
+    // ignore: non_constant_identifier_names
     this.valid_till,
+   // ignore: non_constant_identifier_names
    this.featured_at,
    
+    // ignore: non_constant_identifier_names
     this.deleted_at,
    
 
@@ -325,16 +343,14 @@ class ProductModel {
         brand: map['brand']?.toString(),
         fuel: map['fuel']?.toString(),
         transmission: map['transmission']?.toString(),
-        mileage: map['mileage'] != null
-            ? (map['mileage'] is int
-                ? map['mileage']
-                : int.tryParse(map['mileage'].toString()))
-            : null,
-        ownerType: map['ownerType'] != null
-            ? (map['ownerType'] is int
-                ? map['ownerType']
-                : int.tryParse(map['ownerType'].toString()))
-            : null,
+        // mileage: map['mileage'] != null
+        //     ? (map['mileage'] is int
+        //         ? map['mileage']
+        //         : int.tryParse(map['mileage'].toString()))
+        //     : null,
+        
+      
+        ownerType: map['ownerType']?.toString(),
         condition: map['condition']?.toString(),
         description: map['description']?.toString(),
         category: map['category']?.toString(),
@@ -347,17 +363,23 @@ class ProductModel {
         area: map['area']?.toString(),
         furnishing: map['furnishing']?.toString(),
         // Mobile specific
-        storage: map['storage']?.toString(),
+        storage: map['storage'],
         ram: map['ram']?.toString(),
-        screenSize: map['screenSize']?.toString(),
-        camera: map['camera']?.toString(),
-        battery: map['battery']?.toString(),
+        screenSize: map['screenSize'],
+        camera: map['camera'],
+        battery: map['battery'],
         processor: map['processor']?.toString(),
-        operatingSystem: map['operatingSystem']?.toString(),
+        operatingSystem: map['operatingSystem'],
         // Jobs specific
         position: map['position']?.toString(),
         company: map['company']?.toString(),
-        salary: map['salary']?.toString(),
+        salary: map['salary'] != null
+            ? (map['salary'] is int  
+                ? map['salary']
+                : int.tryParse(map['salary'].toString()))
+            : null,
+     
+        // salary: map['salary']?.toString(),
         experienceLevel: map['experienceLevel']?.toString(),
 
         jobType: map['jobType']?.toString(),
@@ -388,7 +410,7 @@ class ProductModel {
         electronics_category: map['electronics_category']?.toString(),
         product: map['product']?.toString(),
         warranty: map['warranty']?.toString(),
-        color: map['color']?.toString(),
+        color: map['color'],
         fashion_category: map['fashion_category']?.toString(),
         size: map['size']?.toString(),
         hobby_category: map['hobby_category']?.toString(),
@@ -585,14 +607,16 @@ class ProductModel {
 
 
 
-
+  // ToJson method
+  Map<String, dynamic> map() {
+    return {
+      'mileage': mileage,
+      // ... other fields
+    };
+  }
  
 
   
 
 }
-
-// In product_model.dart
-
-
 

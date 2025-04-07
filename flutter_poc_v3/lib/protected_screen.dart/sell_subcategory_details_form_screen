@@ -460,7 +460,7 @@ void _submitForm() async {
         'category': widget.category,
         'price': price,
         'condition': controllers['condition']?.text?.trim() ?? '',
-        // 'thumb': 'https://loremflickr.com/500/300/fish',
+         'thumb': 'https://loremflickr.com/500/300/fish',
         'description': controllers['description']?.text?.trim() ?? '',
         'make': controllers['brand']?.text?.trim() ?? '',
         'model': controllers['title']?.text?.trim() ?? '',
@@ -584,30 +584,36 @@ void _submitForm() async {
               _isFormReadOnly = true;
             });
 
+            // ScaffoldMessenger.of(currentContext).showSnackBar(
+            //   SnackBar(content: Text('Ad posted successfully!')),
+            // );
+              // Show success message before navigation
             ScaffoldMessenger.of(currentContext).showSnackBar(
-              SnackBar(content: Text('Ad posted successfully!')),
+              const SnackBar(
+                content: Text('Ad posted successfully!'),
+                duration: Duration(seconds: 1), // Short duration
+              ),
             );
+             // Add a small delay before navigation
+            await Future.delayed(const Duration(milliseconds: 500));
 
             // Verify the save
             final savedId = await prefs.getString('adpostId');
             print('Verification - Retrieved adpostId: $savedId');
             
+            
             // Navigate to UploadingScreen
             if (!mounted) return;
-            Navigator.pushAndRemoveUntil(
-    currentContext, // Check if widget is still mounted
-  MaterialPageRoute(builder: (context) => UploadingScreen()),
-  (route) => false, // Removes all previous routes
-);
+//             Navigator.pushAndRemoveUntil(
+//     currentContext, // Check if widget is still mounted
+//   MaterialPageRoute(builder: (context) => UploadingScreen()),
+//   (route) => false, // Removes all previous routes
+// );
+            Navigator.pushReplacement(
+              currentContext,
+              MaterialPageRoute(builder: (context) => const UploadingScreen()),
+            );
 
-            // Navigator.pushReplacement(
-            //   context,
-            //   MaterialPageRoute(
-            //     builder: (context) => const UploadingScreen(
-                 
-            //     ),
-            //   ),
-            // );
             
           }
           
@@ -9534,6 +9540,15 @@ labelText: 'city',
     child:Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // CustomTextFormField(
+        //   labelText: 'thumb',
+        //   hintText:
+        //       'Please enter the thumb',
+        //   prefixIcon: Icons.search,
+        //   readOnly: _isFormReadOnly,
+        //   controller: controllers['thumb']!,
+        // ),
+        const SizedBox(height: 10),
 
 
     CustomTextFormField(

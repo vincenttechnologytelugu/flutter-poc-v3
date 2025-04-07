@@ -60,26 +60,26 @@ class _ChatScreenState extends State<ChatScreen>
 //         }
 //         return;
 //       }
-    // if (token == null) {
-    //     // Check if context is still valid
-    //     if (!context.mounted) return;
+      // if (token == null) {
+      //     // Check if context is still valid
+      //     if (!context.mounted) return;
 
-    //     Get.snackbar(
-    //       'Login Required',
-    //       'Please login to continue',
-    //       snackStyle: SnackStyle.FLOATING,
-    //       snackPosition: SnackPosition.BOTTOM,
-    //       backgroundColor:
-    //           const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
-    //       colorText: const Color.fromARGB(255, 12, 65, 0),
-    //       margin: const EdgeInsets.all(10),
-    //       duration: const Duration(seconds: 2),
-    //     );
+      //     Get.snackbar(
+      //       'Login Required',
+      //       'Please login to continue',
+      //       snackStyle: SnackStyle.FLOATING,
+      //       snackPosition: SnackPosition.BOTTOM,
+      //       backgroundColor:
+      //           const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
+      //       colorText: const Color.fromARGB(255, 12, 65, 0),
+      //       margin: const EdgeInsets.all(10),
+      //       duration: const Duration(seconds: 2),
+      //     );
 
-    //     // Use Get.to instead of Navigator
-    //     Get.to(() => const LoginScreen());
-    //     return;
-    //   }
+      //     // Use Get.to instead of Navigator
+      //     Get.to(() => const LoginScreen());
+      //     return;
+      //   }
 
       final response = await http.get(
         Uri.parse('http://13.200.179.78/chat/conversations'),
@@ -95,6 +95,10 @@ class _ChatScreenState extends State<ChatScreen>
 
         for (var conv in data) {
           // Load messages for each conversation
+          // Make sure thumb is included in the product data
+          if (conv['product'] != null && conv['product']['thumb'] != null) {
+            conv['product']['thumb'] = conv['product']['thumb'].toString();
+          }
           final messagesResponse = await http.post(
             Uri.parse('http://13.200.179.78/chat/messages'),
             headers: {
@@ -234,12 +238,6 @@ class _ChatScreenState extends State<ChatScreen>
   }
 }
 
-
-
-
-
-
-
 class _ConversationTile extends StatefulWidget {
   final Conversation conversation;
 
@@ -257,7 +255,8 @@ class _ConversationTileState extends State<_ConversationTile> {
   Widget buildThumbImage(String? thumbUrl, {double size = 40}) {
     return thumbUrl != null && thumbUrl.isNotEmpty
         ? Image.network(
-            thumbUrl,
+            // thumbUrl,
+            'http://13.200.179.78/$thumbUrl', // Updated URL construction
             width: size,
             height: size,
             fit: BoxFit.fill,
@@ -307,38 +306,45 @@ class _ConversationTileState extends State<_ConversationTile> {
           width: 85,
           height: 85,
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
+            shape: BoxShape.rectangle,
             border: Border.all(
-              color: widget.conversation.isActive ? Colors.grey.shade200 : Colors.grey.shade400,
+              color: widget.conversation.isActive
+                  ? Colors.grey.shade200
+                  : Colors.grey.shade400,
               width: 2,
             ),
           ),
           child: ClipOval(
             child: buildThumbImage(
               widget.conversation.product.thumb,
-              size: 85,
+              size: 125,
             ),
           ),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-             if (widget.conversation.messages.isNotEmpty) 
-      Text(
-        '${widget.conversation.messages.last.firstName ?? ''} ${widget.conversation.messages.last.lastName ?? ''}'.trim(),
-        style: TextStyle(
-          fontSize: 14,
-          color: widget.conversation.isActive ? Colors.grey[600] : Colors.grey[400],
-        ),
-      ),
+            if (widget.conversation.messages.isNotEmpty)
+              Text(
+                '${widget.conversation.messages.last.firstName ?? ''} ${widget.conversation.messages.last.lastName ?? ''}'
+                    .trim(),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: widget.conversation.isActive
+                      ? Colors.grey[600]
+                      : Colors.grey[400],
+                ),
+              ),
             Text(
-             ( widget.conversation.product.title ?? 'No Title').toUpperCase(),
-             maxLines: 2,
+              (widget.conversation.product.title ?? 'No Title').toUpperCase(),
+              maxLines: 2,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-              overflow: TextOverflow.ellipsis,
-                color: widget.conversation.isActive ? const Color.fromARGB(255, 67, 65, 65) : Colors.grey,
+                overflow: TextOverflow.ellipsis,
+                color: widget.conversation.isActive
+                    ? const Color.fromARGB(255, 67, 65, 65)
+                    : Colors.grey,
               ),
             ),
           ],
@@ -350,27 +356,29 @@ class _ConversationTileState extends State<_ConversationTile> {
             Text(
               widget.conversation.lastMessage ?? 'No messages',
               style: TextStyle(
-                color: widget.conversation.isActive ? Colors.grey[600] : Colors.grey[400],
+                color: widget.conversation.isActive
+                    ? Colors.grey[600]
+                    : Colors.grey[400],
                 fontSize: 14,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-                                                Text(
-widget.conversation.product.price != null
-      ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.price)}' 
-      : 'N/A',
-  style: const TextStyle(
-    fontSize: 15,
-    fontWeight: FontWeight.w900,
-    color: Color.fromARGB(255, 13, 1, 1),
-    letterSpacing: 1.2,
-    fontFamily: 'Poppins',
-                                         fontStyle: FontStyle.normal,
-  ),
-  overflow: TextOverflow.ellipsis,
-)
+            Text(
+              widget.conversation.product.price != null
+                  ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.price)}'
+                  : 'N/A',
+              style: const TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w900,
+                color: Color.fromARGB(255, 13, 1, 1),
+                letterSpacing: 1.2,
+                fontFamily: 'Poppins',
+                fontStyle: FontStyle.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+            )
             // Text(
             //   '₹${conversation.product.price ?? 0}',
             //   style: TextStyle(
@@ -392,54 +400,54 @@ widget.conversation.product.price != null
               ),
             ),
             const SizedBox(width: 8),
-          
             PopupMenuButton<String>(
-  icon: const Icon(
-    Icons.more_vert,
-    color: Colors.grey,
-  ),
-  itemBuilder: (context) => [
-    if (widget.conversation.isActive) // Only show deactivate option if conversation is active
-      const PopupMenuItem(
-        value: 'deactivate',
-        child: Row(
-          children: [
-            Icon(
-              Icons.block,
-              color: Colors.orange,
-              size: 20,
-            ),
-            SizedBox(width: 8),
-            Text(
-              'Deactivate',
-              style: TextStyle(color: Colors.orange),
-            ),
-          ],
-        ),
-      ),
-    const PopupMenuItem(
-      value: 'delete',
-      child: Row(
-        children: [
-          Icon(
-            Icons.delete_outline,
-            color: Colors.red,
-            size: 20,
-          ),
-          SizedBox(width: 8),
-          Text(
-            'Delete',
-            style: TextStyle(color: Colors.red),
-          ),
-        ],
-      ),
-    ),
-  ],
-  onSelected: (value) async {
-    try {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token');
-      
+              icon: const Icon(
+                Icons.more_vert,
+                color: Colors.grey,
+              ),
+              itemBuilder: (context) => [
+                if (widget.conversation
+                    .isActive) // Only show deactivate option if conversation is active
+                  const PopupMenuItem(
+                    value: 'deactivate',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.block,
+                          color: Colors.orange,
+                          size: 20,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          'Deactivate',
+                          style: TextStyle(color: Colors.orange),
+                        ),
+                      ],
+                    ),
+                  ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 20,
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              onSelected: (value) async {
+                try {
+                  final prefs = await SharedPreferences.getInstance();
+                  final token = prefs.getString('token');
+
 //         if (token == null) {
 //         if (mounted) {
 //           ScaffoldMessenger.of(context).showSnackBar(
@@ -453,107 +461,129 @@ widget.conversation.product.price != null
 //         return;
 //       }
 
-      if (value == 'deactivate') {
-        try {
-          final response = await http.put(
-            Uri.parse('http://13.200.179.78/chat/deactivate'),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-            body: json.encode({
-              'conversationId': widget.conversation.id,
-            }),
-          );
+                  if (value == 'deactivate') {
+                    try {
+                      final response = await http.put(
+                        Uri.parse('http://13.200.179.78/chat/deactivate'),
+                        headers: {
+                          'Authorization': 'Bearer $token',
+                          'Content-Type': 'application/json',
+                        },
+                        body: json.encode({
+                          'conversationId': widget.conversation.id,
+                        }),
+                      );
 
-          if (response.statusCode == 200) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Conversation deactivated successfully')),
-              );
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to chat tab
-              );
-            }
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Failed to deactivate conversation')),
-              );
-            }
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: $e')),
-            );
-          }
-        }
-      } else if (value == 'delete') {
-        try {
-          final response = await http.post(
-            Uri.parse('http://13.200.179.78/chat/removeConversation'),
-            headers: {
-              'Authorization': 'Bearer $token',
-              'Content-Type': 'application/json',
-            },
-            body: json.encode({
-              'conversationId': widget.conversation.id,
-            }),
-          );
+                      if (response.statusCode == 200) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text(
+                                    'Conversation deactivated successfully')),
+                          );
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const HomeScreen()), // Navigate to chat tab
+                          );
+                        }
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Failed to deactivate conversation')),
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $e')),
+                        );
+                      }
+                    }
+                  } else if (value == 'delete') {
+                    try {
+                      final response = await http.post(
+                        Uri.parse(
+                            'http://13.200.179.78/chat/removeConversation'),
+                        headers: {
+                          'Authorization': 'Bearer $token',
+                          'Content-Type': 'application/json',
+                        },
+                        body: json.encode({
+                          'conversationId': widget.conversation.id,
+                        }),
+                      );
 
-          if (response.statusCode == 200) {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Conversation deleted successfully')),
-              );
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HomeScreen()), // Navigate to chat tab
-              );
-            }
-          } else {
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Failed to delete conversation')),
-              );
-            }
-          }
-        } catch (e) {
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: $e')),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
-        );
-      }
-    }
-  },
-),
-
+                      if (response.statusCode == 200) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content:
+                                    Text('Conversation deleted successfully')),
+                          );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const HomeScreen()), // Navigate to chat tab
+                          );
+                        }
+                      } else {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Failed to delete conversation')),
+                          );
+                        }
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error: $e')),
+                        );
+                      }
+                    }
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                }
+              },
+            ),
           ],
         ),
-        onTap: widget.conversation.isActive ? () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => UserChatScreen(
-                conversationId: widget.conversation.id,
-                product: widget.conversation.product,
-                thumb: widget.conversation.product.thumb ?? '',
-                title: widget.conversation.product.title ?? '',
-                price: widget.conversation.product.price ?? 0.0,
-              ),
-            ),
-          );
-        } : null,
+        onTap: widget.conversation.isActive
+            ? () {
+                final String fullThumbUrl = widget.conversation.product.thumb !=
+                            null &&
+                        widget.conversation.product.thumb!.isNotEmpty
+                    ? 'http://13.200.179.78/${widget.conversation.product.thumb}'
+                    : '';
+                // Add debug logging
+                log('Debug - Original thumb: ${widget.conversation.product.thumb}');
+                log('Debug - Full thumb URL: $fullThumbUrl');
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UserChatScreen(
+                      conversationId: widget.conversation.id,
+                      product: widget.conversation.product,
+                      // thumb: widget.conversation.product.thumb ?? '',
+                      thumb: fullThumbUrl, // Pass the full URL
+                      title: widget.conversation.product.title ?? '',
+                      price: widget.conversation.product.price ?? 0.0,
+                    ),
+                  ),
+                );
+              }
+            : null,
       ),
     );
   }
@@ -571,7 +601,7 @@ widget.conversation.product.price != null
   //   }
   // }
 
-    String _formatDateTime(String? dateString) {
+  String _formatDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) {
       return 'Recently'; // Default text if date is null or empty
     }
@@ -601,5 +631,3 @@ widget.conversation.product.price != null
     }
   }
 }
-
-

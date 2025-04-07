@@ -370,28 +370,45 @@ Widget buildThumbImage(ProductModel product) {
         ),
         title: Row(
           children: [
-              buildThumbImage(widget.product), // Thumbnail
-            // Container(
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(12),
-            //     boxShadow: [
-            //       BoxShadow(
-            //         color: Colors.grey.withAlpha((0.9 * 255).round()),
-            //         spreadRadius: 1,
-            //         blurRadius: 1,
-            //         offset: const Offset(0, 1),
-            //       ),
-            //     ],
-            //   ),
-            //   child: ClipRRect(
-            //     borderRadius: BorderRadius.circular(12),
-            //     child: SizedBox(
-            //       width: 60,
-            //       height: 60,
-            //       child: buildThumbImage(widget.product.thumb),
-            //     ),
-            //   ),
-            // ),
+               buildThumbImage(widget.product), // Thumbnail
+               Container(
+            width: 40,
+            height: 40,
+            margin: const EdgeInsets.only(right: 10),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: ClipOval(
+              child: widget.thumb.isNotEmpty
+                  ? Image.network(
+                      widget.thumb,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => const Icon(
+                        Icons.image_not_supported,
+                        size: 20,
+                        color: Colors.grey,
+                      ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Center(
+                          child: CircularProgressIndicator(
+                            value: loadingProgress.expectedTotalBytes != null
+                                ? loadingProgress.cumulativeBytesLoaded /
+                                    loadingProgress.expectedTotalBytes!
+                                : null,
+                          ),
+                        );
+                      },
+                    )
+                  : const Icon(
+                      Icons.image_not_supported,
+                      size: 20,
+                      color: Colors.grey,
+                    ),
+            ),
+          ),
+           
             const SizedBox(width: 12),
             Expanded(
               child: Column(

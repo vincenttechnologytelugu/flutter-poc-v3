@@ -135,108 +135,214 @@ class _UploadingScreenState extends State<UploadingScreen> {
     return true;
   }
 
-  Future<void> uploadFile(File file, bool isVideo) async {
-    try {
-      // Validate file size
-      bool isValidSize = await _validateFileSize(file, isVideo);
-      if (!isValidSize) return;
+  // Future<void> uploadFile(File file, bool isVideo) async {
+  //   try {
+  //     // Validate file size
+  //     bool isValidSize = await _validateFileSize(file, isVideo);
+  //     if (!isValidSize) return;
 
-      final token = await _getToken();
-      final adpostId = await _getAdpostId();
-      // Add debug log to check values
-      log('Token: $token');
-      log('AdpostId: $adpostId');
+  //     final token = await _getToken();
+  //     final adpostId = await _getAdpostId();
+  //     // Add debug log to check values
+  //     log('Token: $token');
+  //     log('AdpostId: $adpostId');
 
-      if (token == null || adpostId == null) {
+  //     if (token == null || adpostId == null) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Authentication or AdPost ID missing')),
+  //       );
+  //       return;
+  //     }
+
+  //     var uri = Uri.parse(
+  //         'http://13.200.179.78/adposts/upload_file?adpostId=$adpostId');
+  //     var request = http.MultipartRequest('POST', uri);
+
+  //     // Add authorization header
+  //     request.headers['Authorization'] = 'Bearer $token';
+
+  //     // Determine file type and create MultipartFile
+  //     String fileName = file.path.split('/').last;
+  //     String contentType;
+
+  //     // Validate file type
+  //     if (isVideo) {
+  //       if (!fileName.toLowerCase().endsWith('.mp4')) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Only MP4 videos are allowed')),
+  //         );
+  //         return;
+  //       }
+  //       contentType = 'video/mp4';
+  //     } else {
+  //       if (!fileName.toLowerCase().endsWith('.jpg') &&
+  //           !fileName.toLowerCase().endsWith('.jpeg') &&
+  //           !fileName.toLowerCase().endsWith('.png')) {
+  //         ScaffoldMessenger.of(context).showSnackBar(
+  //           SnackBar(content: Text('Only JPEG and PNG images are allowed')),
+  //         );
+  //         return;
+  //       }
+  //       contentType = fileName.toLowerCase().endsWith('.png')
+  //           ? 'image/png'
+  //           : 'image/jpeg';
+  //     }
+
+  //     var multipartFile = await http.MultipartFile.fromPath(
+  //       'file',
+  //       file.path,
+  //       contentType: MediaType.parse(contentType),
+  //     );
+
+  //     request.files.add(multipartFile);
+
+  //     // Show loading indicator
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Uploading ${isVideo ? 'video' : 'image'}...')),
+  //     );
+
+  //     var response = await request.send();
+  //     var responseData = await response.stream.bytesToString();
+  //     var jsonResponse = json.decode(responseData);
+
+  //     if (response.statusCode == 200) {
+  //       AssetModel asset = AssetModel.fromJson(jsonResponse);
+  //       setState(() {
+  //         if (isVideo) {
+  //           videoAsset = asset;
+  //         } else {
+  //           imageAssets.add(asset);
+  //         }
+  //       });
+  //       // Debug print to verify the ID
+  //       log('Uploaded asset ID: ${asset.id}');
+
+  //       String fileExtension = file.path.split('.').last.toLowerCase();
+  //       // ignore: unused_local_variable
+  //       bool isImage = ['jpg', 'jpeg', 'png'].contains(fileExtension);
+
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Upload successful - ID: ${asset.id}')),
+  //       );
+  //       log('Upload response: $jsonResponse');
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text(jsonResponse['message'] ?? 'Upload failed')),
+  //       );
+  //     }
+  //   } catch (e) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Error uploading file: $e')),
+  //     );
+  //     log('Error uploading file: $e');
+  //   }
+  // }
+
+
+
+
+Future<void> uploadFile(File file, bool isVideo, bool isFirstImage) async {
+  try {
+    bool isValidSize = await _validateFileSize(file, isVideo);
+    if (!isValidSize) return;
+
+    final token = await _getToken();
+    final adpostId = await _getAdpostId();
+    log('Token: $token');
+    log('AdpostId: $adpostId');
+
+    if (token == null || adpostId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Authentication or AdPost ID missing')),
+      );
+      return;
+    }
+
+    // Construct URL based on whether it's the first image
+    final url = !isVideo && isFirstImage
+        ? 'http://13.200.179.78/adposts/upload_file?adpostId=$adpostId&thumb=true'
+        : 'http://13.200.179.78/adposts/upload_file?adpostId=$adpostId';
+
+    var uri = Uri.parse(url);
+    var request = http.MultipartRequest('POST', uri);
+    request.headers['Authorization'] = 'Bearer $token';
+
+    String fileName = file.path.split('/').last;
+    String contentType;
+
+    if (isVideo) {
+      if (!fileName.toLowerCase().endsWith('.mp4')) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Authentication or AdPost ID missing')),
+          const SnackBar(content: Text('Only MP4 videos are allowed')),
         );
         return;
       }
-
-      var uri = Uri.parse(
-          'http://13.200.179.78/adposts/upload_file?adpostId=$adpostId');
-      var request = http.MultipartRequest('POST', uri);
-
-      // Add authorization header
-      request.headers['Authorization'] = 'Bearer $token';
-
-      // Determine file type and create MultipartFile
-      String fileName = file.path.split('/').last;
-      String contentType;
-
-      // Validate file type
-      if (isVideo) {
-        if (!fileName.toLowerCase().endsWith('.mp4')) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Only MP4 videos are allowed')),
-          );
-          return;
-        }
-        contentType = 'video/mp4';
-      } else {
-        if (!fileName.toLowerCase().endsWith('.jpg') &&
-            !fileName.toLowerCase().endsWith('.jpeg') &&
-            !fileName.toLowerCase().endsWith('.png')) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Only JPEG and PNG images are allowed')),
-          );
-          return;
-        }
-        contentType = fileName.toLowerCase().endsWith('.png')
-            ? 'image/png'
-            : 'image/jpeg';
-      }
-
-      var multipartFile = await http.MultipartFile.fromPath(
-        'file',
-        file.path,
-        contentType: MediaType.parse(contentType),
-      );
-
-      request.files.add(multipartFile);
-
-      // Show loading indicator
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Uploading ${isVideo ? 'video' : 'image'}...')),
-      );
-
-      var response = await request.send();
-      var responseData = await response.stream.bytesToString();
-      var jsonResponse = json.decode(responseData);
-
-      if (response.statusCode == 200) {
-        AssetModel asset = AssetModel.fromJson(jsonResponse);
-        setState(() {
-          if (isVideo) {
-            videoAsset = asset;
-          } else {
-            imageAssets.add(asset);
-          }
-        });
-        // Debug print to verify the ID
-        log('Uploaded asset ID: ${asset.id}');
-
-        String fileExtension = file.path.split('.').last.toLowerCase();
-        // ignore: unused_local_variable
-        bool isImage = ['jpg', 'jpeg', 'png'].contains(fileExtension);
-
+      contentType = 'video/mp4';
+    } else {
+      if (!fileName.toLowerCase().endsWith('.jpg') &&
+          !fileName.toLowerCase().endsWith('.jpeg') &&
+          !fileName.toLowerCase().endsWith('.png')) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Upload successful - ID: ${asset.id}')),
+          const SnackBar(content: Text('Only JPEG and PNG images are allowed')),
         );
-        log('Upload response: $jsonResponse');
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(jsonResponse['message'] ?? 'Upload failed')),
-        );
+        return;
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error uploading file: $e')),
-      );
-      log('Error uploading file: $e');
+      contentType = fileName.toLowerCase().endsWith('.png')
+          ? 'image/png'
+          : 'image/jpeg';
     }
+
+    var multipartFile = await http.MultipartFile.fromPath(
+      'file',
+      file.path,
+      contentType: MediaType.parse(contentType),
+    );
+
+    request.files.add(multipartFile);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Uploading ${isVideo ? 'video' : 'image'}...')),
+    );
+
+    var response = await request.send();
+    var responseData = await response.stream.bytesToString();
+    var jsonResponse = json.decode(responseData);
+
+    if (response.statusCode == 200) {
+      AssetModel asset = AssetModel.fromJson(jsonResponse);
+      setState(() {
+        if (isVideo) {
+          videoAsset = asset;
+        } else {
+          imageAssets.add(asset);
+        }
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Upload successful - ID: ${asset.id}')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(jsonResponse['message'] ?? 'Upload failed')),
+      );
+    }
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Error uploading file: $e')),
+    );
+    log('Error uploading file: $e');
   }
+}
+
+
+
+
+
+
+
+
+
+
 
 // Add this method to your state class
   Future<bool> deleteAssetFromServer(String assetId) async {
@@ -287,23 +393,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
                   fit: BoxFit.cover,
                 ),
                 if (index < imageAssets.length)
-                  // Positioned(
-                  //   bottom: 0,
-                  //   left: 0,
-                  //   right: 0,
-                  //   child: Container(
-                  //     color: Colors.black.withOpacity(0.7),
-                  //     padding: EdgeInsets.all(4),
-                  //     child: Text(
-                  //       'ID: ${imageAssets[index].id}',
-                  //       style: TextStyle(
-                  //         color: Colors.white,
-                  //         fontSize: 10,
-                  //       ),
-                  //       textAlign: TextAlign.center,
-                  //     ),
-                  //   ),
-                  // ),
+             
 
                   Positioned(
                     bottom: 0,
@@ -335,30 +425,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
                       ),
                     ),
                   ),
-                // Positioned(
-                //   right: 0,
-                //   child: Container(
-                //     decoration: BoxDecoration(
-                //       color:
-                //           const Color.fromARGB(255, 17, 9, 9).withOpacity(0.5),
-                //       shape: BoxShape.circle,
-                //     ),
-                //     child: IconButton(
-                //       icon: const Icon(
-                //         Icons.delete_forever_rounded,
-                //         color: Color.fromARGB(255, 249, 247, 247),
-                //       ),
-                //       onPressed: () {
-                //         setState(() {
-                //           selectedImages.removeAt(index);
-                //           if (index < imageAssets.length) {
-                //             imageAssets.removeAt(index);
-                //           }
-                //         });
-                //       },
-                //     ),
-                //   ),
-                // ),
+              
 
                 Positioned(
                   right: 0,
@@ -368,51 +435,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
                       shape: BoxShape.circle,
                     ),
                     child:
-                        //  IconButton(
-                        //   icon: const Icon(
-                        //     Icons.delete_forever_rounded,
-                        //     color: Colors.white,
-                        //   ),
-                        //   onPressed: () async {
-                        //     if (index < imageAssets.length) {
-                        //       // Show loading indicator
-                        //       showDialog(
-                        //         context: context,
-                        //         barrierDismissible: false,
-                        //         builder: (BuildContext context) {
-                        //           return Center(child: CircularProgressIndicator());
-                        //         },
-                        //       );
-
-                        //       // Delete from server
-                        //       final success = await deleteAssetFromServer(
-                        //           imageAssets[index].id);
-
-                        //       // Remove loading indicator
-                        //       Navigator.pop(context);
-
-                        //       if (success) {
-                        //         setState(() {
-                        //           selectedImages.removeAt(index);
-                        //           imageAssets.removeAt(index);
-                        //         });
-
-                        //         ScaffoldMessenger.of(context).showSnackBar(
-                        //           SnackBar(
-                        //               content: Text('Image deleted successfully')),
-                        //         );
-
-                        //         // Allow picking new image
-                        //         await pickImage();
-                        //       } else {
-
-                        //         ScaffoldMessenger.of(context).showSnackBar(
-                        //           SnackBar(content: Text('Failed to delete image')),
-                        //         );
-                        //       }
-                        //     }
-                        //   },
-                        // ),
+                        
 
                         IconButton(
                       icon: const Icon(
@@ -468,35 +491,176 @@ class _UploadingScreenState extends State<UploadingScreen> {
   }
 
 // Update pickImage function
-  Future<void> pickImage() async {
-    final int maxImages = packageRules?['image_attachments'] ?? 2;
+  // Future<void> pickImage() async {
+  //   final int maxImages = packageRules?['image_attachments'] ?? 2;
 
-    if (selectedImages.length >= maxImages) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Maximum image limit ($maxImages) reached')),
+  //   if (selectedImages.length >= maxImages) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(content: Text('Maximum image limit ($maxImages) reached')),
+  //     );
+  //     return;
+  //   }
+
+  //   // Show dialog first
+  //   bool proceed = await _showFileTypeDialog(false);
+  //   if (!proceed) return;
+
+  //   try {
+  //     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  //     if (image != null) {
+  //       File imageFile = File(image.path);
+  //       // Upload the image first
+  //       await uploadFile(imageFile, false);
+  //       // If upload successful, add to local list
+  //       setState(() {
+  //         selectedImages.add(imageFile);
+  //       });
+  //     }
+  //   } catch (e) {
+  //     log('Error picking image: $e');
+  //   }
+  // }
+
+Future<void> pickImage() async {
+  final int maxImages = packageRules?['image_attachments'] ?? 2;
+
+  if (selectedImages.length >= maxImages) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Maximum image limit ($maxImages) reached'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+    return;
+  }
+
+  // Show file type dialog first
+  bool proceed = await _showFileTypeDialog(false);
+  if (!proceed) return;
+
+  // Show source selection dialog
+  ImageSource? source = await showDialog<ImageSource>(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text('Select Image Source'),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.blue),
+              title: const Text('Gallery'),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Colors.blue),
+              title: const Text('Camera'),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+          ],
+        ),
       );
-      return;
-    }
+    },
+  );
 
-    // Show dialog first
-    bool proceed = await _showFileTypeDialog(false);
-    if (!proceed) return;
+  if (source == null) return;
 
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        File imageFile = File(image.path);
-        // Upload the image first
-        await uploadFile(imageFile, false);
-        // If upload successful, add to local list
+  try {
+    final XFile? image = await _picker.pickImage(
+      source: source,
+      imageQuality: 50,
+    );
+
+    if (image != null) {
+      File imageFile = File(image.path);
+      
+      // Show upload confirmation dialog
+   // Show upload confirmation dialog
+bool shouldUpload = await showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+      ),
+      child: Container(
+        constraints: const BoxConstraints(
+          maxWidth: 400,  // Maximum width
+          maxHeight: 500, // Maximum height
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                'Upload Image',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            Flexible(  // Added Flexible
+              child: Container(
+                constraints: const BoxConstraints(
+                  maxHeight: 300,  // Maximum height for image
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.file(
+                    imageFile,
+                    fit: BoxFit.contain,  // Changed to contain
+                  ),
+                ),
+              ),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Text('Do you want to upload this image?'),
+            ),
+            ButtonBar(
+              children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                  ),
+                  child: const Text(
+                    'Upload',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+) ?? false;
+
+
+      if (shouldUpload) {
+        // Check if this is the first image
+        bool isFirstImage = selectedImages.isEmpty;
+        await uploadFile(imageFile, false, isFirstImage); // Modified to include isFirstImage
         setState(() {
           selectedImages.add(imageFile);
         });
       }
-    } catch (e) {
-      log('Error picking image: $e');
     }
+  } catch (e) {
+    log('Error picking image: $e');
   }
+}
+
+
+
 
 // Update pickVideo function
   Future<void> pickVideo() async {
@@ -527,7 +691,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
 
         File videoFile = File(video.path);
         // Upload the video first
-        await uploadFile(videoFile, true);
+        await uploadFile(videoFile, true, false); // Modified to include isFirstImage
 
         await _disposeVideoControllers();
 
@@ -657,23 +821,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
         ),
         if (videoAsset != null)
 
-          // Positioned(
-          //   bottom: 0,
-          //   left: 0,
-          //   right: 0,
-          //   child: Container(
-          //     color: Colors.black.withOpacity(0.7),
-          //     padding: EdgeInsets.all(4),
-          //     child: Text(
-          //       'Video ID: ${videoAsset!.id}',
-          //       style: TextStyle(
-          //         color: Colors.white,
-          //         fontSize: 12,
-          //       ),
-          //       textAlign: TextAlign.center,
-          //     ),
-          //   ),
-          // ),
+          
 
           Positioned(
             top: 150,
@@ -706,25 +854,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
               ),
             ),
           ),
-        // Positioned(
-        //   left: 0,
-        //   child: Container(
-        //     decoration: BoxDecoration(
-        //       color: Colors.black.withOpacity(0.5),
-        //       shape: BoxShape.circle,
-        //     ),
-        //     child: IconButton(
-        //       icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
-        //       onPressed: () async {
-        //         await _disposeVideoControllers();
-        //         setState(() {
-        //           selectedVideo = null;
-        //           videoAsset = null;
-        //         });
-        //       },
-        //     ),
-        //   ),
-        // ),
+      
 
         Positioned(
           left: 0,
@@ -734,47 +864,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
               shape: BoxShape.circle,
             ),
             child:
-                // IconButton(
-                //   icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
-                //   onPressed: () async {
-                //     if (videoAsset != null) {
-                //       // Show loading indicator
-                //       showDialog(
-                //         context: context,
-                //         barrierDismissible: false,
-                //         builder: (BuildContext context) {
-                //           return Center(child: CircularProgressIndicator());
-                //         },
-                //       );
-
-                //       // Delete from server
-                //       final success = await deleteAssetFromServer(videoAsset!.id);
-
-                //       // Remove loading indicator
-                //       Navigator.pop(context);
-
-                //       if (success) {
-                //         // Dispose video controllers
-                //         await _disposeVideoControllers();
-                //         setState(() {
-                //           selectedVideo = null;
-                //           videoAsset = null;
-                //         });
-
-                //         ScaffoldMessenger.of(context).showSnackBar(
-                //           SnackBar(content: Text('Video deleted successfully')),
-                //         );
-
-                //         // Allow picking new video
-                //         await pickVideo();
-                //       } else {
-                //         ScaffoldMessenger.of(context).showSnackBar(
-                //           SnackBar(content: Text('Failed to delete video')),
-                //         );
-                //       }
-                //     }
-                //   },
-                // ),
+              
 
                 IconButton(
               icon: Icon(Icons.delete_forever_rounded, color: Colors.white),
@@ -886,12 +976,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
             const SizedBox(height: 20),
 
             ElevatedButton(
-              // style: ButtonStyle(
-              //   backgroundColor: WidgetStateProperty.all<Color>(
-              //     selectedImages.length < maxImages ? Colors.blue : Colors.grey,
-
-              //   ),
-              // ),
+             
               onPressed: pickImage,
               child: Text('Pick Images (${selectedImages.length}/$maxImages)',
               style: GoogleFonts.rosarivo(textStyle: TextStyle(fontSize: 16, color: const Color.fromARGB(255, 17, 2, 2), 
@@ -920,55 +1005,7 @@ class _UploadingScreenState extends State<UploadingScreen> {
             // For video button
             if (maxVideos > 0) const SizedBox(height: 20),
 
-            // if (selectedImages.isNotEmpty)
-            //   SizedBox(
-            //     height: 100,
-            //     child: ListView.builder(
-            //       scrollDirection: Axis.horizontal,
-            //       itemCount: selectedImages.length,
-            //       itemBuilder: (context, index) {
-            //         return Padding(
-            //           padding: const EdgeInsets.all(8.0),
-            //           child: Stack(
-            //             children: [
-            //               Container(
-            //                 decoration: BoxDecoration(
-            //                   border: Border.all(color: Colors.black),
-            //                 ),
-            //                 child: Image.file(
-            //                   selectedImages[index],
-            //                   height: 100,
-            //                   width: 100,
-            //                   fit: BoxFit.cover,
-            //                 ),
-            //               ),
-            //               Positioned(
-            //                 right: 20,
-            //                 top: 40,
-            //                 left: 50,
-            //                 bottom: 100,
-            //                 child: Container(
-            //                   decoration: BoxDecoration(
-            //                     color: Colors.black.withOpacity(0.5),
-            //                     shape: BoxShape.circle,
-            //                   ),
-            //                   child: IconButton(
-            //                     icon: const Icon(Icons.delete_forever_rounded,
-            //                         color: Color.fromARGB(255, 11, 5, 5)),
-            //                     onPressed: () {
-            //                       setState(() {
-            //                         selectedImages.removeAt(index);
-            //                       });
-            //                     },
-            //                   ),
-            //                 ),
-            //               ),
-            //             ],
-            //           ),
-            //         );
-            //       },
-            //     ),
-            //   ),
+          
             _buildImagePreview(),
 
             _buildVideoPreview(),

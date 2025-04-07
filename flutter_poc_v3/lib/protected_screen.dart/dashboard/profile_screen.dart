@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/public_screen.dart/update_profile_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/services/auth_service.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -35,10 +36,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   ProfileResponseModel profileData = ProfileResponseModel();
   XFile? pickedXFile;
+
+// Add this function
+  void updateProfileImage() async {
+    final prefs = await SharedPreferences.getInstance();
+    final displayPicture = prefs.getString('display_picture');
+    final token = prefs.getString('token');
+
+    if (displayPicture != null && token != null) {
+      try {
+        final response = await http.get(
+          Uri.parse('http://13.200.179.78/$displayPicture'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (response.statusCode == 200 && mounted) {
+          setState(() {}); // Trigger rebuild to show new image
+        }
+      } catch (e) {
+        log('Error loading profile image: $e');
+      }
+    }
+  }
+
+
+
+
+
   @override
   void initState() {
     super.initState();
     refreshUserDataFromApi();
+     updateProfileImage(); // Add this line
     // Set up periodic refresh
     _refreshTimer = Timer.periodic(const Duration(minutes: 5), (timer) {
       if (mounted) {
@@ -46,238 +77,227 @@ class _ProfileScreenState extends State<ProfileScreen> {
         refreshUserData();
       }
     });
-  //     // Add this to show the popup after a brief delay
-  // Future.delayed(const Duration(milliseconds: 100), () {
-  //   if (mounted) {
-  //     showSubscriptionDialog();
-  //   }
-  // });
+    //     // Add this to show the popup after a brief delay
+    // Future.delayed(const Duration(milliseconds: 100), () {
+    //   if (mounted) {
+    //     showSubscriptionDialog();
+    //   }
+    // });
   }
 
-
-
-
-
 // Add this method to show subscription dialog
-void showSubscriptionDialog() {
-  showDialog(
-    context: context,
-    barrierDismissible: true,
-    builder: (BuildContext context) {
-      return Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Stack(
-                children: [
-                  const Text(
-                    'Subscription Packages',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color.fromARGB(255, 240, 107, 31),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0,
-                    top: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                height: 400,
-                child: ListView(
+  void showSubscriptionDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Stack(
                   children: [
-                    _buildPackageCard(
-                      'Free',
-                      '₹0',
-                      '1 Month',
-                      [
-                        '1 Post',
-                        '2 Image Attachments',
-                        'Basic Features',
-                        'No Contacts'
-                      ],
-                      false,
+                    const Text(
+                      'Subscription Packages',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color.fromARGB(255, 240, 107, 31),
+                      ),
                     ),
-                    const SizedBox(height: 10),
-                    _buildPackageCard(
-                      'Silver',
-                      '₹1000',
-                      '3 Months',
-                      [
-                        '6 Posts',
-                        '4 Image Attachments',
-                        'Manual boost every 15 days',
-                        '5 Contacts'
-                      ],
-                      true,
-                    ),
-                    const SizedBox(height: 10),
-                    _buildPackageCard(
-                      'Gold',
-                      '₹1200',
-                      '6 Months',
-                      [
-                        '12 Posts',
-                        '4 Image Attachments',
-                        '1 Video Attachment',
-                        'Manual boost every 3 days',
-                        '12 Contacts'
-                      ],
-                      false,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
-
-// Add this helper method for building package cards
-Widget _buildPackageCard(String title, String price, String validity, List<String> features, bool isPopular) {
-  return Card(
-    elevation: isPopular ? 8 : 4,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(15),
-      side: isPopular
-          ? const BorderSide(color: Color.fromARGB(255, 240, 107, 31), width: 2)
-          : BorderSide.none,
-    ),
-    child: Container(
-      padding: const EdgeInsets.all(15),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              if (isPopular)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 240, 107, 31),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text(
-                    'BEST VALUE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                price,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 240, 107, 31),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '/ $validity',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 15),
-          ...features.map((feature) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.check_circle,
-                      color: Color.fromARGB(255, 240, 107, 31),
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        feature,
-                        style: const TextStyle(fontSize: 14),
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      child: IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.pop(context),
                       ),
                     ),
                   ],
                 ),
-              )),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: isPopular 
-                    ? const Color.fromARGB(255, 240, 107, 31)
-                    : Colors.blue,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const InvoiceBillingScreen(),
+                const SizedBox(height: 20),
+                SizedBox(
+                  height: 400,
+                  child: ListView(
+                    children: [
+                      _buildPackageCard(
+                        'Free',
+                        '₹0',
+                        '1 Month',
+                        [
+                          '1 Post',
+                          '2 Image Attachments',
+                          'Basic Features',
+                          'No Contacts'
+                        ],
+                        false,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildPackageCard(
+                        'Silver',
+                        '₹1000',
+                        '3 Months',
+                        [
+                          '6 Posts',
+                          '4 Image Attachments',
+                          'Manual boost every 15 days',
+                          '5 Contacts'
+                        ],
+                        true,
+                      ),
+                      const SizedBox(height: 10),
+                      _buildPackageCard(
+                        'Gold',
+                        '₹1200',
+                        '6 Months',
+                        [
+                          '12 Posts',
+                          '4 Image Attachments',
+                          '1 Video Attachment',
+                          'Manual boost every 3 days',
+                          '12 Contacts'
+                        ],
+                        false,
+                      ),
+                    ],
                   ),
-                );
-              },
-              child: const Text(
-                'Subscribe Now',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+// Add this helper method for building package cards
+  Widget _buildPackageCard(String title, String price, String validity,
+      List<String> features, bool isPopular) {
+    return Card(
+      elevation: isPopular ? 8 : 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: isPopular
+            ? const BorderSide(
+                color: Color.fromARGB(255, 240, 107, 31), width: 2)
+            : BorderSide.none,
+      ),
+      child: Container(
+        padding: const EdgeInsets.all(15),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (isPopular)
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(255, 240, 107, 31),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Text(
+                      'BEST VALUE',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  price,
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 240, 107, 31),
+                  ),
+                ),
+                const SizedBox(width: 5),
+                Text(
+                  '/ $validity',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 15),
+            ...features.map((feature) => Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: Color.fromARGB(255, 240, 107, 31),
+                        size: 20,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          feature,
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+            const SizedBox(height: 10),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: isPopular
+                      ? const Color.fromARGB(255, 240, 107, 31)
+                      : Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const InvoiceBillingScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  'Subscribe Now',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
-
-
-
-
-
-
-
-
-
+    );
+  }
 
   @override
   void dispose() {
@@ -397,14 +417,16 @@ Widget _buildPackageCard(String title, String price, String validity, List<Strin
     setState(() => isLoading = true);
     try {
       final prefs = await SharedPreferences.getInstance();
+  
       final token = prefs.getString('token');
+       
 
 //       if (token == null) {
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           const SnackBar(content: Text("Token Not Found")),
 //         );
-      
-// // 
+
+// //
 // Navigator.push(
 //   context,
 //   MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -423,6 +445,10 @@ Widget _buildPackageCard(String title, String price, String validity, List<Strin
 
       if (response.statusCode == 200) {
         final userDetails = jsonDecode(response.body);
+          final prefs = await SharedPreferences.getInstance();
+            if (userDetails['display_picture'] != null) {
+    await prefs.setString('display_picture', userDetails['display_picture']);
+  }
         log('User details: $userDetails');
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         profileData = ProfileResponseModel.fromJson(responseData);
@@ -447,52 +473,51 @@ Widget _buildPackageCard(String title, String price, String validity, List<Strin
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 242, 245, 247),
       appBar: AppBar(
-        title: const Text('Profile',
-         style: TextStyle(
-        fontFamily: 'Roboto', // Custom font family (you can change to a modern font)
-        fontWeight: FontWeight.w100, // Semi-bold font weight for modern look
-        fontSize: 30, // Larger font size for emphasis
-        color: Colors.blueAccent, // Modern text color
-        letterSpacing: 1.5, // Increased letter spacing for a modern feel
-        shadows: [
-          Shadow(
-            blurRadius: 1.0, // Light shadow for depth
-            color: Colors.black, // Soft shadow color
-            offset: Offset(1.0, 1.0), // Slight offset for a subtle depth effect
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontFamily:
+                'Roboto', // Custom font family (you can change to a modern font)
+            fontWeight:
+                FontWeight.w100, // Semi-bold font weight for modern look
+            fontSize: 30, // Larger font size for emphasis
+            color: Colors.blueAccent, // Modern text color
+            letterSpacing: 1.5, // Increased letter spacing for a modern feel
+            shadows: [
+              Shadow(
+                blurRadius: 1.0, // Light shadow for depth
+                color: Colors.black, // Soft shadow color
+                offset:
+                    Offset(1.0, 1.0), // Slight offset for a subtle depth effect
+              ),
+            ],
           ),
-        ],
-      ),
         ),
         actions: [
-Container(
-  decoration: BoxDecoration(
-    color: Color(0xFF2D3436),
-    shape: BoxShape.circle,
-    boxShadow: [
-      BoxShadow(
-        color: Color(0xFF2D3436).withOpacity(0.3),
-        blurRadius: 15,
-        spreadRadius: 2,
-        offset: Offset(0, 4),
-      ),
-    ],
-  ),
-  child: IconButton(
-    icon: const Icon(
-      Icons.refresh_rounded,
-      size: 28,
-      color: Color(0xFF00FF7F),
-    ),
-    onPressed: refreshUserDataFromApi,
-    splashColor: Color(0xFF00FF7F).withOpacity(0.2),
-    highlightColor: Color(0xFF00FF7F).withOpacity(0.1),
-  ),
-)
-
-
-
-
-          
+          Container(
+            decoration: BoxDecoration(
+              color: Color(0xFF2D3436),
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Color(0xFF2D3436).withOpacity(0.3),
+                  blurRadius: 15,
+                  spreadRadius: 2,
+                  offset: Offset(0, 4),
+                ),
+              ],
+            ),
+            child: IconButton(
+              icon: const Icon(
+                Icons.refresh_rounded,
+                size: 28,
+                color: Color(0xFF00FF7F),
+              ),
+              onPressed: refreshUserDataFromApi,
+              splashColor: Color(0xFF00FF7F).withOpacity(0.2),
+              highlightColor: Color(0xFF00FF7F).withOpacity(0.1),
+            ),
+          )
 
           // IconButton(
           //   icon: const Icon(Icons.refresh),
@@ -523,30 +548,92 @@ Container(
                               // Profile Image Section
                               Stack(
                                 children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      border: Border.all(
-                                        color: Colors.blue,
-                                        width: 3,
-                                      ),
-                                    ),
-                                    child: pickedXFile != null
-                                        ? CircleAvatar(
-                                            radius: 60,
-                                            backgroundImage: FileImage(
-                                                File(pickedXFile!.path)),
-                                          )
-                                        : const CircleAvatar(
-                                            radius: 60,
-                                            backgroundColor: Colors.blue,
-                                            child: Icon(
-                                              Icons.person,
-                                              size: 50,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                  ),
+                                  // Container(
+                                  //   decoration: BoxDecoration(
+                                  //     shape: BoxShape.circle,
+                                  //     border: Border.all(
+                                  //       color: Colors.blue,
+                                  //       width: 3,
+                                  //     ),
+                                  //   ),
+                                  //   child: pickedXFile != null
+                                  //       ? CircleAvatar(
+                                  //           radius: 60,
+                                  //           backgroundImage: FileImage(
+                                  //               File(pickedXFile!.path)),
+                                  //         )
+                                  //       : const CircleAvatar(
+                                  //           radius: 60,
+                                  //           backgroundColor: Colors.blue,
+                                  //           child: Icon(
+                                  //             Icons.person,
+                                  //             size: 50,
+                                  //             color: Colors.white,
+                                  //           ),
+                                  //         ),
+                                  // ),
+
+
+  Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: Colors.blue,
+          width: 3,
+        ),
+      ),
+      child: pickedXFile != null
+          ? CircleAvatar(
+              radius: 60,
+              backgroundImage: FileImage(File(pickedXFile!.path)),
+            )
+          : FutureBuilder<SharedPreferences>(
+              future: SharedPreferences.getInstance(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final token = snapshot.data!.getString('token');
+                  final displayPicture = snapshot.data!.getString('display_picture');
+
+                  if (token != null && displayPicture != null) {
+                    return CircleAvatar(
+                      radius: 60,
+                      backgroundImage: NetworkImage(
+                        'http://13.200.179.78/$displayPicture',
+                        headers: {
+                          'Authorization': 'Bearer $token',
+                        },
+                      ),
+                      backgroundColor: Colors.blue,
+                      onBackgroundImageError: (e, s) => const Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Colors.white,
+                      ),
+                    );
+                  }
+                }
+                return const CircleAvatar(
+                  radius: 60,
+                  backgroundColor: Colors.blue,
+                  child: Icon(
+                    Icons.person,
+                    size: 50,
+                    color: Colors.white,
+                  ),
+                );
+              },
+            ),
+    ),
+
+
+
+ 
+
+
+
+
+
+
                                   Positioned(
                                     bottom: 0,
                                     right: 0,
@@ -565,20 +652,182 @@ Container(
                                           color: Colors.white,
                                           size: 20,
                                         ),
-                                        onPressed: () async {
-                                          final ImagePicker imagePicker =
-                                              ImagePicker();
-                                          pickedXFile =
-                                              await imagePicker.pickImage(
-                                            source: ImageSource.camera,
-                                            imageQuality: 30,
-                                            preferredCameraDevice:
-                                                CameraDevice.rear,
-                                          );
-                                          if (pickedXFile != null) {
-                                            setState(() {});
-                                          }
-                                        },
+
+                                    onPressed: () async {
+  // Show bottom sheet with options
+  final choice = await showModalBottomSheet<String>(
+    context: context,
+    builder: (BuildContext context) {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Select jpg and png images only',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.photo_library),
+              title: const Text('Select from gallery'),
+              onTap: () => Navigator.pop(context, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a picture'),
+              onTap: () => Navigator.pop(context, 'camera'),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+
+  if (choice == null) return;
+
+  final ImagePicker imagePicker = ImagePicker();
+  final XFile? image = await imagePicker.pickImage(
+    source: choice == 'gallery' ? ImageSource.gallery : ImageSource.camera,
+    imageQuality: 30,
+    maxWidth: 1024, // Add max width
+    maxHeight: 1024, // Add max height
+  );
+
+  if (image != null) {
+    // Validate file type
+    final String extension = image.path.split('.').last.toLowerCase();
+    if (!['jpg', 'jpeg', 'png'].contains(extension)) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select only JPG or PNG images')),
+      );
+      return;
+    }
+
+    // Show confirmation dialog with Share Photo button
+    if (!mounted) return;
+    
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.file(
+                File(image.path),
+                height: 200,
+                width: double.infinity,
+                fit: BoxFit.cover,
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  backgroundColor: Colors.blue,
+                ),
+                onPressed: () async {
+                  Navigator.pop(context); // Close bottom sheet
+
+                  // Get token from SharedPreferences
+                  final prefs = await SharedPreferences.getInstance();
+                  final token = prefs.getString('token');
+
+                  if (token == null) {
+                    if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please login to continue')),
+                    );
+                    return;
+                  }
+
+                  // Create form data
+                  final formData = http.MultipartRequest(
+                    'POST',
+                    Uri.parse('http://13.200.179.78/authentication/display_picture'),
+                  );
+
+                  // Add authorization header
+                  formData.headers['Authorization'] = 'Bearer $token';
+
+                  // Add file to form data with explicit mime type
+                  final mimeType = extension == 'png' ? 'image/png' : 'image/jpeg';
+                  formData.files.add(
+                    await http.MultipartFile.fromPath(
+                      'file',
+                      image.path,
+                      contentType: MediaType.parse(mimeType),
+                    ),
+                  );
+
+                  try {
+                    final response = await formData.send();
+                    final responseData = await response.stream.bytesToString();
+
+                    if (response.statusCode == 200) {
+                       final responseData = json.decode(await response.stream.bytesToString());
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('display_picture', responseData['data']['path']);
+                      setState(() {
+                        pickedXFile = image;
+                      });
+                        updateProfileImage(); // Add this line
+
+
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Profile picture updated successfully')),
+                      );
+                    } else {
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: ${json.decode(responseData)['message']}')),
+                      );
+                    }
+                  } catch (e) {
+                    if (!mounted) return;
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //   const SnackBar(content: Text('Failed to upload image')),
+                    // );
+                  }
+                },
+                child: const Text(
+                  'Share Photo',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+},
+
+
+                                        // onPressed: () async {
+                                        //   final ImagePicker imagePicker =
+                                        //       ImagePicker();
+                                        //   pickedXFile =
+                                        //       await imagePicker.pickImage(
+                                        //     source: ImageSource.camera,
+                                        //     imageQuality: 30,
+                                        //     preferredCameraDevice:
+                                        //         CameraDevice.rear,
+                                        //   );
+                                        //   if (pickedXFile != null) {
+                                        //     setState(() {});
+                                        //   }
+                                        // },
                                       ),
                                     ),
                                   ),

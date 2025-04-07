@@ -52,6 +52,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
 
+// After successful login and receiving user data
+void updateUserData(Map<String, dynamic> userData) async {
+  final prefs = await SharedPreferences.getInstance();
+  if (userData['display_picture'] != null) {
+    await prefs.setString('display_picture', userData['display_picture']);
+  }
+}
 
 
  Future<void> checkAuthAndNavigate() async {

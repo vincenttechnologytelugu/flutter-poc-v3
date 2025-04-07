@@ -304,8 +304,8 @@ class _SearchScreenState extends State<SearchScreen> {
       'Legal',
     ],
     'Pets': [
-      'Dog',
-      'Cat',
+      'Dogs',
+      'Cats',
       'Birds',
       'Fish',
       'Reptiles',

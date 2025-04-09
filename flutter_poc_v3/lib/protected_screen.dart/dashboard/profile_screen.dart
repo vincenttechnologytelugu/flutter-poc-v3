@@ -3,6 +3,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/custom_bottom_nav_bar.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/logout_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/invoice_billing_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
@@ -10,6 +12,7 @@ import 'package:flutter_poc_v3/public_screen.dart/update_profile_screen.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/services/auth_service.dart';
+import 'package:flutter_poc_v3/utils/widgets/auth_guard.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -77,13 +80,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         refreshUserData();
       }
     });
-    //     // Add this to show the popup after a brief delay
-    // Future.delayed(const Duration(milliseconds: 100), () {
-    //   if (mounted) {
-    //     showSubscriptionDialog();
-    //   }
-    // });
+  
   }
+
+
+  
 
 // Add this method to show subscription dialog
   void showSubscriptionDialog() {
@@ -518,7 +519,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               highlightColor: Color(0xFF00FF7F).withOpacity(0.1),
             ),
           )
-
+    
           // IconButton(
           //   icon: const Icon(Icons.refresh),
           //   onPressed: refreshUserDataFromApi,
@@ -572,9 +573,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   //           ),
                                   //         ),
                                   // ),
-
-
-  Container(
+    
+    
+      Container(
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -593,7 +594,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 if (snapshot.hasData) {
                   final token = snapshot.data!.getString('token');
                   final displayPicture = snapshot.data!.getString('display_picture');
-
+    
                   if (token != null && displayPicture != null) {
                     return CircleAvatar(
                       radius: 60,
@@ -624,16 +625,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
               },
             ),
     ),
-
-
-
- 
-
-
-
-
-
-
+    
+    
+    
+     
+    
+    
+    
+    
+    
+    
                                   Positioned(
                                     bottom: 0,
                                     right: 0,
@@ -652,10 +653,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: Colors.white,
                                           size: 20,
                                         ),
-
+    
                                     onPressed: () async {
-  // Show bottom sheet with options
-  final choice = await showModalBottomSheet<String>(
+      // Show bottom sheet with options
+      final choice = await showModalBottomSheet<String>(
     context: context,
     builder: (BuildContext context) {
       return Container(
@@ -685,19 +686,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       );
     },
-  );
-
-  if (choice == null) return;
-
-  final ImagePicker imagePicker = ImagePicker();
-  final XFile? image = await imagePicker.pickImage(
+      );
+    
+      if (choice == null) return;
+    
+      final ImagePicker imagePicker = ImagePicker();
+      final XFile? image = await imagePicker.pickImage(
     source: choice == 'gallery' ? ImageSource.gallery : ImageSource.camera,
     imageQuality: 30,
     maxWidth: 1024, // Add max width
     maxHeight: 1024, // Add max height
-  );
-
-  if (image != null) {
+      );
+    
+      if (image != null) {
     // Validate file type
     final String extension = image.path.split('.').last.toLowerCase();
     if (!['jpg', 'jpeg', 'png'].contains(extension)) {
@@ -707,7 +708,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       return;
     }
-
+    
     // Show confirmation dialog with Share Photo button
     if (!mounted) return;
     
@@ -733,11 +734,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 onPressed: () async {
                   Navigator.pop(context); // Close bottom sheet
-
+    
                   // Get token from SharedPreferences
                   final prefs = await SharedPreferences.getInstance();
                   final token = prefs.getString('token');
-
+    
                   if (token == null) {
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -745,16 +746,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     );
                     return;
                   }
-
+    
                   // Create form data
                   final formData = http.MultipartRequest(
                     'POST',
                     Uri.parse('http://13.200.179.78/authentication/display_picture'),
                   );
-
+    
                   // Add authorization header
                   formData.headers['Authorization'] = 'Bearer $token';
-
+    
                   // Add file to form data with explicit mime type
                   final mimeType = extension == 'png' ? 'image/png' : 'image/jpeg';
                   formData.files.add(
@@ -764,21 +765,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       contentType: MediaType.parse(mimeType),
                     ),
                   );
-
+    
                   try {
                     final response = await formData.send();
                     final responseData = await response.stream.bytesToString();
-
+    
                     if (response.statusCode == 200) {
                        final responseData = json.decode(await response.stream.bytesToString());
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString('display_picture', responseData['data']['path']);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('display_picture', responseData['data']['path']);
                       setState(() {
                         pickedXFile = image;
                       });
                         updateProfileImage(); // Add this line
-
-
+    
+    
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Profile picture updated successfully')),
@@ -810,10 +811,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       },
     );
-  }
-},
-
-
+      }
+    },
+    
+    
                                         // onPressed: () async {
                                         //   final ImagePicker imagePicker =
                                         //       ImagePicker();
@@ -834,7 +835,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ],
                               ),
                               const SizedBox(height: 20),
-
+    
                               // User Info Section
                               Text(
                                 '${profileData.firstName ?? ""} ${profileData.lastName ?? ""}',
@@ -873,7 +874,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-
+    
                       // Actions Card
                       Card(
                         elevation: 8,
@@ -939,22 +940,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(height: 12),
                               _buildActionButton(
                                 icon: Icons.logout,
-                                label: 'Logout',
+                                label: 'Settings',
                                 color: Colors.red,
                                 onPressed: () async {
-                                  final prefs =
-                                      await SharedPreferences.getInstance();
-                                  await prefs.clear();
-                                  await AuthService.logout();
-                                  // Navigator.of(context).pushReplacement(
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => const LoginScreen(),
-                                  //   ),
-                                  // );
+                                  // final prefs =
+                                  //     await SharedPreferences.getInstance();
+                                  // await prefs.clear();
+                                  // await AuthService.logout();
+                             
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => LoginScreen()),
+                                        builder: (context) => LogoutScreen()),
                                   );
                                 },
                               ),
@@ -967,6 +964,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
             ),
+              bottomNavigationBar: CustomBottomNavBar(currentIndex: 4),
     );
   }
 }

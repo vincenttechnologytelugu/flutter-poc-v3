@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -153,7 +154,7 @@ class _RazorpaymentGatewayState extends State<RazorpaymentGateway> {
       
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const SellScreen()),
         (route) => false,
       );
     }

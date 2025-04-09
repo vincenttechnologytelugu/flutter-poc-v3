@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/cart_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:intl/intl.dart';
@@ -576,9 +577,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     // log('Assets: ${widget.productModel.assets}');
     // log('Image URL: ${widget.productModel.getFirstImageUrl()}');
     return Card(
+       color: const Color.fromARGB(255, 213, 221, 216),
       elevation: 10,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+        side: const BorderSide(
+          color: Color.fromARGB(255, 40, 19, 19),
+          width: 1,
+        ),
       ),
       child: Stack(
         children: [
@@ -601,6 +607,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     // Image Container
                     Container(
                       padding: const EdgeInsets.all(0),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        color: const Color.fromARGB(255, 210, 216, 212),
+                      ),
                       height: 130,
                       width: double.infinity,
                       child: Builder(
@@ -657,8 +667,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color(0xFF6A1B9A), // Deep Purple
-                                        Color(0xFFE91E63), // Pink
+                                        Color.fromARGB( 255,
+                                                            252,
+                                                            252,
+                                                            252), // Deep Purple
+                                        Color.fromARGB( 255,
+                                                            252,
+                                                            252,
+                                                            252), // Pink
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -676,7 +692,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     "FEATURED",
                                     style: const TextStyle(
                                       fontSize: 12,
-                                      color: Color.fromARGB(255, 242, 244, 246),
+                                      color: Color.fromARGB( 255, 1, 179, 25),
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
@@ -714,8 +730,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   // Color(0xFF046368),
-                                  Color.fromARGB(255, 97, 76, 181),
-                                  Color.fromARGB(255, 97, 76, 181),
+                                  Color.fromARGB(255, 1, 179, 25),
+                                  Color.fromARGB(255, 1, 179, 25),
                                 ], // Stylish gradient
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -777,13 +793,18 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            const Icon(Icons.location_on, size: 18),
+                            const Icon(Icons.location_on_outlined, size: 18),
                             Expanded(
                               child: Text(
                                 '${widget.productModel.location ?? ''}, ${widget.productModel.city ?? ''}, ${widget.productModel.state ?? ''}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(fontSize: 14),
+                                style:  TextStyle(fontSize: 14,
+                                 fontFamily: GoogleFonts.abhayaLibre()
+                                            .fontFamily,
+                                
+                                ),
+                                
                               ),
                             ),
                           ],
@@ -797,13 +818,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               child: Text(
                                 _formatDateTime(
                                     widget.productModel.publishedAt),
-                                style: const TextStyle(
+                                style:  TextStyle(
                                   fontSize: 16,
-                                  color: Color.fromARGB(255, 14, 3, 3),
+                                  color: Color.fromARGB(255, 122, 120, 120),
                                   fontWeight: FontWeight.bold,
+                                    fontFamily:
+                                          GoogleFonts.abhayaLibre().fontFamily,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
+                                
                               ),
                             ),
                           ],
@@ -857,6 +881,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           cartController.addToFavourite(
                             context,
                             widget.productModel.id.toString(),
+                             screenName: 'sub_category_posts_screen'  // Add this parameter
                           );
                         }
                       },

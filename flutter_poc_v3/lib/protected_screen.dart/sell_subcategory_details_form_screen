@@ -23,14 +23,14 @@ import 'dart:developer';
 class SellSubcategoryDetailsFormScreen extends StatefulWidget {
   final String category;
   final String subcategory;
-  final Color categoryColor;
+    final Color categoryColor;
  
 
   const SellSubcategoryDetailsFormScreen({
     Key? key,
     required this.category,
     required this.subcategory,
-    required this.categoryColor,
+      required this.categoryColor,
    
   }) : super(key: key);
 
@@ -45,6 +45,8 @@ class SellSubcategoryDetailsFormScreen extends StatefulWidget {
 
 class _SellSubcategoryDetailsFormScreenState
     extends State<SellSubcategoryDetailsFormScreen> {
+  // Add this line at the top of your state class
+  final String screenName = 'sell_subcategory_details_form_screen';
 
       late Map<String, TextEditingController> controllers;
      bool isLoading = false;  // Add this line
@@ -62,9 +64,44 @@ bool _isTitleEditable = false;  // Add this at class level
 
 
 
+  // Add this method to load saved data
+  void _loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // controllers['title']?.text = prefs.getString('saved_title') ?? '';
+      controllers['city']?.text = prefs.getString('saved_city') ?? '';
+      controllers['price']?.text = prefs.getString('saved_price') ?? '';
+      controllers['description']?.text = prefs.getString('saved_description') ?? '';
+      controllers['location']?.text = prefs.getString('saved_location') ?? '';
+      controllers['state']?.text = prefs.getString('saved_state') ?? '';
+      // Add other fields as needed
+    });
+  }
+
+  // Add this method to save data
+  void _saveFormData() async {
+    final prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('saved_title', controllers['title']?.text ?? '');
+    await prefs.setString('saved_city', controllers['city']?.text ?? '');
+    await prefs.setString('saved_price', controllers['price']?.text ?? '');
+    await prefs.setString('saved_description', controllers['description']?.text ?? '');
+    await prefs.setString('saved_location', controllers['location']?.text ?? '');
+    await prefs.setString('saved_state', controllers['state']?.text ?? '');
+    // Add other fields as needed
+  }
 
 
-
+// Clear saved data after successful form submission
+  void _clearSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    // await prefs.remove('saved_title');
+    await prefs.remove('saved_city');
+    await prefs.remove('saved_price');
+    await prefs.remove('saved_description');
+    await prefs.remove('saved_location');
+    await prefs.remove('saved_state');
+    // Add other fields as needed
+  }
 
 
 
@@ -322,7 +359,7 @@ Widget _buildOwnershipTile(BuildContext context, String ownerType, StateSetter s
 @override
 void initState() {
   super.initState();
-  
+    _loadSavedData(); // Add this line
   controllers = {
     'category': TextEditingController(text: widget.category),
     'title': TextEditingController(text: widget.subcategory),  // Initialize with subcategory
@@ -411,6 +448,36 @@ void _submitForm() async {
           final currentContext = context;
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+       if (token == null) {
+        await prefs.setString('saved_category', widget.category);
+await prefs.setString('saved_subcategory', widget.subcategory);
+
+await prefs.setString('saved_color', widget.categoryColor.value.toRadixString(16));
+          await prefs.setString('previous_route', screenName);
+        // Check if context is still valid
+        if (!context.mounted) return;
+
+        Get.snackbar(
+          'Login Required',
+          'Please login to continue',
+          snackStyle: SnackStyle.FLOATING,
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor:
+              const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
+          colorText: const Color.fromARGB(255, 12, 65, 0),
+          margin: const EdgeInsets.all(10),
+          duration: const Duration(seconds: 2),
+        );
+
+        // Use Get.to instead of Navigator
+        // Get.to(() => const LoginScreen());
+           // Use Navigator.push instead of Get.to to maintain the stack
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
+        return;
+      }
 
 
  
@@ -556,6 +623,7 @@ void _submitForm() async {
       log('Response body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+           _clearSavedData(); // Clear saved data only on successful submission
         try {
           final Map<String, dynamic> responseData = json.decode(response.body);
           print('Parsed response data: $responseData');
@@ -9558,6 +9626,7 @@ labelText: 'city',
       prefixIcon: Icons.search,
       readOnly: _isFormReadOnly,
       controller: controllers['title']!,
+      
     ),
     const SizedBox(height: 10),
     CustomTextFormField(
@@ -9591,6 +9660,7 @@ labelText: 'city',
   
     TextFormField(
   controller: controllers['state'],
+    onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -9720,6 +9790,7 @@ labelText: 'city',
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+    onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Brand',
      labelStyle: TextStyle(
@@ -9809,6 +9880,7 @@ labelText: 'city',
   // readOnly: _isFormReadOnly,
   readOnly:true,
   controller: controllers['category'],
+    onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Category',
      labelStyle: TextStyle(
@@ -9890,6 +9962,7 @@ labelText: 'city',
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['model'],
+    onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Model',
      labelStyle: TextStyle(

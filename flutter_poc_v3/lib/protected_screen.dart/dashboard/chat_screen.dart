@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/custom_bottom_nav_bar.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/user_chat_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
@@ -45,42 +46,7 @@ class _ChatScreenState extends State<ChatScreen>
 
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      // firstName = prefs.getString('firstName');
-      // lastName = prefs.getString('lastName');
-
-//       if (token == null) {
-//         if (mounted) {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             const SnackBar(content: Text('Token not found atttempting to log')),
-//           );
-//       Navigator.push(
-//   context,
-//   MaterialPageRoute(builder: (context) => LoginScreen()),
-// );
-//         }
-//         return;
-//       }
-      // if (token == null) {
-      //     // Check if context is still valid
-      //     if (!context.mounted) return;
-
-      //     Get.snackbar(
-      //       'Login Required',
-      //       'Please login to continue',
-      //       snackStyle: SnackStyle.FLOATING,
-      //       snackPosition: SnackPosition.BOTTOM,
-      //       backgroundColor:
-      //           const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
-      //       colorText: const Color.fromARGB(255, 12, 65, 0),
-      //       margin: const EdgeInsets.all(10),
-      //       duration: const Duration(seconds: 2),
-      //     );
-
-      //     // Use Get.to instead of Navigator
-      //     Get.to(() => const LoginScreen());
-      //     return;
-      //   }
-
+     
       final response = await http.get(
         Uri.parse('http://13.200.179.78/chat/conversations'),
         headers: {
@@ -160,6 +126,7 @@ class _ChatScreenState extends State<ChatScreen>
           _buildBuyingTab(),
         ],
       ),
+        bottomNavigationBar: CustomBottomNavBar(currentIndex: 1),
     );
   }
 
@@ -379,14 +346,6 @@ class _ConversationTileState extends State<_ConversationTile> {
               ),
               overflow: TextOverflow.ellipsis,
             )
-            // Text(
-            //   '₹${conversation.product.price ?? 0}',
-            //   style: TextStyle(
-            //     fontWeight: FontWeight.w600,
-            //     color: conversation.isActive ? Colors.blue : Colors.grey,
-            //     fontSize: 15,
-            //   ),
-            // ),
           ],
         ),
         trailing: Row(
@@ -448,19 +407,6 @@ class _ConversationTileState extends State<_ConversationTile> {
                   final prefs = await SharedPreferences.getInstance();
                   final token = prefs.getString('token');
 
-//         if (token == null) {
-//         if (mounted) {
-//           ScaffoldMessenger.of(context).showSnackBar(
-//             const SnackBar(content: Text('')),
-//           );
-//       Navigator.push(
-//   context,
-//   MaterialPageRoute(builder: (context) => LoginScreen()),
-// );
-//         }
-//         return;
-//       }
-
                   if (value == 'deactivate') {
                     try {
                       final response = await http.put(
@@ -481,12 +427,19 @@ class _ConversationTileState extends State<_ConversationTile> {
                                 content: Text(
                                     'Conversation deactivated successfully')),
                           );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const HomeScreen()), // Navigate to chat tab
-                          );
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //       builder: (context) =>
+                          //           const HomeScreen()), // Navigate to chat tab
+                          // );
+                          // Find parent ChatScreen and refresh
+                          final chatScreenState = context
+                              .findAncestorStateOfType<_ChatScreenState>();
+                          if (chatScreenState != null) {
+                            await chatScreenState
+                                ._loadConversationsAndMessages();
+                          }
                         }
                       } else {
                         if (context.mounted) {
@@ -525,12 +478,21 @@ class _ConversationTileState extends State<_ConversationTile> {
                                 content:
                                     Text('Conversation deleted successfully')),
                           );
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    const HomeScreen()), // Navigate to chat tab
-                          );
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const HomeScreen(),
+                          //   ),
+
+                          //   // Navigate to chat tab
+                          // );
+                          // Find parent ChatScreen and refresh
+                          final chatScreenState = context
+                              .findAncestorStateOfType<_ChatScreenState>();
+                          if (chatScreenState != null) {
+                            await chatScreenState
+                                ._loadConversationsAndMessages();
+                          }
                         }
                       } else {
                         if (context.mounted) {
@@ -568,7 +530,7 @@ class _ConversationTileState extends State<_ConversationTile> {
                     : '';
                 // Add debug logging
                 log('Debug - Original thumb: ${widget.conversation.product.thumb}');
-                log('Debug - Full thumb URL: $fullThumbUrl');
+                ('Debug - Full thumb URL: $fullThumbUrl');
                 Navigator.push(
                   context,
                   MaterialPageRoute(

@@ -141,7 +141,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                   icon: const Icon(
                     Icons.notifications_outlined,
                     size: 25,
-                    color: Color.fromARGB(255, 240, 6, 232),
+                    color: Color.fromARGB(255, 20, 19, 20),
                   ),
                   onPressed: () {
                     Navigator.push(

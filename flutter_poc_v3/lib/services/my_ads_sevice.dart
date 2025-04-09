@@ -52,18 +52,19 @@ void handleUnauthorized(BuildContext context) {
       final token = await _getToken();
       // if (token == null) throw Exception('No token found');
       if (token == null) {
-  handleUnauthorized(context);
+   handleUnauthorized(context);
   throw Exception('');
 }
 
-
+log("Token for My Ads: $token"); // Add this to debug
       final response = await http.get(
         Uri.parse('$baseUrl/adposts/my_ads'),
         headers: _getHeaders(token),
       );
-
+    log('MyAds Response Status: ${response.statusCode}'); // Add this log
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+           log('MyAds Data: ${data['data']}'); // Add this log
         return data['data'] ?? [];
       }
       throw Exception('Failed to load my ads');

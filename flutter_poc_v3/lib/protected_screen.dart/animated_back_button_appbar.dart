@@ -395,7 +395,7 @@ class _AnimatedBackButtonAppBarState extends State<AnimatedBackButtonAppBar>
           return ShaderMask(
             shaderCallback: (Rect bounds) {
               return LinearGradient(
-                colors: [Colors.purpleAccent, Colors.blueAccent],
+                colors: [const Color.fromARGB(255, 1, 179, 25), Colors.blueAccent],
                 stops: [_animationController.value, _animationController.value + 0.3],
               ).createShader(bounds);
             },

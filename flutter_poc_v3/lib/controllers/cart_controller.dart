@@ -273,7 +273,7 @@ class CartController extends GetxController {
 //     }
 //   }
 
-  Future<void> addToFavourite(BuildContext context, String adpostId) async {
+  Future<void> addToFavourite(BuildContext context, String adpostId, {String? screenName}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       favouriteIds = prefs.getStringList('favoriteAdposts') ?? [];
@@ -281,6 +281,7 @@ class CartController extends GetxController {
       log('Token: $token');
 
       if (token == null) {
+          await prefs.setString('previous_route', screenName ?? 'home_screen');
         // Check if context is still valid
         if (!context.mounted) return;
 
@@ -297,7 +298,12 @@ class CartController extends GetxController {
         );
 
         // Use Get.to instead of Navigator
-        Get.to(() => const LoginScreen());
+        // Get.to(() => const LoginScreen());
+           // Use Navigator.push instead of Get.to to maintain the stack
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const LoginScreen()),
+        );
         return;
       }
 
@@ -337,7 +343,7 @@ class CartController extends GetxController {
           backgroundColor: Colors.transparent,
           colorText: Colors.white,
           margin: const EdgeInsets.all(12),
-          duration: const Duration(seconds: 2),
+          duration: const Duration(seconds: 1),
           borderRadius: 0,
           padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
           boxShadows: [
@@ -372,6 +378,7 @@ class CartController extends GetxController {
             end: Alignment.bottomRight,
           ),
         );
+        update();
       }
     } catch (e) {
       // Check if context is still valid

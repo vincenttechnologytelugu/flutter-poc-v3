@@ -90,226 +90,15 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       }
     });
 
-    // Add this to show the subscription dialog
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        showSubscriptionDialog(context);
-      }
-    });
+    // // Add this to show the subscription dialog
+    // Future.delayed(const Duration(milliseconds: 100), () {
+    //   if (mounted) {
+    //     showSubscriptionDialog(context);
+    //   }
+    // });
 
     _scrollController.addListener(_scrollListener);
   }
-
-// Add this method to show subscription dialog
-// void showSubscriptionDialog() {
-//   showDialog(
-//     context: context,
-//     barrierDismissible: true,
-//     builder: (BuildContext context) {
-//       return Dialog(
-//         shape: RoundedRectangleBorder(
-//           borderRadius: BorderRadius.circular(20),
-//         ),
-//         child: Container(
-//           padding: const EdgeInsets.all(20),
-//           child: Column(
-//             mainAxisSize: MainAxisSize.min,
-//             children: [
-//               Stack(
-//                 children: [
-//                   const Text(
-//                     'Subscription Packages',
-//                     style: TextStyle(
-//                       fontSize: 24,
-//                       fontWeight: FontWeight.bold,
-//                       color: Color.fromARGB(255, 240, 107, 31),
-//                     ),
-//                   ),
-//                   Positioned(
-//                     right: 0,
-//                     top: 0,
-//                     child: IconButton(
-//                       icon: const Icon(Icons.close),
-//                       onPressed: () => Navigator.pop(context),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//               const SizedBox(height: 20),
-//               SizedBox(
-//                 height: 400,
-//                 child: ListView(
-//                   children: [
-//                     _buildPackageCard(
-//                       'Free',
-//                       '₹0',
-//                       '1 Month',
-//                       [
-//                         '1 Post',
-//                         '2 Image Attachments',
-//                         'Basic Features',
-//                         'No Contacts'
-//                       ],
-//                       false,
-//                     ),
-//                     const SizedBox(height: 10),
-//                     _buildPackageCard(
-//                       'Silver',
-//                       '₹1000',
-//                       '3 Months',
-//                       [
-//                         '6 Posts',
-//                         '4 Image Attachments',
-//                         'Manual boost every 15 days',
-//                         '5 Contacts'
-//                       ],
-//                       true,
-//                     ),
-//                     const SizedBox(height: 10),
-//                     _buildPackageCard(
-//                       'Gold',
-//                       '₹1200',
-//                       '6 Months',
-//                       [
-//                         '12 Posts',
-//                         '4 Image Attachments',
-//                         '1 Video Attachment',
-//                         'Manual boost every 3 days',
-//                         '12 Contacts'
-//                       ],
-//                       false,
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ],
-//           ),
-//         ),
-//       );
-//     },
-//   );
-// }
-
-// // Add this helper method for building package cards
-// Widget _buildPackageCard(String title, String price, String validity, List<String> features, bool isPopular) {
-//   return Card(
-//     elevation: isPopular ? 8 : 4,
-//     shape: RoundedRectangleBorder(
-//       borderRadius: BorderRadius.circular(15),
-//       side: isPopular
-//           ? const BorderSide(color: Color.fromARGB(255, 240, 107, 31), width: 2)
-//           : BorderSide.none,
-//     ),
-//     child: Container(
-//       padding: const EdgeInsets.all(15),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Row(
-//             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//             children: [
-//               Text(
-//                 title,
-//                 style: const TextStyle(
-//                   fontSize: 20,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//               if (isPopular)
-//                 Container(
-//                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-//                   decoration: BoxDecoration(
-//                     color: const Color.fromARGB(255, 240, 107, 31),
-//                     borderRadius: BorderRadius.circular(12),
-//                   ),
-//                   child: const Text(
-//                     'BEST VALUE',
-//                     style: TextStyle(
-//                       color: Colors.white,
-//                       fontSize: 12,
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//                   ),
-//                 ),
-//             ],
-//           ),
-//           const SizedBox(height: 10),
-//           Row(
-//             crossAxisAlignment: CrossAxisAlignment.end,
-//             children: [
-//               Text(
-//                 price,
-//                 style: const TextStyle(
-//                   fontSize: 24,
-//                   fontWeight: FontWeight.bold,
-//                   color: Color.fromARGB(255, 240, 107, 31),
-//                 ),
-//               ),
-//               const SizedBox(width: 5),
-//               Text(
-//                 '/ $validity',
-//                 style: TextStyle(
-//                   fontSize: 14,
-//                   color: Colors.grey[600],
-//                 ),
-//               ),
-//             ],
-//           ),
-//           const SizedBox(height: 15),
-//           ...features.map((feature) => Padding(
-//                 padding: const EdgeInsets.only(bottom: 8),
-//                 child: Row(
-//                   children: [
-//                     const Icon(
-//                       Icons.check_circle,
-//                       color: Color.fromARGB(255, 240, 107, 31),
-//                       size: 20,
-//                     ),
-//                     const SizedBox(width: 8),
-//                     Expanded(
-//                       child: Text(
-//                         feature,
-//                         style: const TextStyle(fontSize: 14),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               )),
-//           const SizedBox(height: 10),
-//           SizedBox(
-//             width: double.infinity,
-//             child: ElevatedButton(
-//               style: ElevatedButton.styleFrom(
-//                 backgroundColor: isPopular
-//                     ? const Color.fromARGB(255, 240, 107, 31)
-//                     : Colors.blue,
-//                 padding: const EdgeInsets.symmetric(vertical: 12),
-//                 shape: RoundedRectangleBorder(
-//                   borderRadius: BorderRadius.circular(10),
-//                 ),
-//               ),
-//               onPressed: () {
-//                 Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                     builder: (context) => const InvoiceBillingScreen(),
-//                   ),
-//                 );
-//               },
-//               child: const Text(
-//                 'Subscribe Now',
-//                 style: TextStyle(
-//                   fontSize: 16,
-//                   fontWeight: FontWeight.bold,
-//                 ),
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     ),
-//   );
-// }
 
 // Function to show the subscription dialog
   void showSubscriptionDialog(BuildContext context) {
@@ -507,12 +296,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                     builder: (context) => const InvoiceBillingScreen(),
                   ),
                 );
-                // Navigator.push(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => const Scaffold(body: Center(child: Text('Invoice Screen'))),
-                //   ),
-                // );
               },
               isPopular: isPopular,
             ),
@@ -787,100 +570,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     }
   }
 
-  //  Future<void> loadMoreData() async {
-  //   if (!isLoadingMore && hasMoreData) {
-  //     setState(() {
-  //       isLoadingMore = true;
-  //     });
-
-  //     try {
-  //       final locationController = Get.find<LocationController>();
-  //       final selectedArea = locationController.selectedLocation.value;
-  //       final currentCity = locationController.selectedCity.value;
-  //       final currentState = locationController.selectedState.value;
-
-  //       // Build URL with proper sequence
-  //       String url =
-  //           "http://13.200.179.78/adposts?page=$currentPage&psize=$pageSize";
-
-  //       // Add parameters based on what's available
-  //       if (selectedArea.isNotEmpty) url += "&location=$selectedArea";
-  //       if (currentCity.isNotEmpty) url += "&city=$currentCity";
-  //       if (currentState.isNotEmpty) url += "&state=$currentState";
-
-  //       final response = await http.get(Uri.parse(url));
-
-  //       if (response.statusCode == 200) {
-  //         final Map<String, dynamic> responseData = json.decode(response.body);
-  //         final List<dynamic> newProducts = responseData['data'];
-
-  //         List<dynamic> matchedProducts = newProducts.where((product) {
-  //           String productArea =
-  //               product['location']?.toString().toLowerCase() ?? '';
-  //           String productCity =
-  //               product['city']?.toString().toLowerCase() ?? '';
-  //           String productState =
-  //               product['state']?.toString().toLowerCase() ?? '';
-
-  //           bool matches = false;
-
-  //           // Check all three parameters
-  //           if (selectedArea.isNotEmpty &&
-  //               currentCity.isNotEmpty &&
-  //               currentState.isNotEmpty) {
-  //             matches = productArea.contains(selectedArea.toLowerCase()) &&
-  //                 productCity.contains(currentCity.toLowerCase()) &&
-  //                 productState.contains(currentState.toLowerCase());
-  //           }
-  //           // Check combinations of two parameters
-  //           else if (selectedArea.isNotEmpty && currentCity.isNotEmpty) {
-  //             matches = productArea.contains(selectedArea.toLowerCase()) &&
-  //                 productCity.contains(currentCity.toLowerCase());
-  //           } else if (selectedArea.isNotEmpty && currentState.isNotEmpty) {
-  //             matches = productArea.contains(selectedArea.toLowerCase()) &&
-  //                 productState.contains(currentState.toLowerCase());
-  //           } else if (currentCity.isNotEmpty && currentState.isNotEmpty) {
-  //             matches = productCity.contains(currentCity.toLowerCase()) &&
-  //                 productState.contains(currentState.toLowerCase());
-  //           }
-  //           // Check single parameters
-  //           else if (selectedArea.isNotEmpty) {
-  //             matches = productArea.contains(selectedArea.toLowerCase());
-  //           } else if (currentCity.isNotEmpty) {
-  //             matches = productCity.contains(currentCity.toLowerCase());
-  //           } else if (currentState.isNotEmpty) {
-  //             matches = productState.contains(currentState.toLowerCase());
-  //           }
-
-  //           return matches;
-  //         }).toList();
-
-  //         setState(() {
-  //           for (var item in matchedProducts) {
-  //             productsController.productModelList
-  //                 .add(ProductModel.fromJson(item));
-  //           }
-
-  //           hasMoreData = matchedProducts.isNotEmpty &&
-  //               matchedProducts.length >= pageSize;
-  //           if (matchedProducts.isNotEmpty) {
-  //             currentPage++;
-  //           }
-  //         });
-  //       }
-  //     } catch (e) {
-  //       log('Error loading more data: $e');
-  //       setState(() {
-  //         hasMoreData = false;
-  //       });
-  //     } finally {
-  //       setState(() {
-  //         isLoadingMore = false;
-  //       });
-  //     }
-  //   }
-  // }
-// Define color constants
   static const primaryColor = Color.fromARGB(255, 240, 107, 31);
   static const backgroundColor = Color(0xFFF5F5F5);
   static const textColor = Colors.black87;
@@ -961,151 +650,12 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
               ),
             )),
         actions: [
-          // TweenAnimationBuilder<double>(
-          //   tween: Tween(begin: 0, end: 2 * pi),
-          //   duration: const Duration(seconds: 3),
-          //   builder: (context, value, child) {
-          //     return Transform.rotate(
-          //       angle: value,
-          //       child: Container(
-          //         padding: const EdgeInsets.all(2),
-          //         decoration: BoxDecoration(
-          //           borderRadius: BorderRadius.circular(30),
-          //           gradient: SweepGradient(
-          //             colors: const [
-          //               Color(0xFFFF6B6B),
-          //               Color(0xFF4ECDC4),
-          //               Color(0xFFFFBE0B),
-          //               Color(0xFF7400B8),
-          //               Color(0xFFFF6B6B),
-          //             ],
-          //             stops: const [0.0, 0.25, 0.5, 0.75, 1.0],
-          //             transform: GradientRotation(value),
-          //           ),
-          //         ),
-          //         child: child,
-          //       ),
-          //     );
-          //   },
-          //   child: Container(
-          //     padding: const EdgeInsets.all(8),
-          //     decoration: BoxDecoration(
-          //       color: Colors.white,
-          //       borderRadius: BorderRadius.circular(28),
-          //     ),
-          //     child: IconButton(
-          //       icon: const Icon(
-          //         Icons.card_membership,
-          //         color: Color.fromARGB(255, 4, 74, 50),
-          //         size: 28,
-          //       ),
-          //       onPressed: () => showSubscriptionDialog(context),
-          //     ),
-          //   ),
-          // ),
-          // Positioned(
-          //   top: -5,
-          //   right: -5,
-          //   child: Container(
-          //     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          //     decoration: BoxDecoration(
-          //       gradient: const LinearGradient(
-          //         colors: [Colors.black87, Colors.black54],
-          //         begin: Alignment.topLeft,
-          //         end: Alignment.bottomRight,
-          //       ),
-          //       borderRadius: BorderRadius.circular(12),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.black.withOpacity(0.2),
-          //           blurRadius: 4,
-          //           offset: const Offset(0, 2),
-          //         ),
-          //       ],
-          //     ),
-          //     child: Row(
-          //       mainAxisSize: MainAxisSize.min,
-          //       children: [
-          //         // Silver Text Animation
-          //         TweenAnimationBuilder<double>(
-          //           tween: Tween(begin: 0, end: 1),
-          //           duration: const Duration(seconds: 2),
-          //           builder: (context, value, child) {
-          //             return Transform.scale(
-          //               scale: 0.8 + (value * 0.2),
-          //               child: ShaderMask(
-          //                 shaderCallback: (bounds) => LinearGradient(
-          //                   colors: [
-          //                     Colors.grey.shade300,
-          //                     Colors.white,
-          //                     Colors.grey.shade300,
-          //                   ],
-          //                   stops: [0.0, value, 1.0],
-          //                 ).createShader(bounds),
-          //                 child: Text(
-          //                   'Silver',
-          //                   style: GoogleFonts.rajdhani(
-          //                     textStyle: TextStyle(
-          //                       color: Colors.white,
-          //                       fontSize: 14,
-          //                       fontWeight: FontWeight.w600,
-          //                       letterSpacing: value * 1.5,
-          //                     ),
-          //                   ),
-          //                 ),
-          //               ),
-          //             );
-          //           },
-          //         ),
-          //         const Text(
-          //           ' • ',
-          //           style: TextStyle(
-          //             color: Colors.white,
-          //             fontSize: 14,
-          //           ),
-          //         ),
-          //         // Gold Text Animation
-          //         TweenAnimationBuilder<double>(
-          //           tween: Tween(begin: 0, end: 1),
-          //           duration: const Duration(seconds: 2),
-          //           builder: (context, value, child) {
-          //             return Transform.scale(
-          //               scale: 1.0 + (sin(value * pi * 2) * 0.1),
-          //               child: ShaderMask(
-          //                 shaderCallback: (bounds) => LinearGradient(
-          //                   colors: const [
-          //                     Color(0xFFFFD700),
-          //                     Color(0xFFFFC000),
-          //                     Color(0xFFFFD700),
-          //                   ],
-          //                   stops: [0.0, value, 1.0],
-          //                 ).createShader(bounds),
-          //                 child: Text(
-          //                   'Gold',
-          //                   style: GoogleFonts.cinzelDecorative(
-          //                     textStyle: TextStyle(
-          //                       color: Colors.white,
-          //                       fontSize: 14,
-          //                       fontWeight: FontWeight.bold,
-          //                       letterSpacing: value * 1.5,
-          //                     ),
-          //                   ),
-          //                 ),
-          //               ),
-          //             );
-          //           },
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-
           Stack(
             clipBehavior: Clip.none, // Allows children to overflow
             children: [
               TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0, end: 2 * pi),
-                duration: const Duration(seconds: 3),
+                duration: const Duration(seconds: 1),
                 builder: (context, value, child) {
                   return Transform.rotate(
                     angle: value,
@@ -1172,7 +722,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                       // Silver Text Animation
                       TweenAnimationBuilder<double>(
                         tween: Tween(begin: 0, end: 1),
-                        duration: const Duration(seconds: 2),
+                        duration: const Duration(seconds: 1),
                         builder: (context, value, child) {
                           return Transform.scale(
                             scale: 0.8 + (value * 0.2),
@@ -1266,7 +816,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                   margin: const EdgeInsets.only(top: 15, left: 30),
                   child: CircleAvatar(
                     radius: 12,
-                    backgroundColor: const Color.fromARGB(255, 81, 7, 255),
+                    backgroundColor: const Color.fromARGB(255, 250, 252, 250),
                     child: Container(
                         alignment: Alignment.center,
                         padding: const EdgeInsets.all(2),
@@ -1328,10 +878,11 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                       child: Card(
                         elevation: 2,
                         // color: const Color.fromARGB(255, 245, 242, 242),
-                        color: const Color.fromARGB(255, 242, 247, 243),
+                        color: const Color.fromARGB(255, 213, 221, 216),
+
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
-                        margin: const EdgeInsets.all(4),
+                        margin: const EdgeInsets.all(2),
                         child: Column(
                           children: [
                             Padding(
@@ -1471,10 +1022,13 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                     gradient:
                                                         const LinearGradient(
                                                       colors: [
-                                                        Color(
-                                                            0xFF6A1B9A), // Deep Purple
-                                                        Color(
-                                                            0xFFE91E63), // Pink
+                                                        Color.fromARGB(
+                                                            255,
+                                                            252,
+                                                            252,
+                                                            252), // Deep Purple
+                                                        Color.fromARGB(255, 252,
+                                                            252, 252), // Pink
                                                       ],
                                                       begin: Alignment.topLeft,
                                                       end:
@@ -1495,13 +1049,14 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                       ),
                                                     ],
                                                   ),
-                                                  child: const Text(
+                                                  child: Text(
                                                     'FEATURED',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
+                                                    style: GoogleFonts.roboto(
+                                                      color: Color.fromARGB(
+                                                          255, 1, 179, 25),
                                                       fontWeight:
                                                           FontWeight.bold,
-                                                      fontSize: 12,
+                                                      fontSize: 13,
                                                       letterSpacing: 0.5,
                                                     ),
                                                   ),
@@ -1514,29 +1069,30 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                     ),
 
                                     Positioned(
-                                      top: 5,
+                                      top: 8,
                                       right: 5,
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: const Color.fromARGB(
                                               255, 203, 203, 189),
                                           borderRadius:
-                                              BorderRadius.circular(20),
+                                              BorderRadius.circular(22),
                                           border: Border.all(
                                             color: Colors.white,
-                                            width: 3.0, // Thick white border
+                                            width: 1, // Thick white border
                                           ),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black.withAlpha(
-                                                  (0.5 * 255).round()),
-                                              blurRadius: 4,
+                                                  (0.1 * 255).round()),
+                                              blurRadius: 2,
                                               spreadRadius: 1,
                                             ),
                                           ],
                                         ),
                                         child: TweenAnimationBuilder(
-                                          duration: Duration(milliseconds: 100),
+                                          duration:
+                                              Duration(milliseconds: 1000),
                                           tween: Tween<double>(
                                             begin: 0,
                                             end: cartController.isFavourite(
@@ -1561,7 +1117,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                         .addToFavourite(
                                                             context,
                                                             productModel.id
-                                                                .toString());
+                                                                .toString(),
+                                                                screenName: 'responsive_products_screen'  // Add this parameter 
+                                                                );
                                                   }
                                                 },
                                                 icon: Stack(
@@ -1630,7 +1188,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                               end: 1.0),
                                                           duration: Duration(
                                                               milliseconds:
-                                                                  1000 +
+                                                                  100 +
                                                                       index *
                                                                           200),
                                                           curve:
@@ -1751,42 +1309,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                               ),
                             ),
                             // Product details...
-                            SizedBox(height: 2),
-                            // Update the Row widget after location
-                            Row(
-                              // mainAxisAlignment: MainAxisAlignment.center,
-                              // crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color:
-                                        const Color.fromARGB(255, 243, 127, 12),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  margin: const EdgeInsets.only(left: 5),
-                                  child: const Icon(
-                                    Icons.access_time,
-                                    size: 20,
-                                    color: Color.fromARGB(255, 243, 240, 240),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: Text(
-                                    'Posted: ${_formatDateTime(productModel.publishedAt)}', // Remove DateTime.parse here
-                                    style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromARGB(255, 12, 3, 3),
-                                      overflow: TextOverflow.ellipsis,
-                                      letterSpacing: 1,
-                                      fontFamily:
-                                          GoogleFonts.abhayaLibre().fontFamily,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                            SizedBox(height: 8),
+
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 5,
@@ -1795,17 +1319,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                 //  crossAxisAlignment: CrossAxisAlignment.start,
                                 // mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  // Text("₹ ${productModel.price.toString()}",
-                                  //     style: const TextStyle(
-                                  //         color:
-                                  //             Color.fromARGB(255, 4, 63, 68),
-                                  //         fontSize: 18,
-                                  //         fontWeight: FontWeight.bold,
-                                  //         fontFamily: 'Poppins',
-                                  //         fontStyle: FontStyle.italic,
-                                  //         ),
-                                  //         overflow: TextOverflow.ellipsis,
-                                  //         ),
                                   Container(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 6, horizontal: 8),
@@ -1813,8 +1326,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                         gradient: LinearGradient(
                                           colors: [
                                             // Color(0xFF046368),
-                                            Color.fromARGB(255, 97, 76, 181),
-                                            Color.fromARGB(255, 97, 76, 181),
+                                            Color.fromARGB(255, 1, 179, 25),
+                                            Color.fromARGB(255, 1, 179, 25),
                                           ], // Stylish gradient
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
@@ -1830,23 +1343,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                           ),
                                         ],
                                       ),
-                                      child:
-                                          //  Text(
-                                          //   "₹ ${productModel.price.toString()}",
-                                          //   style: const TextStyle(
-                                          //     color: Colors
-                                          //         .white, // White text for contrast
-                                          //     fontSize: 15,
-                                          //     fontWeight: FontWeight.bold,
-                                          //     fontFamily: 'Poppins',
-                                          //     fontStyle: FontStyle.normal,
-                                          //     letterSpacing:
-                                          //         0.8, // Slight spacing for elegance
-                                          //   ),
-                                          //   overflow: TextOverflow.ellipsis,
-                                          // ),
-
-                                          Text(
+                                      child: Text(
                                         productModel.price != null
                                             ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
                                             : 'N/A',
@@ -1860,22 +1357,21 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                         ),
                                         overflow: TextOverflow.ellipsis,
                                       )),
-
                                   Row(
                                     children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: const Color.fromARGB(
-                                              255, 243, 127, 12),
-                                        ),
-                                        child: Icon(
-                                          Icons.title_rounded,
-                                          color: const Color.fromARGB(
-                                              255, 245, 241, 241),
-                                          size: 18,
-                                        ),
-                                      ),
+                                      // Container(
+                                      //   decoration: BoxDecoration(
+                                      //     shape: BoxShape.circle,
+                                      //     color: const Color.fromARGB(
+                                      //         255, 243, 127, 12),
+                                      //   ),
+                                      //   child: Icon(
+                                      //     Icons.title_rounded,
+                                      //     color: const Color.fromARGB(
+                                      //         255, 245, 241, 241),
+                                      //     size: 18,
+                                      //   ),
+                                      // ),
                                       const SizedBox(
                                         width: 3,
                                       ),
@@ -1910,13 +1406,12 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                   Container(
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: const Color.fromARGB(
-                                          255, 243, 127, 12),
+                                      color: const Color.fromARGB(255, 6, 3, 0),
                                     ),
                                     child: const Icon(
                                       Icons.location_on_outlined,
                                       color: Color.fromARGB(255, 251, 248, 248),
-                                      size: 20,
+                                      size: 16,
                                     ),
                                   ),
                                   const SizedBox(
@@ -1976,60 +1471,41 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                               ),
                             ),
                             const SizedBox(height: 2),
-                            // Row(
-                            //   mainAxisAlignment: MainAxisAlignment.start,
-                            //   crossAxisAlignment: CrossAxisAlignment.center,
-                            //   children: [
-                            //     Container(
-                            //       margin: EdgeInsets.only(left: 4),
-                            //       child: const Icon(
-                            //         Icons.access_time,
-                            //         size: 15,
-                            //         color: Color.fromARGB(255, 9, 2, 2),
-                            //       ),
-                            //     ),
-                            //     const SizedBox(width: 4),
-                            //     Flexible(
-                            //       child: Text(
-                            //         'Posted: ${_formatDateTime(DateTime.parse(productModel.publishedAt))}',
-                            //         style: const TextStyle(
-                            //           fontSize: 15,
-                            //           fontWeight: FontWeight.bold,
-                            //           color: Color.fromARGB(255, 12, 3, 3),
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-
-                            //                 Row(
-                            //                   mainAxisAlignment: MainAxisAlignment.start,
-                            //                   crossAxisAlignment: CrossAxisAlignment.center,
-                            //                   children: [
-                            //                     Container(
-                            //                       margin: EdgeInsets.only(left: 4),
-                            //                       child: const Icon(
-                            //                         Icons.access_time,
-                            //                         size: 15,
-                            //                         color: Color.fromARGB(255, 9, 2, 2),
-                            //                       ),
-                            //                     ),
-                            //                     const SizedBox(width: 4),
-                            //                     Flexible(
-                            //                       // Your Text widget:
-                            //                       child:
-                            //                         Text(
-                            //   'Posted: ${_formatDate(productModel.publishedAt)}', // Add this line
-                            //   style: TextStyle(
-                            //     fontSize: 15,
-                            //     fontWeight: FontWeight.bold,
-                            //     color: const Color.fromARGB(255, 12, 3, 3),
-                            //   ),
-                            // ),
-
-                            //                     ),
-                            //                   ],
-                            //                 ),
+                            // Update the Row widget after location
+                            Row(
+                              // mainAxisAlignment: MainAxisAlignment.center,
+                              // crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                // Container(
+                                //   decoration: BoxDecoration(
+                                //     color:
+                                //         const Color.fromARGB(255, 243, 127, 12),
+                                //     shape: BoxShape.circle,
+                                //   ),
+                                //   margin: const EdgeInsets.only(left: 5),
+                                //   child: const Icon(
+                                //     Icons.access_time,
+                                //     size: 20,
+                                //     color: Color.fromARGB(255, 243, 240, 240),
+                                //   ),
+                                // ),
+                                const SizedBox(width: 4),
+                                Flexible(
+                                  child: Text(
+                                    'Posted: ${_formatDateTime(productModel.publishedAt)}', // Remove DateTime.parse here
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 47, 46, 46),
+                                      overflow: TextOverflow.ellipsis,
+                                      letterSpacing: 1,
+                                      fontFamily:
+                                          GoogleFonts.abhayaLibre().fontFamily,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
@@ -2064,14 +1540,6 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
       ),
     );
   }
-
-  //   @override
-  // void dispose() {
-  //   _scrollController.dispose();
-  //   _scrollController.removeListener(_scrollListener);
-
-  //   super.dispose();
-  // }
 }
 
 class _AnimatedBorderCard extends StatefulWidget {
@@ -2097,7 +1565,7 @@ class _AnimatedBorderCardState extends State<_AnimatedBorderCard>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat();
   }
@@ -2162,10 +1630,10 @@ class ShimmerText extends StatefulWidget {
   final TextStyle style;
 
   const ShimmerText({
-    Key? key,
+    super.key,
     required this.text,
     required this.style,
-  }) : super(key: key);
+  });
 
   @override
   State<ShimmerText> createState() => _ShimmerTextState();
@@ -2179,7 +1647,7 @@ class _ShimmerTextState extends State<ShimmerText>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
       vsync: this,
     )..repeat();
   }
@@ -2224,7 +1692,7 @@ class _ShimmerTextState extends State<ShimmerText>
 class AnimatedPrice extends StatefulWidget {
   final String price;
 
-  const AnimatedPrice({Key? key, required this.price}) : super(key: key);
+  const AnimatedPrice({super.key, required this.price});
 
   @override
   _AnimatedPriceState createState() => _AnimatedPriceState();
@@ -2272,12 +1740,13 @@ class AnimatedSubscribeButton extends StatefulWidget {
   final bool isPopular;
 
   const AnimatedSubscribeButton({
-    Key? key,
+    super.key,
     required this.onPressed,
     this.isPopular = false,
-  }) : super(key: key);
+  });
 
   @override
+  // ignore: library_private_types_in_public_api
   _AnimatedSubscribeButtonState createState() =>
       _AnimatedSubscribeButtonState();
 }
@@ -2334,7 +1803,3 @@ class _AnimatedSubscribeButtonState extends State<AnimatedSubscribeButton> {
     );
   }
 }
-
-
-
-

@@ -5,10 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:flutter_poc_v3/models/profile_details.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/chat_screen.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/my_adds.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/profile_screen.dart';
 
 //import 'package:flutter_poc_v3/main.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
-
+import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/sell_subcategory_details_form_screen';
 
 import 'package:flutter_poc_v3/public_screen.dart/ProfileResponseModel.dart';
 
@@ -16,6 +21,7 @@ import 'package:flutter_poc_v3/public_screen.dart/register_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/splash_screen.dart';
 
 import 'package:flutter_poc_v3/services/auth_service.dart';
+import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -35,6 +41,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final formKey = GlobalKey<FormState>();
+  final MyAdsService myAdsService = MyAdsService(); // Define myAdsService
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final SizedBox textFieldDefaultGap = const SizedBox(height: 16);
@@ -46,28 +53,77 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void initState() {
-  
     super.initState();
+
     checkLoginStatus();
   }
 
+//  Future<void> checkAuthAndNavigate() async {
+//     try {
+//       // Add a minimum delay for splash screen
+//       await Future.delayed(const Duration(seconds: 1));
 
-// After successful login and receiving user data
-void updateUserData(Map<String, dynamic> userData) async {
-  final prefs = await SharedPreferences.getInstance();
-  if (userData['display_picture'] != null) {
-    await prefs.setString('display_picture', userData['display_picture']);
-  }
-}
+//       final prefs = await SharedPreferences.getInstance();
+//       final token = prefs.getString('token');
 
+//       if (token != null) {
+//         // Validate token and get user details
+//         final authService = AuthService();
+//         final isValid = await authService.validateAndUpdateAuthUser(token);
 
- Future<void> checkAuthAndNavigate() async {
+//         if (mounted) {
+//           if (isValid) {
+//             // The auth user object is already saved in SharedPreferences by validateAndUpdateAuthUser
+//             Navigator.pushAndRemoveUntil(
+//               context,
+//               MaterialPageRoute(builder: (context) => const HomeScreen()
+//               ),
+//               (Route<dynamic> route) => false,
+//             );
+
+//           }
+
+//            else {
+//             // Clear invalid token
+//             await prefs.remove('token');
+//             await prefs.remove('user_data');
+
+//             Navigator.pushReplacement(
+
+//               context,
+//               MaterialPageRoute(builder: (context) => const LoginScreen()),
+//             );
+//           }
+//         }
+//       } else {
+//         if (mounted) {
+//           Navigator.pushReplacement(
+//             context,
+//             MaterialPageRoute(builder: (context) => const LoginScreen()),
+//           );
+//         }
+//       }
+//     } catch (e) {
+//       // Handle any errors
+//       log('Error in checkAuthAndNavigate: $e');
+//       if (mounted) {
+//         Navigator.pushReplacement(
+//           context,
+//           MaterialPageRoute(builder: (context) => const LoginScreen()),
+//         );
+//       }
+//     }
+//   }
+
+  Future<void> checkAuthAndNavigate() async {
     try {
       // Add a minimum delay for splash screen
       await Future.delayed(const Duration(seconds: 1));
 
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+      // Get the previous route name from SharedPreferences
+      final previousRoute = prefs.getString('previous_route') ?? '';
 
       if (token != null) {
         // Validate token and get user details
@@ -76,25 +132,99 @@ void updateUserData(Map<String, dynamic> userData) async {
 
         if (mounted) {
           if (isValid) {
-            // The auth user object is already saved in SharedPreferences by validateAndUpdateAuthUser
-            Navigator.pushAndRemoveUntil(
-              context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()
-              ),
-              (Route<dynamic> route) => false,
-            );
-              
-            
-          }
- 
-           else {
+            // Navigate based on previous route
+            if (previousRoute.isNotEmpty) {
+              switch (previousRoute) {
+                case 'chat_screen':
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ChatScreen(),
+                    ),
+                    (route) => false,
+                  );
+                  break;
+                case 'sell_subcategory_details_form_screen':
+                  final savedCategory = prefs.getString('saved_category') ?? '';
+                  final savedSubcategory =
+                      prefs.getString('saved_subcategory') ?? '';
+                  // Convert hex string back to Color
+                  final savedColorString =
+                      prefs.getString('saved_color') ?? 'FF000000';
+                  final savedColor =
+                      Color(int.parse(savedColorString, radix: 16));
+
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SellSubcategoryDetailsFormScreen(
+                        category: savedCategory,
+                        subcategory: savedSubcategory,
+                        categoryColor: savedColor,
+                      ),
+                    ),
+                  
+                  );
+
+                  //  Navigator.pop(context); // Go back to product details
+                  break;
+                case 'my_adds':
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const MyAdds(),
+                    ),
+                    (route) => false,
+                  );
+                  //  Navigator.pop(context); // Go back to product details
+                  break;
+                case 'profile_screen':
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ProfileScreen(),
+                    ),
+                    (route) => false,
+                  );
+                  //  Navigator.pop(context); // Go back to product details
+
+                  break;
+                case 'product_details':
+                  Navigator.pop(context); // Go back to product details
+                  break;
+                case 'sub_category_posts_screen':
+                  Navigator.pop(context); // Go back to sub category posts
+                  break;
+                case 'category_based_posts_screen':
+                  Navigator.pop(context); // Go back to category details
+                  break;
+
+                default:
+                  Navigator.pop(context); // Go back to location screen
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const HomeScreen()),
+                    (route) => false,
+                  );
+              }
+              // Clear the previous route after navigation
+              await prefs.remove('previous_route');
+            } else {
+              // Default navigation if no previous route
+              Navigator.pop(context); // Go back to location screen
+              // Navigator.pushAndRemoveUntil(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => const HomeScreen()),
+              //   (route) => false,
+              // );
+            }
+          } else {
             // Clear invalid token
             await prefs.remove('token');
             await prefs.remove('user_data');
-            
+            await prefs.remove('previous_route');
 
             Navigator.pushReplacement(
-            
               context,
               MaterialPageRoute(builder: (context) => const LoginScreen()),
             );
@@ -120,12 +250,9 @@ void updateUserData(Map<String, dynamic> userData) async {
     }
   }
 
- 
-
   Future<bool> handleLocationPermission(BuildContext context) async {
     bool serviceEnabled;
     LocationPermission permission;
-  
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -181,8 +308,8 @@ void updateUserData(Map<String, dynamic> userData) async {
 //         ScaffoldMessenger.of(context).showSnackBar(
 //           const SnackBar(content: Text("Token Not Found")),
 //         );
-       
-// // 
+
+// //
 // Navigator.push(
 //   context,
 //   MaterialPageRoute(builder: (context) => LoginScreen()),
@@ -212,13 +339,13 @@ void updateUserData(Map<String, dynamic> userData) async {
         await prefs.setString('first_name', profileData.firstName ?? '');
         await prefs.setString('last_name', profileData.lastName ?? '');
         await prefs.setString('email', profileData.email ?? '');
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const HomeScreen()),
-            (route) => false, // This removes all previous routes
-          );
-        }
+        // if (mounted) {
+        //   Navigator.pushAndRemoveUntil(
+        //     context,
+        //     MaterialPageRoute(builder: (context) => const HomeScreen()),
+        //     (route) => false, // This removes all previous routes
+        //   );
+        // }
       }
     } catch (e) {
       log('Error refreshing user data: $e');
@@ -264,6 +391,46 @@ void updateUserData(Map<String, dynamic> userData) async {
     // If no token or invalid token, stay on LoginScreen
   }
 
+  static const String baseUrl = 'http://13.200.179.78';
+
+  Future<String?> _getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('token');
+  }
+
+  Map<String, String> _getHeaders(String token) {
+    return {
+      'Authorization': 'Bearer $token',
+      'Content-Type': 'application/json',
+    };
+  }
+
+  Future<List<dynamic>> getMyAds(BuildContext context) async {
+    try {
+      final token = await _getToken();
+      // if (token == null) throw Exception('No token found');
+      if (token == null) {
+        //  handleUnauthorized(context);
+        throw Exception('');
+      }
+
+      log("Token for My Ads: $token"); // Add this to debug
+      final response = await http.get(
+        Uri.parse('$baseUrl/adposts/my_ads'),
+        headers: _getHeaders(token),
+      );
+      log('MyAds Response Status: ${response.statusCode}'); // Add this log
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        log('MyAds Data: ${data['data']}'); // Add this log
+        return data['data'] ?? [];
+      }
+      throw Exception('Failed to load my ads');
+    } catch (e) {
+      throw Exception('Error getting my ads: $e');
+    }
+  }
+
   Future<void> loginUser(String email, String password) async {
     setState(() {
       isLoading = true;
@@ -304,7 +471,7 @@ void updateUserData(Map<String, dynamic> userData) async {
           await prefs.setString('user_state', responseData['state'] ?? '');
 
           // Request location permission
-        
+
           bool hasLocationPermission = await handleLocationPermission(context);
           if (!hasLocationPermission) {
             setState(() {
@@ -346,8 +513,9 @@ void updateUserData(Map<String, dynamic> userData) async {
 
           // Now proceed with user data refresh and navigation
           await refreshUserDataFromApi();
-  // Call the mixin method with context
-      await checkAuthAndNavigate();
+          await getMyAds(context);
+          // Call the mixin method with context
+          await checkAuthAndNavigate();
         } else {
           throw Exception('Session token not received from server');
         }
@@ -372,35 +540,81 @@ void updateUserData(Map<String, dynamic> userData) async {
   }
 
   // In login_screen.dart or register_screen.dart
-  Future<void> handleLoginSuccess() async {
-    // or handleRegistrationSuccess
-    try {
-      final locationController = Get.find<LocationController>();
-      await locationController.updateToCurrentLocation();
+  // Future<void> handleLoginSuccess() async {
+  //   // or handleRegistrationSuccess
+  //   try {
+  //     final locationController = Get.find<LocationController>();
+  //     await locationController.updateToCurrentLocation();
 
-      // Navigate to home screen
-      Get.offAll(() => const HomeScreen());
-    } catch (e) {
-      log('Error handling login success: $e');
+  //     // Navigate to home screen
+  //     // Get.offAll(() => const HomeScreen());
+  //   } catch (e) {
+  //     log('Error handling login success: $e');
+  //   }
+  // }
+
+  Future<void> handleLoginSuccess(String token) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('token', token);
+
+    // Get previous route
+    final previousRoute = prefs.getString('previous_route');
+
+    if (mounted) {
+      if (previousRoute != null) {
+        // Clear previous route
+        await prefs.remove('previous_route');
+
+        // Navigate based on previous route
+        switch (previousRoute) {
+          case 'chat_screen':
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const ChatScreen()),
+            );
+            break;
+          case 'my_adds':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const MyAdds(),
+              ),
+            );
+            break;
+          case 'profile_screen':
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const ProfileScreen(),
+              ),
+            );
+            break;
+          default:
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const HomeScreen()),
+            );
+        }
+      } else {
+        // No previous route, go to HomeScreen
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const HomeScreen()),
+        );
+      }
     }
   }
 
   // In your login success handler
-void onLoginSuccess(Map<String, dynamic> userData) async {
-  final prefs = await SharedPreferences.getInstance();
-  
-  if (userData['active_subscription_rules'] != null) {
-    await prefs.setString(
-      'active_subscription_rules',
-      json.encode(userData['active_subscription_rules'])
-    );
-    log('Saved subscription rules: ${userData['active_subscription_rules']}');
+  void onLoginSuccess(Map<String, dynamic> userData) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (userData['active_subscription_rules'] != null) {
+      await prefs.setString('active_subscription_rules',
+          json.encode(userData['active_subscription_rules']));
+      log('Saved subscription rules: ${userData['active_subscription_rules']}');
+    }
   }
-  
- 
-}
-
-
 
   Future<void> handleAuthSuccess() async {
     final LocationController locationController =
@@ -444,7 +658,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
       }
     }
 
-    Get.offAll(() => const HomeScreen());
+    // Get.offAll(() => const HomeScreen());
   }
 
   @override
@@ -457,22 +671,24 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-      backgroundColor: Colors.transparent, // Make AppBar transparent
-      elevation: 0, // Remove shadow
-      leading: IconButton(
-        icon: const Icon(
-          Icons.close,
-          color: Color.fromARGB(255, 43, 33, 33), // Match your existing text color
-          size: 30,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent, // Make AppBar transparent
+        elevation: 0, // Remove shadow
+        leading: IconButton(
+          icon: const Icon(
+            Icons.close,
+            color: Color.fromARGB(
+                255, 43, 33, 33), // Match your existing text color
+            size: 30,
+          ),
+          onPressed: () {
+            Navigator.pop(
+                context); // This will navigate back to previous screen
+          },
         ),
-        onPressed: () {
-          Navigator.pop(context); // This will navigate back to previous screen
-        },
       ),
-    ),
       body: Container(
-         color: const Color.fromARGB(255, 234, 223, 223),
+        color: const Color.fromARGB(255, 234, 223, 223),
         // Background: Solid magenta as per the image description
         //  color: const Color(0xFFFF00FF), // Vibrant magenta (#FF00FF)
         // decoration: const BoxDecoration(
@@ -502,7 +718,8 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                       fontWeight: FontWeight.bold,
                       shadows: [
                         Shadow(
-                                              color: Color.fromARGB(255, 43, 33, 33), // White (#FFFFFF)
+                          color: Color.fromARGB(
+                              255, 43, 33, 33), // White (#FFFFFF)
 
                           blurRadius: 2,
                           offset: Offset(1, 1),
@@ -518,7 +735,8 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
 
                     decoration: BoxDecoration(
                       shape: BoxShape.rectangle,
-                      color: const Color.fromARGB(255, 180, 169, 173), // Slightly darker magenta
+                      color: const Color.fromARGB(
+                          255, 180, 169, 173), // Slightly darker magenta
                       border: Border.all(color: Colors.white, width: 2),
                     ),
                     // child: Image.asset(
@@ -538,7 +756,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const Text(
                     "Welcome Back!",
                     style: TextStyle(
-                         color: Color.fromARGB(255, 53, 6, 240),
+                      color: Color.fromARGB(255, 53, 6, 240),
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
                     ),
@@ -570,7 +788,6 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const SizedBox(height: 16),
                   // User ID Input Field
                   TextFormField(
-                    
                     textAlign: TextAlign.start,
                     style: const TextStyle(
                       color: Color.fromARGB(
@@ -578,10 +795,11 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                       fontSize: 23.0,
                     ),
                     controller: _emailController,
-                      keyboardType: TextInputType.text, // Specify appropriate keyboard type
-  textInputAction: TextInputAction.next, // Add this
-  autofocus: false,
-                  
+                    keyboardType:
+                        TextInputType.text, // Specify appropriate keyboard type
+                    textInputAction: TextInputAction.next, // Add this
+                    autofocus: false,
+
                     onEditingComplete: () {
                       FocusScope.of(context).nextFocus();
                     },
@@ -593,7 +811,7 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                           color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
                       prefixIcon: const Icon(
                         Icons.email,
-                          color: Color.fromARGB(255, 53, 6, 240),
+                        color: Color.fromARGB(255, 53, 6, 240),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
@@ -643,9 +861,10 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                     ),
                     controller: _passwordController,
                     obscureText: !visiblePassword,
-                   keyboardType: TextInputType.text, // Specify appropriate keyboard type
-  
-  autofocus: false,
+                    keyboardType:
+                        TextInputType.text, // Specify appropriate keyboard type
+
+                    autofocus: false,
                     textInputAction: TextInputAction.done,
                     onEditingComplete: () {
                       FocusScope.of(context).unfocus();
@@ -658,14 +877,15 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                           color: Color(0xFFD3D3D3)), // Light gray (#D3D3D3)
                       prefixIcon: const Icon(
                         Icons.lock,
-                         color: Color.fromARGB(255, 53, 6, 240),
+                        color: Color.fromARGB(255, 53, 6, 240),
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           visiblePassword
                               ? Icons.visibility
                               : Icons.visibility_off,
-                          color: const Color.fromARGB(255, 19, 5, 10), // Slightly darker magenta
+                          color: const Color.fromARGB(
+                              255, 19, 5, 10), // Slightly darker magenta
                         ),
                         onPressed: () {
                           setState(() {
@@ -713,7 +933,6 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                   const SizedBox(height: 24),
                   // Login Button
                   SizedBox(
-                   
                     child: ElevatedButton(
                       onPressed: isLoading
                           ? null
@@ -729,15 +948,12 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                                 );
                               }
                             },
-                    
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color.fromARGB(255, 219, 9, 205),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15)),
-                                minimumSize: const Size(100, 50),
-                                
-                                ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(255, 219, 9, 205),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        minimumSize: const Size(100, 50),
+                      ),
                       child: isLoading
                           ? const CircularProgressIndicator(
                               color: Color.fromARGB(255, 244, 244, 249))
@@ -767,7 +983,6 @@ void onLoginSuccess(Map<String, dynamic> userData) async {
                       style: TextStyle(
                         color: Color.fromARGB(255, 8, 19, 238),
                         fontSize: 20,
-                       
                         decorationColor: Colors.white,
                       ),
                     ),

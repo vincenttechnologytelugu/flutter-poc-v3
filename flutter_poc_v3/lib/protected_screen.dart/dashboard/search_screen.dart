@@ -662,8 +662,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 prefixIcon: Icon(Icons.search, color: Colors.blue[400]),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        color: Colors.grey[400],
+                        icon: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.blue[400],
+                          
+                          ),
+                          child: const Icon(Icons.clear)),
+                        color: const Color.fromARGB(255, 14, 2, 2),
                         onPressed: () {
                           _searchController.clear();
                           filterCategories('');
@@ -775,10 +781,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                       ),
                                       title: Text(
                                         subCategory,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.abel(
                                           fontSize: 20,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.grey[800],
+                                          fontWeight: FontWeight.w800,
+                                          color: const Color.fromARGB(255, 45, 39, 39),
                                         ),
                                       ),
                                       trailing: Icon(

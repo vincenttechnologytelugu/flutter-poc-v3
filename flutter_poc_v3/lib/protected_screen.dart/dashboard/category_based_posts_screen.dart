@@ -8,6 +8,7 @@ import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/product_details.dart';
 import 'package:get/get.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:math' show sin, pi;
@@ -15,6 +16,7 @@ import 'dart:math' show sin, pi;
 class CategoryBasedPostsScreen extends StatefulWidget {
   final String apiUrl;
   final String title;
+  
 
   const CategoryBasedPostsScreen({
     super.key,
@@ -427,42 +429,6 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           ),
                                   ),
 
-                                  // // Favorite Button
-                                  // Positioned(
-                                  //   top: 8,
-                                  //   right: 8,
-                                  //   child: Container(
-                                  //       decoration: BoxDecoration(
-                                  //         color: Colors.white.withOpacity(0.9),
-                                  //         shape: BoxShape.circle,
-                                  //       ),
-                                  //       child: GetBuilder<CartController>(
-                                  //         builder: (controller) => IconButton(
-                                  //           onPressed: () {
-                                  //             if (cartController.isFavourite(
-                                  //                 post.id.toString())) {
-                                  //               cartController
-                                  //                   .removeFromFavourite(
-                                  //                       context,
-                                  //                       post.id.toString());
-                                  //             } else {
-                                  //               cartController.addToFavourite(
-                                  //                   context,
-                                  //                   post.id.toString());
-                                  //             }
-                                  //           },
-                                  //           icon: Icon(
-                                  //             Icons.favorite,
-                                  //             color: cartController.isFavourite(
-                                  //                     post.id.toString())
-                                  //                 ? Colors.pink
-                                  //                 : Colors.grey,
-                                  //             size: 20,
-                                  //           ),
-                                  //         ),
-                                  //       )),
-                                  // ),
-
                                   Positioned(
                                     top: 12,
                                     right: 12,
@@ -473,13 +439,13 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: Colors.white,
-                                          width: 3.0,
+                                          width: 1.0,
                                         ),
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.black
                                                 .withAlpha((0.5 * 255).round()),
-                                            blurRadius: 4,
+                                            blurRadius: 2,
                                             spreadRadius: 1,
                                           ),
                                         ],
@@ -509,6 +475,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                   cartController.addToFavourite(
                                                     context,
                                                     post.id.toString(),
+                                                     screenName: 'category_based_posts_screen'  // Add this parameter
                                                   );
                                                 }
                                               },
@@ -730,9 +697,10 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color(
-                                                    0xFF6A1B9A), // Deep Purple
-                                                Color(0xFFE91E63), // Pink
+                                                Color.fromARGB(255, 252, 252,
+                                                    252), // Deep Purple
+                                                Color.fromARGB(
+                                                    255, 252, 252, 252), // Pink
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
@@ -754,7 +722,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           child: const Text(
                                             'FEATURED',
                                             style: TextStyle(
-                                              color: Colors.white,
+                                              color: Color.fromARGB(
+                                                  255, 1, 179, 25),
                                               fontWeight: FontWeight.bold,
                                               fontSize: 12,
                                               letterSpacing: 0.5,
@@ -816,8 +785,8 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color.fromARGB(255, 255, 0, 0),
-                                                Color.fromARGB(255, 255, 0, 0)
+                                                Color.fromARGB(255, 1, 179, 25),
+                                                Color.fromARGB(255, 1, 179, 25)
                                               ], // Green gradient
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
@@ -888,6 +857,9 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                               color: const Color.fromARGB(
                                                   255, 23, 22, 22),
                                               fontSize: 16,
+                                              fontFamily:
+                                                  GoogleFonts.abhayaLibre()
+                                                      .fontFamily,
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
@@ -930,6 +902,9 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                             color: const Color.fromARGB(
                                                 255, 23, 22, 22),
                                             fontSize: 16,
+                                            fontFamily:
+                                                GoogleFonts.abhayaLibre()
+                                                    .fontFamily,
                                           ),
                                         ),
                                       ],

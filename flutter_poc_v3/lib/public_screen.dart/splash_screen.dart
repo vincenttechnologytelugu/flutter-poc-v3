@@ -208,7 +208,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();

@@ -10,6 +10,7 @@ import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/animated_back_button_appbar.dart';
 import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 // import 'package:flutter_poc_v3/protected_screen.dart/contact_seller_screen.dart';
@@ -38,36 +39,34 @@ final ScrollController _scrollController = ScrollController();
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
-   // Check if token exists
-//     if (token == null) {
-//       // Navigator.pushAndRemoveUntil(
-//       //       context,
-//       //       MaterialPageRoute(builder: (context) => const LoginScreen()),
-//       //       (route) => false,
-//       //     );
-//       Navigator.push(
-//   context,
-//   MaterialPageRoute(builder: (context) => LoginScreen()),
-// );
-//     }
+
     if (token == null) {
+            // Add this line to save the current route
+      await prefs.setString('previous_route', 'product_details');
+     
         // Check if context is still valid
         if (!context.mounted) return;
 
-        Get.snackbar(
-          'Login Required',
-          'Please login to continue',
-          snackStyle: SnackStyle.FLOATING,
-          snackPosition: SnackPosition.BOTTOM,
-          backgroundColor:
-              const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
-          colorText: const Color.fromARGB(255, 12, 65, 0),
-          margin: const EdgeInsets.all(10),
-          duration: const Duration(seconds: 2),
-        );
+        // Get.snackbar(
+
+        //   'Login Required',
+        //   'Please login to continue',
+        //   snackStyle: SnackStyle.FLOATING,
+        //   snackPosition: SnackPosition.BOTTOM,
+        //   backgroundColor:
+        //       const Color.fromARGB(255, 232, 235, 239).withOpacity(0.8),
+        //   colorText: const Color.fromARGB(255, 12, 65, 0),
+        //   margin: const EdgeInsets.all(10),
+        //   duration: const Duration(seconds: 2),
+        // );
 
         // Use Get.to instead of Navigator
-        Get.to(() => const LoginScreen());
+        // Get.to(() => const LoginScreen());
+             // Use push instead of Get.to to maintain the back stack
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
         return;
       }
       
@@ -305,14 +304,16 @@ final ScrollController _scrollController = ScrollController();
             ),
           ),
           const SizedBox(width: 8),
-          Text(
-            title.toUpperCase(),
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color.fromARGB(221, 4, 4, 248),
-              overflow: TextOverflow.ellipsis,
-
+          Expanded(
+            child: Text(
+              title.toUpperCase(),
+              style: const TextStyle(
+                fontSize: 16,
+                 fontWeight: FontWeight.bold,
+                color: Color.fromARGB(221, 252, 252, 254),
+                overflow: TextOverflow.ellipsis,
+            
+              ),
             ),
           ),
         ],
@@ -381,7 +382,7 @@ final ScrollController _scrollController = ScrollController();
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
+              style: GoogleFonts.abel(
                 fontSize: 18,
                 color: const Color.fromARGB(179, 13, 2, 2),
                 fontWeight: FontWeight.w500,
@@ -393,7 +394,7 @@ final ScrollController _scrollController = ScrollController();
             flex: 3,
             child: Text(
               value ?? 'N/A',
-              style: const TextStyle(
+              style: GoogleFonts.abel(
                 fontSize: 18,
                 color: Color.fromARGB(179, 1, 1, 9),
                 fontWeight: FontWeight.bold,
@@ -1510,13 +1511,13 @@ final ScrollController _scrollController = ScrollController();
                     Icon(
                       Icons.image_not_supported_outlined,
                       size: 50,
-                      color: Color.fromARGB(255, 123, 74, 74),
+                      color: Color.fromARGB(255, 210, 197, 197),
                     ),
                     SizedBox(height: 8),
                     Text(
                       'Image not available',
                       style: TextStyle(
-                        color: Color.fromARGB(255, 123, 74, 74),
+                        color: Color.fromARGB(255, 163, 151, 151),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1558,8 +1559,8 @@ final ScrollController _scrollController = ScrollController();
                                       gradient: LinearGradient(
                                         colors: [
                                           // Color(0xFF046368),
-                                           Color.fromARGB(255, 97, 76, 181),
-                                               Color.fromARGB(255, 97, 76, 181),
+                                           Color.fromARGB(255, 1, 179, 25),
+                                               Color.fromARGB(255, 1, 179, 25),
                                         ], // Stylish gradient
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
@@ -1689,7 +1690,7 @@ final ScrollController _scrollController = ScrollController();
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(221, 49, 6, 242),
+                        color: Color.fromARGB(221, 252, 252, 254),
                       ),
                     ),
         
@@ -1719,7 +1720,7 @@ final ScrollController _scrollController = ScrollController();
                             padding: const EdgeInsets.all(16),
                             child: Text(
                               widget.productModel.description!,
-                              style: const TextStyle(
+                              style:GoogleFonts.abel(
                                 fontSize: 18,
                                 height: 1.6,
                                 color: Color.fromARGB(221, 14, 1, 1),
@@ -1739,7 +1740,7 @@ final ScrollController _scrollController = ScrollController();
                     //   ),
                     // ),
                     Container(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(10),
                       child: Row(
                         children: [
                           // In ProductDetails class
@@ -1750,7 +1751,7 @@ final ScrollController _scrollController = ScrollController();
                               // onPressed: () => _handleChatPress(context),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    const Color.fromARGB(255, 243, 33, 156),
+                                    const Color.fromARGB(255, 222, 122, 122),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
                                   side: const BorderSide(

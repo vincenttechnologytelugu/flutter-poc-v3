@@ -95,6 +95,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 180, 170, 177),
       appBar: AppBar(
+          automaticallyImplyLeading: false, // This removes the back arrow
         title: const Text(
           'Favourite Posts',
           style: TextStyle(

@@ -3,6 +3,7 @@
 import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/dashboard/custom_bottom_nav_bar.dart';
 
 import 'package:flutter_poc_v3/protected_screen.dart/deactivate_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/edit_my_ad_screen.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_poc_v3/utils/widgets/auth_guard.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:math'; // Import dart:math for sin function
 
@@ -37,6 +39,13 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
+        // Add listener to tab controller
+    tabController.addListener(() {
+      if (tabController.index == 1) { // PROMOTIONS tab
+        _loadMyAds();
+      }
+    });
+
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
@@ -55,12 +64,9 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
     _loadMyAds();
   }
 
-  @override
-  void dispose() {
-    tabController.dispose();
-    _animationController.dispose();
-    super.dispose();
-  }
+  
+
+ 
 
   void _showInitialDialog(BuildContext context) {
     showDialog(
@@ -136,24 +142,26 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
   }
 
   Future<void> _loadMyAds() async {
+      if (!mounted) return; // Add this check at the start
     try {
+        setState(() => isLoading = true);
       final ads = await _myAdsService.getMyAds(context);
-      setState(() {
-        myAds = ads;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          myAds = ads;
+          isLoading = false;
+        });
+      }
     } catch (e) {
       // setState(() => isLoading = false);
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(content: Text('Failed to load ads: $e')),
       // );
+      // setState(() => isLoading = false);
+        if (mounted) { // Check mounted before setState
       setState(() => isLoading = false);
-      if (mounted) {
-        // Add this check
-        // ScaffoldMessenger.of(context).showSnackBar(
-        //   SnackBar(content: Text('Failed to load ads: $e')),
-        // );
-      }
+    }
+     
     }
   }
 
@@ -432,6 +440,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // automaticallyImplyLeading: true,
         backgroundColor: Colors.transparent,
         elevation: 4,
         flexibleSpace: Container(
@@ -444,7 +453,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
           ),
         ),
         title: Text(
-          "My Ads",
+          "My Adds",
           style: GoogleFonts.tenorSans(
             textStyle: TextStyle(
               color: Colors.white,
@@ -470,12 +479,16 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
           overlayColor: MaterialStateProperty.resolveWith(
               (states) => Colors.white.withOpacity(0.1)), // Subtle hover effect
           tabs: [
-            Tab(text: "PROMOTIONS"),
-            Tab(text: "FAVOURITES"),
+               Tab(text: "FAVOURITES"),
+             Tab(text: "PROMOTIONS"),
+           
+            
+           
+           
           ],
         ),
       ),
-
+    
       // appBar: AppBar(
       //   backgroundColor: const Color.fromARGB(255, 172, 179, 181),
       //     title: Text(
@@ -527,9 +540,14 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
       body: TabBarView(
         controller: tabController,
         children: [
+              FavouriteScreen(),
           isLoading
               ? Center(child: CircularProgressIndicator())
-              : ListView.builder(
+              : RefreshIndicator(
+               onRefresh: _loadMyAds,
+              child: myAds.isEmpty
+            ? const Center(child: Text('No ads available'))
+             : ListView.builder(
                   itemCount: myAds.length,
                   itemBuilder: (context, index) {
                     final ad = myAds[index];
@@ -599,7 +617,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                         ),
                                       ],
                                     ),
-
+                 
                               // child: Image.network(
                               //   ad['thumb'] ?? '',
                               //   width: 80,
@@ -656,13 +674,13 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                     ),
                                   ],
                                 ),
-
+                 
                                 // Text("Active",
                                 // style: TextStyle(
                                 //   color: ad['isActive'] ? Colors.green : Colors.red,
                                 // ),
                                 // ),
-
+                 
                                 IconButton(
                                   icon: Icon(Icons.more_vert),
                                   onPressed: () => _showOptionsDialog(ad),
@@ -699,7 +717,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                         try {
                                           final success = await _myAdsService
                                               .makeFeatured(context, ad['_id']);
-
+                 
                                           if (success) {
                                             scaffoldMessenger.showSnackBar(
                                               const SnackBar(
@@ -754,9 +772,9 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                       ),
                                       borderRadius: BorderRadius.circular(5),
                                     ),
-
+                 
                                     // Add this to your State class
-
+                 
                                     // Replace the existing Text widget with this:
                                     child: Stack(
                                       children: [
@@ -808,7 +826,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                           //     );
                                           //   },
                                           // ),
-
+                 
                                           AnimatedBuilder(
                                             animation: _animation,
                                             builder: (context, child) {
@@ -888,7 +906,7 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                           ),
                                       ],
                                     )
-
+                 
                                     // child: Text(
                                     //   'FEATURED',
                                     //   style: TextStyle(
@@ -964,9 +982,17 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                     );
                   },
                 ),
-          FavouriteScreen(),
+              ),
+              
         ],
       ),
+        bottomNavigationBar: CustomBottomNavBar(currentIndex: 3),
     );
+  }
+   @override
+  void dispose() {
+    tabController.dispose();
+    _animationController.dispose();
+    super.dispose();
   }
 }

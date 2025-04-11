@@ -57,7 +57,7 @@ class CategoryData {
     ],
   
     'Bikes': [
-"Honda Shine 100"
+"Honda Shine 100",
 
 
 
@@ -65,7 +65,7 @@ class CategoryData {
 "Honda Shine 125",
 
 
-"Honda SP 125",
+"Honda",
 
 
 "Honda SP 160",

@@ -33,3 +33,11 @@ category image url:https://onlinefreeadsbe.s3.ap-south-1.amazonaws.com/public/ca
 
 category name:services
 category image url:https://onlinefreeadsbe.s3.ap-south-1.amazonaws.com/public/categories/services.jpg
+
+
+Register:http://13.200.179.78/authentication/register
+Login:http://13.200.179.78/authentication/login
+"Get User Profile":http://13.200.179.78/authentication/auth_user
+"Post User Profile":http://13.200.179.78/authentication/auth_user
+"Update User Profile":http://13.200.179.78/authentication/update_password
+"Display Pictire":"http://13.200.179.78/authentication/display_picture"

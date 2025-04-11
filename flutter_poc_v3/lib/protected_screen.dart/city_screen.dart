@@ -104,7 +104,7 @@ class _CityScreenState extends State<CityScreen> {
         'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
         'Vijayanagaram', 'Eluru', 'Adoni', 'Chittoor', 'Nandyal', 'Kavali',
         'Nellore', 'Kurnool', 'Kadapa', 'Anantapur', 'Vizianagaram', 'Rajahmundry', 'Kakinada',
-        'gudivada','vissannapeta','tiruvuru','mangalagiri',"Hindupur"
+        'gudivada','vissannapeta','tiruvuru','mangalagiri',"Hindupur","nuzvid"
        
 
 

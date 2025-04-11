@@ -189,6 +189,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   //  Navigator.pop(context); // Go back to product details
 
                   break;
+                    case 'package_screen':
+                  Navigator.pop(context); // Go back to product details
+                  break;
                 case 'product_details':
                   Navigator.pop(context); // Go back to product details
                   break;
@@ -520,8 +523,9 @@ class _LoginScreenState extends State<LoginScreen> {
           throw Exception('Session token not received from server');
         }
       } else {
+      
         final errorData = jsonDecode(response.body);
-        throw Exception(errorData['message'] ?? 'Login failed');
+        throw Exception(errorData['message'] ?? 'Login failed. Please try again.');
       }
     } catch (e) {
       setState(() {
@@ -529,13 +533,13 @@ class _LoginScreenState extends State<LoginScreen> {
         isLoading = false;
       });
 
-      Fluttertoast.showToast(
-        msg: e.toString(),
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.BOTTOM,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
+      // Fluttertoast.showToast(
+      //   msg: e.toString(),
+      //   toastLength: Toast.LENGTH_LONG,
+      //   gravity: ToastGravity.BOTTOM,
+      //   backgroundColor: Colors.red,
+      //   textColor: Colors.white,
+      // );
     }
   }
 

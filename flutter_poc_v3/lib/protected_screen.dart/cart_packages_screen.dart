@@ -25,6 +25,7 @@ void _handleProceedToPayment() {
     String packageId;
     double amount = widget.selectedPackage.price?.toDouble() ?? 0.0;
     
+    
     // Determine package ID based on amount
     if (amount == 0) {
       packageId = '678f2d327f36cdf7fba13595';

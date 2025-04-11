@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_category_screen.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PackageScreen extends StatefulWidget {
   const PackageScreen({super.key});
@@ -13,7 +15,30 @@ class PackageScreen extends StatefulWidget {
 class _PackageScreenState extends State<PackageScreen> {
   String selectedCategory = 'Select Category'; // To store selected category
   String location = "Select Location";
+// Add this function to handle API call
+Future<bool> validateUserToken() async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
 
+    if (token == null || token.isEmpty) {
+      return false;
+    }
+
+    final response = await http.get(
+      Uri.parse('http://13.200.179.78/authentication/auth_user'),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    return response.statusCode == 200;
+  } catch (e) {
+    print('Error validating token: $e');
+    return false;
+  }
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -3,6 +3,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
@@ -45,7 +46,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
       //     context,
       //     MaterialPageRoute(builder: (context) => LoginScreen()),
       //   );
-        
+
       //   return;
       // }
 
@@ -65,6 +66,10 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
         // Check if the data is in a nested field
         final List<dynamic> data =
             jsonResponse['data'] ?? jsonResponse['adposts'] ?? [];
+              // Add debug print
+  for (var item in data) {
+    log('Thumb URL from response: ${item['thumb']}');
+  }
 
         setState(() {
           favouriteAdposts = data
@@ -95,7 +100,7 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 180, 170, 177),
       appBar: AppBar(
-          automaticallyImplyLeading: false, // This removes the back arrow
+        automaticallyImplyLeading: false, // This removes the back arrow
         title: const Text(
           'Favourite Posts',
           style: TextStyle(
@@ -156,165 +161,300 @@ class _FavouriteScreenState extends State<FavouriteScreen> {
                     ),
                   ],
                 ))
-              : ListView.builder(
-                  itemCount: favouriteAdposts.length,
-                  itemBuilder: (context, index) {
-                    final post = favouriteAdposts[index];
-                    return InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductDetails(
-                              productModel: post,
+              : 
+              // ListView.builder(
+              //     itemCount: favouriteAdposts.length,
+              //     itemBuilder: (context, index) {
+              //       final post = favouriteAdposts[index];
+              //       return InkWell(
+              //         onTap: () {
+              //           Navigator.push(
+              //             context,
+              //             MaterialPageRoute(
+              //               builder: (context) => ProductDetails(
+              //                 productModel: post,
+              //               ),
+              //             ),
+              //           );
+              //         },
+              //         child: Card(
+              //           // clipBehavior: Clip.antiAlias,
+              //           elevation: 9,
+              //           surfaceTintColor:
+              //               const Color.fromARGB(255, 156, 125, 200),
+              //           color: const Color.fromARGB(255, 225, 219, 219),
+              //           shadowColor: const Color.fromARGB(255, 113, 99, 104),
+              //           shape: RoundedRectangleBorder(
+              //             side: const BorderSide(
+              //               color: Color.fromARGB(255, 52, 48, 59),
+              //               width: 1,
+              //               style: BorderStyle.solid,
+              //               strokeAlign: BorderSide.strokeAlignOutside,
+              //             ),
+              //             borderRadius: BorderRadius.circular(20),
+              //           ),
+              //           margin: const EdgeInsets.all(2),
+              //           child: ListTile(
+              //             leading: post.thumb != null && post.thumb!.isNotEmpty
+              //                 ? Container(
+              //                     decoration: BoxDecoration(
+              //                       borderRadius: BorderRadius.circular(8),
+              //                       border: Border.all(
+              //                         color: const Color.fromARGB(
+              //                             255, 187, 186, 186),
+              //                         width: 1,
+              //                       ),
+              //                     ),
+              //                     width: 120, // Keep the width the same
+              //                     height:
+              //                         220, // Increased height of the container
+              //                     child: ClipRRect(
+              //                       borderRadius: BorderRadius.circular(4),
+              //                       child: Image.network(
+              //                         // post.thumb!,
+              //                         'http://13.200.179.78/${post.thumb}', // Updated URL construction
+              //                         width: 120, // Keep the width the same
+              //                         height:
+              //                             220, // Increased height of the image
+              //                         fit: BoxFit.fill,
+              //                         errorBuilder: (context, error,
+              //                                 stackTrace) =>
+              //                             const Icon(Icons.image_not_supported,
+              //                                 size: 50),
+              //                       ),
+              //                     ),
+              //                   )
+              //                 : const Icon(Icons.image_not_supported),
+              //             title: Column(
+              //               crossAxisAlignment: CrossAxisAlignment.start,
+              //               children: [
+              //                 Text(
+              //                   post.title ?? 'No Title',
+              //                   maxLines: 2,
+              //                   style: const TextStyle(
+              //                     fontWeight: FontWeight.bold,
+              //                   ),
+              //                 ),
+              //                 const SizedBox(
+              //                     height:
+              //                         4), // Add some spacing between title and location
+              //                 Row(
+              //                   children: [
+              //                     const Icon(
+              //                       Icons.location_on,
+              //                       size: 16,
+              //                       color: Color.fromARGB(255, 26, 16, 16),
+              //                     ),
+              //                     const SizedBox(width: 4),
+              //                     Expanded(
+              //                       child: Text(
+              //                         post.location ?? 'Location not available',
+              //                         maxLines: 1,
+              //                         overflow: TextOverflow.ellipsis,
+              //                         style: TextStyle(
+              //                           fontSize: 12,
+              //                           color: const Color.fromARGB(
+              //                               255, 28, 24, 24),
+              //                         ),
+              //                       ),
+              //                     ),
+              //                   ],
+              //                 ),
+              //               ],
+              //             ),
+              //             trailing: Row(
+              //               mainAxisSize: MainAxisSize.min,
+              //               children: [
+              //                 if (post.price != null)
+              //                   Text(
+              //                     '₹${post.price}',
+              //                     style: const TextStyle(
+              //                       fontWeight: FontWeight.bold,
+              //                       color: Colors.pink,
+              //                       fontSize: 16,
+              //                     ),
+              //                   ),
+              //                 IconButton(
+              //                   icon:
+              //                       const Icon(Icons.delete, color: Colors.red),
+              //                   onPressed: () async {
+              //                     await Get.find<CartController>()
+              //                         .removeFromFavourite(
+              //                             context, post.id.toString());
+              //                     getFavouriteAdposts();
+              //                   },
+              //                 ),
+              //               ],
+              //             ),
+              //             contentPadding: const EdgeInsets.symmetric(
+              //               horizontal: 16,
+              //               vertical: 16,
+              //             ),
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(14),
+              //             ),
+              //             tileColor: const Color.fromARGB(255, 239, 238, 243),
+              //             selectedTileColor:
+              //                 const Color.fromARGB(255, 11, 2, 2),
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //   ),
+              // In your FavouriteScreen widget's build method:
+ListView.builder(
+  itemCount: favouriteAdposts.length,
+  itemBuilder: (context, index) {
+    final post = favouriteAdposts[index];
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetails(
+              productModel: post,
+            ),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 9,
+        surfaceTintColor: const Color.fromARGB(255, 156, 125, 200),
+        color: const Color.fromARGB(255, 225, 219, 219),
+        shadowColor: const Color.fromARGB(255, 113, 99, 104),
+        shape: RoundedRectangleBorder(
+          side: const BorderSide(
+            color: Color.fromARGB(255, 52, 48, 59),
+            width: 1,
+            style: BorderStyle.solid,
+            strokeAlign: BorderSide.strokeAlignOutside,
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        margin: const EdgeInsets.all(2),
+        child: ListTile(
+          // Modified leading section to properly display thumb image
+          leading: post.thumb != null && post.thumb!.isNotEmpty
+              ?
+              Container(
+                  width: 120,
+                  height: 120, // Adjusted height for better aspect ratio
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: const Color.fromARGB(255, 187, 186, 186),
+                      width: 1,
+                    ),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: Builder(
+                      builder: (context) {
+                        final imageUrl = 'http://13.200.179.78/${post.thumb}';
+                        log('Loading image from URL: $imageUrl'); // Debug print
+                        return CachedNetworkImage(
+                          imageUrl: imageUrl,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => const Center(
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.blue),
                             ),
                           ),
+                          errorWidget: (context, url, error) {
+                            print('Error loading image: $error'); // Debug print
+                            return Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.error, color: Colors.red),
+                                SizedBox(height: 4),
+                                Text(
+                                  'Error',
+                                  style: TextStyle(fontSize: 10),
+                                ),
+                              ],
+                            );
+                          },
                         );
                       },
-                      child: Card(
-                        // clipBehavior: Clip.antiAlias,
-                        elevation: 9,
-                        surfaceTintColor:
-                            const Color.fromARGB(255, 156, 125, 200),
-                        color: const Color.fromARGB(255, 225, 219, 219),
-                        shadowColor: const Color.fromARGB(255, 113, 99, 104),
-                        shape: RoundedRectangleBorder(
-                          side: const BorderSide(
-                            color: Color.fromARGB(255, 52, 48, 59),
-                            width: 1,
-                            style: BorderStyle.solid,
-                            strokeAlign: BorderSide.strokeAlignOutside,
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        margin: const EdgeInsets.all(2),
-                        child: ListTile(
-                          leading: post.thumb != null && post.thumb!.isNotEmpty
-                              ? Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: const Color.fromARGB(
-                                          255, 187, 186, 186),
-                                      width: 1,
-                                    ),
-                                  ),
-                                  width: 120, // Keep the width the same
-                                  height:
-                                      220, // Increased height of the container
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.circular(4),
-                                    child: Image.network(
-                                      // post.thumb!,
-                                       'http://13.200.179.78/${post.thumb}', // Updated URL construction
-                                      width: 120, // Keep the width the same
-                                      height:
-                                          220, // Increased height of the image
-                                      fit: BoxFit.fill,
-                                      errorBuilder: (context, error,
-                                              stackTrace) =>
-                                          const Icon(Icons.image_not_supported,
-                                              size: 50),
-                                    ),
-                                  ),
-                                )
-                              : const Icon(Icons.image_not_supported),
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                post.title ?? 'No Title',
-                                maxLines: 2,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                  height:
-                                      4), // Add some spacing between title and location
-                              Row(
-                                children: [
-                                  const Icon(
-                                    Icons.location_on,
-                                    size: 16,
-                                    color: Color.fromARGB(255, 26, 16, 16),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Expanded(
-                                    child: Text(
-                                      post.location ?? 'Location not available',
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: const Color.fromARGB(
-                                            255, 28, 24, 24),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (post.price != null)
-                                Text(
-                                  '₹${post.price}',
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.pink,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              IconButton(
-                                icon:
-                                    const Icon(Icons.delete, color: Colors.red),
-                                onPressed: () async {
-                                  await Get.find<CartController>()
-                                      .removeFromFavourite(
-                                          context, post.id.toString());
-                                  getFavouriteAdposts();
-                                },
-                              ),
-                            ],
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 16,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          tileColor: const Color.fromARGB(255, 239, 238, 243),
-                          selectedTileColor:
-                              const Color.fromARGB(255, 11, 2, 2),
-                        ),
-                      ),
-                    );
-                  },
+                    ),
+                  ),
+                )
+              : Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.grey[200],
+                  ),
+                  child: const Icon(
+                    Icons.image_not_supported,
+                    size: 40,
+                    color: Colors.grey,
+                  ),
                 ),
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                post.title ?? 'No Title',
+                maxLines: 2,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.location_on,
+                    size: 16,
+                    color: Color.fromARGB(255, 26, 16, 16),
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      post.location ?? 'Location not available',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color.fromARGB(255, 28, 24, 24),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (post.price != null)
+                Text(
+                  '₹${post.price}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.pink,
+                    fontSize: 16,
+                  ),
+                ),
+              IconButton(
+                icon: const Icon(Icons.delete, color: Colors.red),
+                onPressed: () async {
+                  await Get.find<CartController>()
+                      .removeFromFavourite(context, post.id.toString());
+                  getFavouriteAdposts();
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  },
+)
+
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

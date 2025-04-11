@@ -550,18 +550,7 @@ class _ConversationTileState extends State<_ConversationTile> {
     );
   }
 
-  // String _formatTime(DateTime time) {
-  //   final now = DateTime.now();
-  //   final difference = now.difference(time);
-
-  //   if (difference.inDays == 0) {
-  //     return '${time.hour}:${time.minute.toString().padLeft(2, '0')}';
-  //   } else if (difference.inDays == 1) {
-  //     return 'Yesterday';
-  //   } else {
-  //     return '${time.day}/${time.month}/${time.year}';
-  //   }
-  // }
+  
 
   String _formatDateTime(String? dateString) {
     if (dateString == null || dateString.isEmpty) {
@@ -592,4 +581,10 @@ class _ConversationTileState extends State<_ConversationTile> {
       return 'Recently'; // Return default text if date parsing fails
     }
   }
+
+
+
+  
 }
+
+

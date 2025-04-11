@@ -356,6 +356,7 @@ class ProductModel {
         category: map['category']?.toString(),
         city: map['city']?.toString(),
         thumb: map['thumb']?.toString(),
+          // thumb: map['thumb'] != null ? 'http://13.200.179.78/${map['thumb']}' : null,
         // Properties specific
         propertyType: map['propertyType']?.toString(),
         bedrooms: map['bedrooms']?.toString(),

@@ -4,6 +4,7 @@ import 'package:flutter_poc_v3/protected_screen.dart/dashboard/category_details_
 import 'package:flutter_poc_v3/protected_screen.dart/leven_category_details_screen.dart';
 import 'package:get/get.dart';
 import 'package:flutter_poc_v3/controllers/category_controller.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AllCategoriesScreen extends StatelessWidget {
   const AllCategoriesScreen({super.key});
@@ -23,10 +24,10 @@ class AllCategoriesScreen extends StatelessWidget {
               )
             : GridView.builder(
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 5,
-                  childAspectRatio: 0.8,
-                  crossAxisSpacing: 5,
-                  mainAxisSpacing: 5,
+                  crossAxisCount: 2,
+                  childAspectRatio: 0.9,
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
                 ),
                 itemCount: categoryController.productModelList.length,
                 itemBuilder: (context, index) {
@@ -69,7 +70,7 @@ class AllCategoriesScreen extends StatelessWidget {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color.fromARGB(255, 186, 186, 184),
                         borderRadius: BorderRadius.circular(15),
                         boxShadow: [
                           BoxShadow(
@@ -77,7 +78,7 @@ class AllCategoriesScreen extends StatelessWidget {
                                 // ignore: deprecated_member_use
                                 .withOpacity(0.1),
                             spreadRadius: 1,
-                            blurRadius: 10,
+                            blurRadius: 1,
                             offset: const Offset(0, 3),
                           ),
                         ],
@@ -88,14 +89,14 @@ class AllCategoriesScreen extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: Colors.purple.shade50,
-                              shape: BoxShape.circle,
+                              color: const Color.fromARGB(255, 87, 73, 90),
+                              // shape: BoxShape.circle,
                             ),
                             child: Image.network(
                               productModel.icon,
-                              height: 50,
-                              width: 50,
-                              fit: BoxFit.cover,
+                              height: 140,
+                              width: 140,
+                              fit: BoxFit.fill,
                               errorBuilder: (context, error, stackTrace) {
                                 return Icon(
                                   Icons.category,
@@ -106,15 +107,20 @@ class AllCategoriesScreen extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 5),
-                          Text(
-                            productModel.category.toString(),
-                            maxLines: 1,
-                            textAlign: TextAlign.center,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Color.fromARGB(255, 95, 1, 211),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            width: double.infinity,
+                            child: Text(
+                              productModel.category.toString().toUpperCase(),
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: GoogleFonts.poppins(
+                            
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: Color.fromARGB(255, 25, 0, 148),
+                              ),
                             ),
                           ),
                         ],

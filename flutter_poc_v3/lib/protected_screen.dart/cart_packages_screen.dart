@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
+import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
 import 'package:flutter_poc_v3/public_screen.dart/razorpayment_gateway.dart';
 import 'package:get/get.dart';
 // import 'your_package_model_path.dart';
@@ -19,7 +20,52 @@ class CartPackagesScreen extends StatefulWidget {
 }
 
 class _CartPackagesScreenState extends State<CartPackagesScreen> {
-
+// Add this function to show the dialog
+Future<void> _showPackageExpiredDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    barrierDismissible: false, // User must tap button
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Package Status',
+          style: TextStyle(
+            color: Colors.blue[900],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'Your package has expired or reached its limit. Please select a new package to continue.',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[800],
+          ),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const OfferPackageScreen(),
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            ),
+            child: Text(
+              'OK',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
   
 void _handleProceedToPayment() {
     String packageId;
@@ -35,7 +81,10 @@ void _handleProceedToPayment() {
       packageId = '678f2e2f9ccc3e56abbd8c65';
     } else {
       // Handle other cases or set a default value
-      packageId = 'default_package_id';
+      // packageId = 'default_package_id';
+      // Show dialog and handle package expiration
+    _showPackageExpiredDialog(context);
+    return; // Exit the function early
     }
     
   log('Selected Package Details:');

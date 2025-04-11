@@ -771,14 +771,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final responseData = await response.stream.bytesToString();
     
                     if (response.statusCode == 200) {
+  await refreshUserDataFromApi(); // Add this line
                        final responseData = json.decode(await response.stream.bytesToString());
       final prefs = await SharedPreferences.getInstance();
+     
       await prefs.setString('display_picture', responseData['data']['path']);
                       setState(() {
                         pickedXFile = image;
                       });
                         updateProfileImage(); // Add this line
-    
+      
     
                       if (!mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(

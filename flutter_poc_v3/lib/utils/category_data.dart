@@ -150,8 +150,8 @@ class CategoryData {
      
     ],
     'Cars': [
-      'Cars',
-      'Spare Parts',
+    
+      
       "kia",
       'Hyundai',
       'Honda', 

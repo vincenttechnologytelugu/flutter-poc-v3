@@ -150,6 +150,7 @@ final ScrollController _scrollController = ScrollController();
                   price: widget.productModel.price ?? 0.0,
                   initialMessages: messagesList,
                   product: widget.productModel,
+                   isFromChatScreen: false, // Specify that it's from product details
                 ),
               ),
             );

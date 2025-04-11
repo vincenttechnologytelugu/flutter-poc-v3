@@ -154,6 +154,55 @@ final Map<String, List<String>> titleBrandMap = {
       "OnePlus Watch",
       "Honor Watch GS 3"
     ],
+    'Fitbit Versa 3':[
+      'Amazfit GTS 2',
+      'Xiaomi Mi Band 7',
+      'Realme Watch 2',
+      'OnePlus Watch',
+      'Honor Watch GS 3'
+    ],
+    'Apple Watch':[
+      'Series 7',
+      'Series 6',
+      'Series 5',
+      'Series 4',
+      'Series 3',
+      'Series 2',
+      'Series 1',
+      'Edition',
+      'Nike+',
+      'Edition Nike+'
+    ],
+    'Samsung Galaxy Watch':[
+      '4 Classic',
+      '4 LTE',
+      '3 Classic',
+      '3 LTE',
+      '2 Classic',
+      '2 LTE',
+      '1 Classic',
+      '1 LTE',
+      'Active 2',
+      'Active'
+    ],
+    'Tractors':[
+      'Mahindra',
+      'John Deere',
+      'Case IH',
+      'Claas',
+      'New Holland',
+      'Fendt',
+      'Massey Ferguson',
+      'Kubota',
+      'Johnsen',
+      'Fiat'
+    ],
+    'Bicycles':[
+      'Trek',
+      'Giant',
+      'Scott',
+    ],
+      'Ashok Leyland': ['Dolmus', 'Dolmus Plus', 'Dolmus Prime', 'Dolmus Elite', 'Dolmus Luxe'],
   
   // Add more titles and brands as needed
 };
@@ -179,7 +228,8 @@ final Map<String, List<String>> brandModelMap = {
       'Realme Watch 2',
       'OnePlus Watch',
       'Honor Watch GS 3'
-    ]
+    ],
+    'Ashok Leyland': ['Dolmus', 'Dolmus Plus', 'Dolmus Prime', 'Dolmus Elite', 'Dolmus Luxe'],
   
   
  
@@ -358,6 +408,73 @@ Future<String?> showLocationSelectionDialog(BuildContext context, String city) a
   );
 }
 
+Future<void> _showPetCategoryDialog(BuildContext context) {
+  final List<Map<String, dynamic>> petCategories = [
+    {'name': 'Dog', 'icon': Icons.pets},
+    {'name': 'Cat', 'icon': Icons.pets},
+    {'name': 'Bird', 'icon': Icons.flutter_dash},
+    {'name': 'Fish', 'icon': Icons.water},
+    {'name': 'Rabbit', 'icon': Icons.pets},
+    {'name': 'Hamster', 'icon': Icons.pets},
+    {'name': 'Guinea Pig', 'icon': Icons.pets},
+    {'name': 'Turtle', 'icon': Icons.pets},
+    {'name': 'Parrot', 'icon': Icons.flutter_dash},
+  ];
+
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Select Pet Category',
+          style: TextStyle(
+            color: Colors.blue[900],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: petCategories.map((pet) {
+              return Column(
+                children: [
+                  ListTile(
+                    dense: true,
+                    leading: Icon(
+                      pet['icon'] as IconData,
+                      color: Colors.blue[700],
+                    ),
+                    title: Text(
+                      pet['name'],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    onTap: () {
+                      controllers['pet_category']?.text = pet['name'];
+                      Navigator.pop(context);
+                    },
+                  ),
+                  if (pet != petCategories.last) Divider(height: 1),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 // First, create a map of states and their cities
 final Map<String, List<String>> stateCityMap = {
@@ -405,6 +522,81 @@ final Map<String, List<String>> stateCityMap = {
 
   // Add more states and cities as needed
 };
+
+
+// Add this function to show vaccination type dialog
+Future<void> _showVaccinationTypeDialog(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(
+          'Select Vaccination Type',
+          style: TextStyle(
+            color: Colors.blue[900],
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: SingleChildScrollView( // Added SingleChildScrollView
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // Ensures minimum height
+            children: [
+              ListTile(
+                dense: true, // Makes the ListTile more compact
+                leading: Icon(Icons.medical_services, color: Colors.blue),
+                title: Text('First Stage Vaccination'),
+                onTap: () {
+                  controllers['vaccinationType']?.text = 'First Stage Vaccination';
+                  Navigator.pop(context);
+                },
+              ),
+              Divider(height: 1), // Reduced divider height
+              ListTile(
+                dense: true,
+                leading: Icon(Icons.medical_services, color: Colors.green),
+                title: Text('Second Stage Vaccination'),
+                onTap: () {
+                  controllers['vaccinationType']?.text = 'Second Stage Vaccination';
+                  Navigator.pop(context);
+                },
+              ),
+              Divider(height: 1),
+              ListTile(
+                dense: true,
+                leading: Icon(Icons.medical_services, color: Colors.orange),
+                title: Text('Third Stage Vaccination'),
+                onTap: () {
+                  controllers['vaccinationType']?.text = 'Third Stage Vaccination';
+                  Navigator.pop(context);
+                },
+              ),
+              Divider(height: 1),
+              ListTile(
+                dense: true,
+                leading: Icon(Icons.medical_services, color: Colors.red),
+                title: Text('Not Vaccinated'),
+                onTap: () {
+                  controllers['vaccinationType']?.text = 'Not Vaccinated';
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+
+
+
 
 // Modify your showCitySelectionDialog function
 Future<String?> showCitySelectionDialog(BuildContext context, String state) {
@@ -7352,68 +7544,11 @@ SizedBox(height: 10),
 Widget _buildCommercialVehiclesSparesForm(){
     return Column(
       children: [
-          CustomTextFormField(
-      labelText: 'Title',
-     hintText:
-            'Mention the key features of your item (e.g. brand, model, age, type)',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['title']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-labelText: 'city',
-      hintText: 'Please enter the city',
-     prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['city']!,
-    ),
-    const SizedBox(height: 10),
+         const SizedBox(height: 10),
+
+
   
-    CustomTextFormField(
-      labelText: 'location',
-      hintText: 'Please enter the location',
-   prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['location']!,
-
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'price',
-      hintText: 'Please enter the price',
-    prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['price']!,
-     
-    ),
-    const SizedBox(height: 10),
-
-       
-        TextFormField(
-  controller: controllers['state'], // Using t
-  readOnly: true, // Make it read-only since we're using popup
-  decoration: InputDecoration(
-    labelText: 'State',
-    hintText: 'Select State',
-    prefixIcon: const Icon(Icons.location_city),
-    suffixIcon: const Icon(Icons.arrow_drop_down),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-  onTap: () async {
-    final selectedState = await showStateSelectionDialog(context);
-    if (selectedState != null) {
-      setState(() {
-      controllers['state']?.text = selectedState;
-      });
-    }
-  },
-),
-
-         
-     SizedBox(height: 10),    
+    
       Container(
   decoration: BoxDecoration(
   
@@ -7429,17 +7564,19 @@ labelText: 'city',
   ),
   child:
   TextFormField(
-  readOnly: _isFormReadOnly,
-  controller: controllers['make'],
+  readOnly:true,
+   
+  controller: controllers['title'],
+
   decoration: InputDecoration(
-    labelText: 'Enter Make',
+    labelText: 'Title',
      labelStyle: TextStyle(
             color: Colors.grey[800],
             fontWeight: FontWeight.w600,
             fontSize: 16.0,
             fontFamily: 'Roboto',
           ),
-    hintText: 'Enter Make',
+    hintText: 'Select your Title',
      hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.0,
@@ -7482,16 +7619,617 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+    const SizedBox(height: 10),
+ TextFormField(
+  controller: controllers['state'],
+    // onChanged: (value) => _saveFormData(),
+  readOnly: true, // Keeps it read-only for selection dialog
+  decoration: InputDecoration(
+    labelText: 'State',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    hintText: 'Select State',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.location_city,
+      color: Colors.deepPurple[400],
+      size: 22,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Stylish gradient dropdown icon
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.white,
+        size: 24,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto',
+  ),
+ 
+  cursorColor: Colors.deepPurple[400],
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  onTap: () async {
+    final selectedState = await showStateSelectionDialog(context);
+    if (selectedState != null) {
+      setState(() {
+        controllers['state']?.text = selectedState;
+      });
+    }
+  },
+),
+   
   
+   SizedBox(height: 10),
+   
+    
+ 
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['city'],
+ onTap: () async {
+    // Debug print to check state value
+    log('Current State Value: ${controllers['state']?.text}');
+    
+    final selectedCity = await showCitySelectionDialog(
+      context,
+      controllers['state']?.text ?? '',
+    );
+    if (selectedCity != null) {
+      setState(() {
+        controllers['city']?.text = selectedCity;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'City',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your city',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
 
+     
+    
+ SizedBox(height: 10),    
+  
    
+
+
+ Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['location'],
+  onTap: () async {
+    // Debug print to check city value
+    print('Current City Value: ${controllers['city']?.text}');
+    
+    final selectedLocation = await showLocationSelectionDialog(
+      context,
+      controllers['city']?.text ?? '',
+    );
+    if (selectedLocation != null) {
+      setState(() {
+        controllers['location']?.text = selectedLocation;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Location',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Location',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+ 
+       
+//         TextFormField(
+//   controller: controllers['state'], // Using t
+//   readOnly: true, // Make it read-only since we're using popup
+//   decoration: InputDecoration(
+//     labelText: 'State',
+//     hintText: 'Select State',
+//     prefixIcon: const Icon(Icons.search),
+//     suffixIcon: const Icon(Icons.arrow_drop_down),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(12),
+//     ),
+//   ),
+//   onTap: () async {
+//     final selectedState = await showStateSelectionDialog(context);
+//     if (selectedState != null) {
+//       setState(() {
+//       controllers['state']?.text = selectedState;
+//       });
+//     }
+//   },
+// ),
+   SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  // readOnly: _isFormReadOnly,
+  readOnly:true,
+  controller: controllers['category'],
+    // onChanged: (value) => _saveFormData(),
+  decoration: InputDecoration(
+    labelText: 'Category',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Category',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+     Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+ SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter the price',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    // suffixIcon: Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: [
+    //     Icon(
+    //       Icons.bubble_chart,
+    //       color: Colors.blue[700],
+    //     ),
+    //     Text(
+    //       '*',
+    //       style: TextStyle(
+    //         color: Colors.red,
+    //         fontSize: 20.0,
+    //       ),
+    //     ),
+    //   ],
+    // ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
          
-      SizedBox(height: 10),    
+     SizedBox(height: 10),   
+     Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['fuelType'],
+   onTap: () async {
+    final selectedFuelType = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Fuel Type',
+            style: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Container(
+            width: double.minPositive,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: fuelTypes.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  leading: Icon(
+                    _getFuelTypeIcon(fuelTypes[index]),
+                    color: Colors.blue[700],
+                  ),
+                  title: Text(
+                    fuelTypes[index],
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, fuelTypes[index]);
+                  },
+                  tileColor: controllers['fuelType']?.text == fuelTypes[index]
+                      ? Colors.blue[50]
+                      : null,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedFuelType != null) {
+      setState(() {
+        controllers['fuelType']?.text = selectedFuelType;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Fuel Type',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter Fuel Type',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+ 
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+), 
+SizedBox(height: 10),
       Container(
   decoration: BoxDecoration(
   
@@ -7509,15 +8247,90 @@ labelText: 'city',
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+    // onChanged: (value) => _saveFormData(),
+     onTap: () async {
+    // Check if title is selected
+    final selectedTitle = controllers['title']?.text ?? '';
+    if (selectedTitle.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select car first'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Show brand selection dialog
+    final selectedBrand = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        final brands = titleBrandMap[selectedTitle] ?? [];
+        
+        return AlertDialog(
+          title: Text(
+            'Select Brand for $selectedTitle',
+            style: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: brands.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  leading: Icon(
+                    Icons.branding_watermark,
+                    color: Colors.blue[700],
+                  ),
+                  title: Text(
+                    brands[index],
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, brands[index]);
+                  },
+                  tileColor: controllers['brand']?.text == brands[index]
+                      ? Colors.blue[50]
+                      : null,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedBrand != null) {
+      setState(() {
+        controllers['brand']?.text = selectedBrand;
+      });
+    }
+  },
   decoration: InputDecoration(
-    labelText: 'Enter Brand',
+    labelText: 'Brand (Required)',
      labelStyle: TextStyle(
             color: Colors.grey[800],
             fontWeight: FontWeight.w600,
             fontSize: 16.0,
             fontFamily: 'Roboto',
           ),
-    hintText: 'Enter Brand',
+    hintText: 'Select Brand',
      hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.0,
@@ -7560,15 +8373,171 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+ 
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+            
+        SizedBox(height: 10),
+     
+      Container(
+  decoration: BoxDecoration(
   
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['model'],
+    // onChanged: (value) => _saveFormData(),
+     onTap: () async {
+    // Check if brand is selected
+    final selectedBrand = controllers['brand']?.text ?? '';
+    if (selectedBrand.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select Brand first'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Show model selection dialog
+    final selectedModel = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        final models = brandModelMap[selectedBrand] ?? [];
+        
+        return AlertDialog(
+          title: Text(
+            'Select Model for $selectedBrand',
+            style: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: models.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  leading: Icon(
+                    Icons.directions_car,
+                    color: Colors.blue[700],
+                  ),
+                  title: Text(
+                    models[index],
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, models[index]);
+                  },
+                  tileColor: controllers['model']?.text == models[index]
+                      ? Colors.blue[50]
+                      : null,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedModel != null) {
+      setState(() {
+        controllers['model']?.text = selectedModel;
+      });
+    }
+  },
+
+  decoration: InputDecoration(
+    labelText: 'Model',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter Model',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+    Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
-),  
-     
+),
+
+SizedBox(height: 10),
+
+
           
-        SizedBox(height: 10),    
+           
       Container(
   decoration: BoxDecoration(
   
@@ -7638,7 +8607,7 @@ labelText: 'city',
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -7674,6 +8643,65 @@ labelText: 'city',
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['transmission'],
+   onTap: () async {
+    final selectedTransmission = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Select Transmission Type',
+            style: TextStyle(
+              color: Colors.blue[900],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: Container(
+            width: double.minPositive,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: transmissionTypes.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  leading: Icon(
+                    Icons.settings,  // or Icons.car_repair
+                    color: Colors.blue[700],
+                  ),
+                  title: Text(
+                    '${index + 1}. ${transmissionTypes[index]}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context, transmissionTypes[index]);
+                  },
+                  tileColor: controllers['transmission']?.text == transmissionTypes[index]
+                      ? Colors.blue[50]
+                      : null,
+                );
+              },
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedTransmission != null) {
+      setState(() {
+        controllers['transmission']?.text = selectedTransmission;
+      });
+    }
+  },
   decoration: InputDecoration(
     labelText: 'Enter transmission',
      labelStyle: TextStyle(
@@ -7726,7 +8754,7 @@ labelText: 'city',
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -7760,6 +8788,104 @@ labelText: 'city',
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['color'],
+    onTap: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        final searchController = TextEditingController();
+        List<Map<String, dynamic>> filteredColors = List.from(colorOptions);
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Column(
+                children: [
+                  Text(
+                    'Select Color',
+                    style: TextStyle(
+                      color: Colors.blue[900],
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextField(
+                    controller: searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search Color',
+                      prefixIcon: Icon(Icons.search),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 15, vertical: 0),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        filteredColors = colorOptions
+                            .where((color) => color['name']
+                                .contains(value)) // Case sensitive search
+                            .toList();
+                      });
+                    },
+                  ),
+                ],
+              ),
+              content: Container(
+                width: double.maxFinite,
+                height: 300,
+                child: ListView.builder(
+                  itemCount: filteredColors.length,
+                  itemBuilder: (context, index) {
+                    final color = filteredColors[index];
+                    return ListTile(
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color(int.parse(
+                            color['hex'].replaceAll('#', '0xFF'),
+                          )),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: Colors.grey[300]!,
+                            width: 1,
+                          ),
+                        ),
+                      ),
+                      title: Text(
+                        color['name'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          controllers['color']?.text = color['name'];
+                        });
+                        Navigator.pop(context);
+                      },
+                      selected: controllers['color']?.text == color['name'],
+                      selectedTileColor: Colors.blue[50],
+                    );
+                  },
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    'Cancel',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  },
+
   decoration: InputDecoration(
     labelText: 'Enter color',
      labelStyle: TextStyle(
@@ -7812,171 +8938,15 @@ labelText: 'city',
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
       
-       
-           SizedBox(height: 10),    
-      Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-    readOnly: true,
-  // readOnly: _isFormReadOnly,
-  controller: controllers['category'],
-  decoration: InputDecoration(
-    labelText: 'Category',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Select Category',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-    prefixIcon: Icon(
-     Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
-        SizedBox(height: 10),
 
 
 
-
-
-
-     
-      Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: _isFormReadOnly,
-  controller: controllers['model'],
-  decoration: InputDecoration(
-    labelText: 'Model',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter Model',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-    prefixIcon: Icon(
-     Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
-
-SizedBox(height: 10),
 
 
 
@@ -8230,43 +9200,7 @@ SizedBox(height: 10),
 
  SizedBox(height: 10),
        
-//         TextFormField(
-//            readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'prise'),
-//         ),
-//         TextFormField(
-//            readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'city'),
-//         ),
 
-//  TextFormField(
-//    readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'State'),
-
-//         ),
-        
-//  TextFormField(
-//    readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'Category'),
-
-//         ),
-//         TextFormField(
-//            readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'Title',
-//           hintText: 'A minimum length of Ten Charactrs required',
-
-          
-//           ),
-//         ),
-        
-//         TextFormField(
-//            readOnly: _isFormReadOnly, // Add this line
-//           decoration: InputDecoration(labelText: 'Description',
-//               hintText: 'Include condition, features and reason for selling',
-          
-//           ),
-//           maxLines: 3,
-//         ),
       ],
     );
 
@@ -10384,45 +11318,89 @@ SizedBox(height: 10),
       children: [
   
     const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'Title',
-     hintText:
-            'Mention the key features of your item (e.g. brand, model, age, type)',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['title']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-labelText: 'city',
-      hintText: 'Please enter the city',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['city']!,
-    ),
-    const SizedBox(height: 10),
-  
-    CustomTextFormField(
-      labelText: 'location',
-      hintText: 'Please enter the location',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['location']!,
 
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'price',
-      hintText: 'Please enter the price',
-     prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['price']!,
-     
-    ),
-    const SizedBox(height: 10),
+
+  
     
-        TextFormField(
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly:true,
+   
+  controller: controllers['title'],
+
+  decoration: InputDecoration(
+    labelText: 'Title',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Title',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+    const SizedBox(height: 10),
+ TextFormField(
   controller: controllers['state'],
+    // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -10499,7 +11477,9 @@ labelText: 'city',
     ],
     fontFamily: 'Roboto',
   ),
+ 
   cursorColor: Colors.deepPurple[400],
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   onTap: () async {
     final selectedState = await showStateSelectionDialog(context);
     if (selectedState != null) {
@@ -10509,8 +11489,12 @@ labelText: 'city',
     }
   },
 ),
-         
-     SizedBox(height: 10),    
+   
+  
+   SizedBox(height: 10),
+   
+    
+ 
       Container(
   decoration: BoxDecoration(
   
@@ -10526,18 +11510,31 @@ labelText: 'city',
   ),
   child:
   TextFormField(
-    readOnly:true,
-  // readOnly: _isFormReadOnly,
-  controller: controllers['category'],
+  readOnly: _isFormReadOnly,
+  controller: controllers['city'],
+ onTap: () async {
+    // Debug print to check state value
+    log('Current State Value: ${controllers['state']?.text}');
+    
+    final selectedCity = await showCitySelectionDialog(
+      context,
+      controllers['state']?.text ?? '',
+    );
+    if (selectedCity != null) {
+      setState(() {
+        controllers['city']?.text = selectedCity;
+      });
+    }
+  },
   decoration: InputDecoration(
-    labelText: 'Category',
+    labelText: 'City',
      labelStyle: TextStyle(
             color: Colors.grey[800],
             fontWeight: FontWeight.w600,
             fontSize: 16.0,
             fontFamily: 'Roboto',
           ),
-    hintText: 'Select Category',
+    hintText: 'Select your city',
      hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.0,
@@ -10580,12 +11577,452 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  
   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
+
+     
+    
+ SizedBox(height: 10),    
+  
+   
+
+
+ Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['location'],
+  onTap: () async {
+    // Debug print to check city value
+    print('Current City Value: ${controllers['city']?.text}');
+    
+    final selectedLocation = await showLocationSelectionDialog(
+      context,
+      controllers['city']?.text ?? '',
+    );
+    if (selectedLocation != null) {
+      setState(() {
+        controllers['location']?.text = selectedLocation;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Location',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Location',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+ 
+       
+//         TextFormField(
+//   controller: controllers['state'], // Using t
+//   readOnly: true, // Make it read-only since we're using popup
+//   decoration: InputDecoration(
+//     labelText: 'State',
+//     hintText: 'Select State',
+//     prefixIcon: const Icon(Icons.search),
+//     suffixIcon: const Icon(Icons.arrow_drop_down),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(12),
+//     ),
+//   ),
+//   onTap: () async {
+//     final selectedState = await showStateSelectionDialog(context);
+//     if (selectedState != null) {
+//       setState(() {
+//       controllers['state']?.text = selectedState;
+//       });
+//     }
+//   },
+// ),
+   SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  // readOnly: _isFormReadOnly,
+  readOnly:true,
+  controller: controllers['category'],
+    // onChanged: (value) => _saveFormData(),
+  decoration: InputDecoration(
+    labelText: 'Category',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Category',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+     Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+ SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter the price',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    // suffixIcon: Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: [
+    //     Icon(
+    //       Icons.bubble_chart,
+    //       color: Colors.blue[700],
+    //     ),
+    //     Text(
+    //       '*',
+    //       style: TextStyle(
+    //         color: Colors.red,
+    //         fontSize: 20.0,
+    //       ),
+    //     ),
+    //   ],
+    // ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+         
+     SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['brand'],
+    // onChanged: (value) => _saveFormData(),
+  //    onTap: () async {
+  //   // Check if title is selected
+  //   final selectedTitle = controllers['title']?.text ?? '';
+  //   if (selectedTitle.isEmpty) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(
+  //         content: Text('Please select car first'),
+  //         duration: Duration(seconds: 2),
+  //       ),
+  //     );
+  //     return;
+  //   }
+
+  //   // Show brand selection dialog
+  //   final selectedBrand = await showDialog<String>(
+  //     context: context,
+  //     builder: (BuildContext context) {
+  //       final brands = titleBrandMap[selectedTitle] ?? [];
+        
+  //       return AlertDialog(
+  //         title: Text(
+  //           'Select Brand for $selectedTitle',
+  //           style: TextStyle(
+  //             color: Colors.blue[900],
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //         content: Container(
+  //           width: double.maxFinite,
+  //           child: ListView.builder(
+  //             shrinkWrap: true,
+  //             itemCount: brands.length,
+  //             itemBuilder: (BuildContext context, int index) {
+  //               return ListTile(
+  //                 leading: Icon(
+  //                   Icons.branding_watermark,
+  //                   color: Colors.blue[700],
+  //                 ),
+  //                 title: Text(
+  //                   brands[index],
+  //                   style: TextStyle(
+  //                     fontSize: 16,
+  //                     color: Colors.grey[800],
+  //                   ),
+  //                 ),
+  //                 onTap: () {
+  //                   Navigator.pop(context, brands[index]);
+  //                 },
+  //                 tileColor: controllers['brand']?.text == brands[index]
+  //                     ? Colors.blue[50]
+  //                     : null,
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () => Navigator.pop(context),
+  //             child: Text(
+  //               'Cancel',
+  //               style: TextStyle(color: Colors.red),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+
+  //   if (selectedBrand != null) {
+  //     setState(() {
+  //       controllers['brand']?.text = selectedBrand;
+  //     });
+  //   }
+  // },
+  decoration: InputDecoration(
+    labelText: 'Brand (Required)',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Brand',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+ 
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+            
+       
 
         SizedBox(height: 10),
 
@@ -10658,7 +12095,7 @@ labelText: 'city',
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -10667,82 +12104,9 @@ labelText: 'city',
     SizedBox(height: 10),
 
     
-        Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: _isFormReadOnly,
-  controller: controllers['brand'],
-  decoration: InputDecoration(
-    labelText: 'Brand',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter Brand',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-    prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
 
-    SizedBox(height: 10),
+
+   
 
 
        
@@ -10892,7 +12256,7 @@ labelText: 'city',
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -10968,7 +12332,7 @@ SizedBox(height: 10),
         ),
   cursorColor: Colors.blue[600],
   
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+ // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -11142,75 +12506,10 @@ SizedBox(height: 10),
       children: [
    
     const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'Title',
-     hintText:
-            'Mention the key features of your item (e.g. brand, model, age, type)',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['title']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-labelText: 'city',
-      hintText: 'Please enter the city',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['city']!,
-    ),
-    const SizedBox(height: 10),
-  
-    CustomTextFormField(
-      labelText: 'location',
-      hintText: 'Please enter the location',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['location']!,
 
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'price',
-      hintText: 'Please enter the price',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['price']!,
-     
-    ),
-    const SizedBox(height: 10),
 
   
     
-
-
-
-
-
- 
-        TextFormField(
-  controller: controllers['state'], // Using t
-  readOnly: true, // Make it read-only since we're using popup
-  decoration: InputDecoration(
-    labelText: 'State',
-    hintText: 'Select State',
-    prefixIcon: const Icon(Icons.location_city),
-    suffixIcon: const Icon(Icons.arrow_drop_down),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
-    ),
-  ),
-  onTap: () async {
-    final selectedState = await showStateSelectionDialog(context);
-    if (selectedState != null) {
-      setState(() {
-      controllers['state']?.text = selectedState;
-      });
-    }
-  },
-),
-
-         
-     SizedBox(height: 10),    
       Container(
   decoration: BoxDecoration(
   
@@ -11226,18 +12525,19 @@ labelText: 'city',
   ),
   child:
   TextFormField(
-    readOnly:true,
-  // readOnly: _isFormReadOnly,
-  controller: controllers['category'],
+  readOnly:true,
+   
+  controller: controllers['title'],
+
   decoration: InputDecoration(
-    labelText: 'Category',
+    labelText: 'Title',
      labelStyle: TextStyle(
             color: Colors.grey[800],
             fontWeight: FontWeight.w600,
             fontSize: 16.0,
             fontFamily: 'Roboto',
           ),
-    hintText: ' Enter Category',
+    hintText: 'Select your Title',
      hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.0,
@@ -11280,12 +12580,483 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  
   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
+    const SizedBox(height: 10),
+ TextFormField(
+  controller: controllers['state'],
+    // onChanged: (value) => _saveFormData(),
+  readOnly: true, // Keeps it read-only for selection dialog
+  decoration: InputDecoration(
+    labelText: 'State',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
+    hintText: 'Select State',
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.location_city,
+      color: Colors.deepPurple[400],
+      size: 22,
+    ),
+    filled: true,
+    fillColor: Colors.white,
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Stylish gradient dropdown icon
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.white,
+        size: 24,
+      ),
+    ),
+  ),
+  style: TextStyle(
+    fontSize: 20.0,
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto',
+  ),
+ 
+  cursorColor: Colors.deepPurple[400],
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  onTap: () async {
+    final selectedState = await showStateSelectionDialog(context);
+    if (selectedState != null) {
+      setState(() {
+        controllers['state']?.text = selectedState;
+      });
+    }
+  },
+),
+   
+  
+   SizedBox(height: 10),
+   
+    
+ 
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['city'],
+ onTap: () async {
+    // Debug print to check state value
+    log('Current State Value: ${controllers['state']?.text}');
+    
+    final selectedCity = await showCitySelectionDialog(
+      context,
+      controllers['state']?.text ?? '',
+    );
+    if (selectedCity != null) {
+      setState(() {
+        controllers['city']?.text = selectedCity;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'City',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your city',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+     
+    
+ SizedBox(height: 10),    
+  
+   
+
+
+ Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['location'],
+  onTap: () async {
+    // Debug print to check city value
+    print('Current City Value: ${controllers['city']?.text}');
+    
+    final selectedLocation = await showLocationSelectionDialog(
+      context,
+      controllers['city']?.text ?? '',
+    );
+    if (selectedLocation != null) {
+      setState(() {
+        controllers['location']?.text = selectedLocation;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Location',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Location',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+ 
+       
+//         TextFormField(
+//   controller: controllers['state'], // Using t
+//   readOnly: true, // Make it read-only since we're using popup
+//   decoration: InputDecoration(
+//     labelText: 'State',
+//     hintText: 'Select State',
+//     prefixIcon: const Icon(Icons.search),
+//     suffixIcon: const Icon(Icons.arrow_drop_down),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(12),
+//     ),
+//   ),
+//   onTap: () async {
+//     final selectedState = await showStateSelectionDialog(context);
+//     if (selectedState != null) {
+//       setState(() {
+//       controllers['state']?.text = selectedState;
+//       });
+//     }
+//   },
+// ),
+   SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  // readOnly: _isFormReadOnly,
+  readOnly:true,
+  controller: controllers['category'],
+    // onChanged: (value) => _saveFormData(),
+  decoration: InputDecoration(
+    labelText: 'Category',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Category',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+     Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+ SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter the price',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    // suffixIcon: Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: [
+    //     Icon(
+    //       Icons.bubble_chart,
+    //       color: Colors.blue[700],
+    //     ),
+    //     Text(
+    //       '*',
+    //       style: TextStyle(
+    //         color: Colors.red,
+    //         fontSize: 20.0,
+    //       ),
+    //     ),
+    //   ],
+    // ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
 
    
               SizedBox(height: 10),    
@@ -11363,7 +13134,83 @@ labelText: 'city',
   keyboardAppearance: Brightness.light,
 ),
 ),
-
+SizedBox(height: 10),
+        
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['year'],
+  keyboardType: TextInputType.number, 
+  decoration: InputDecoration(
+    labelText: ' Year',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter year of starting service',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+     prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+       
 
      SizedBox(height: 10),    
       Container(
@@ -11444,123 +13291,10 @@ labelText: 'city',
 ),
         
         
-           SizedBox(height: 10),    
-      Container(
-  decoration: BoxDecoration(
   
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: _isFormReadOnly,
-  controller: controllers['year'],
-  keyboardType: TextInputType.number, 
-  decoration: InputDecoration(
-    labelText: ' Year',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter year of starting service',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-     prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
-        SizedBox(height: 10),
 
 
 
-        //   TextFormField(
-        //      readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'city',
-
-        //   ),
-        // ),
-        // TextFormField(
-        //    readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'state',
-
-        //   ),
-        // ),
-        // TextFormField(
-        //    readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'Type',
-
-        //   ),
-        // ),
-        // TextFormField(
-        //    readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'location',
-
-        //   ),
-        // ),
-
-        //   TextFormField(
-        //      readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'Categoty'),
-        // ),
-        // TextFormField(
-        //    readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'Title'),
-        // ),
-        // TextFormField(
-        //    readOnly: _isFormReadOnly, // Add this line
-        //   decoration: InputDecoration(labelText: 'Description'),
-        //   maxLines: 3,
-        // ),
       ],
     );
   }
@@ -13085,66 +14819,90 @@ SizedBox(height: 10),
     return Column(
       children: [
 
-    const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'Title',
-     hintText:'Mention the key features of your item (e.g. brand, model, age, type)',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['title']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-labelText: 'city',
-      hintText: 'Please enter the city',
-   prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['city']!,
-    ),
-    const SizedBox(height: 10),
-  
-    CustomTextFormField(
-      labelText: 'location',
-      hintText: 'Please enter the location',
-prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['location']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'price',
-      hintText: 'Please enter the price',
-    prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['price']!,
-    ),
-    const SizedBox(height: 10),
-  
+      const SizedBox(height: 10),
 
-//       TextFormField(
-//   controller: controllers['state'], // Using t
-//   readOnly: true, // Make it read-only since we're using popup
-//   decoration: InputDecoration(
-//     labelText: 'State',
-//     hintText: 'Select State',
-//     prefixIcon: const Icon(Icons.location_city),
-//     suffixIcon: const Icon(Icons.arrow_drop_down),
-//     border: OutlineInputBorder(
-//       borderRadius: BorderRadius.circular(12),
-//     ),
-//   ),
-//   onTap: () async {
-//     final selectedState = await showStateSelectionDialog(context);
-//     if (selectedState != null) {
-//       setState(() {
-//       controllers['state']?.text = selectedState;
-//       });
-//     }
-//   },
-// ),
 
-TextFormField(
+  
+    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly:true,
+   
+  controller: controllers['title'],
+
+  decoration: InputDecoration(
+    labelText: 'Title',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Title',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+    const SizedBox(height: 10),
+ TextFormField(
   controller: controllers['state'],
+    // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -13221,7 +14979,9 @@ TextFormField(
     ],
     fontFamily: 'Roboto',
   ),
+ 
   cursorColor: Colors.deepPurple[400],
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   onTap: () async {
     final selectedState = await showStateSelectionDialog(context);
     if (selectedState != null) {
@@ -13231,125 +14991,390 @@ TextFormField(
     }
   },
 ),
+   
+  
+   SizedBox(height: 10),
+   
+    
+ 
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['city'],
+ onTap: () async {
+    // Debug print to check state value
+    log('Current State Value: ${controllers['state']?.text}');
+    
+    final selectedCity = await showCitySelectionDialog(
+      context,
+      controllers['state']?.text ?? '',
+    );
+    if (selectedCity != null) {
+      setState(() {
+        controllers['city']?.text = selectedCity;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'City',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your city',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+     
+    
+ SizedBox(height: 10),    
+  
+   
+
+
+ Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['location'],
+  onTap: () async {
+    // Debug print to check city value
+    print('Current City Value: ${controllers['city']?.text}');
+    
+    final selectedLocation = await showLocationSelectionDialog(
+      context,
+      controllers['city']?.text ?? '',
+    );
+    if (selectedLocation != null) {
+      setState(() {
+        controllers['location']?.text = selectedLocation;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Location',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Location',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+ 
+       
+//         TextFormField(
+//   controller: controllers['state'], // Using t
+//   readOnly: true, // Make it read-only since we're using popup
+//   decoration: InputDecoration(
+//     labelText: 'State',
+//     hintText: 'Select State',
+//     prefixIcon: const Icon(Icons.search),
+//     suffixIcon: const Icon(Icons.arrow_drop_down),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(12),
+//     ),
+//   ),
+//   onTap: () async {
+//     final selectedState = await showStateSelectionDialog(context);
+//     if (selectedState != null) {
+//       setState(() {
+//       controllers['state']?.text = selectedState;
+//       });
+//     }
+//   },
+// ),
+   SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  // readOnly: _isFormReadOnly,
+  readOnly:true,
+  controller: controllers['category'],
+    // onChanged: (value) => _saveFormData(),
+  decoration: InputDecoration(
+    labelText: 'Category',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Category',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+     Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+ SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter the price',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    // suffixIcon: Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: [
+    //     Icon(
+    //       Icons.bubble_chart,
+    //       color: Colors.blue[700],
+    //     ),
+    //     Text(
+    //       '*',
+    //       style: TextStyle(
+    //         color: Colors.red,
+    //         fontSize: 20.0,
+    //       ),
+    //     ),
+    //   ],
+    // ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+         
 
 
 SizedBox(height: 10),
-// Container(
-//   decoration: BoxDecoration(
-//     gradient: LinearGradient(
-//       colors: [
-//         Colors.deepPurple[100]!,
-//         Colors.purple[200]!,
-//         Colors.deepPurple[200]!,
-//       ],
-//       begin: Alignment.topCenter,
-//       end: Alignment.bottomCenter,
-//     ),
-//     borderRadius: BorderRadius.circular(40.0),
-//     boxShadow: [
-//       BoxShadow(
-//         color: Colors.deepPurple[200]!.withOpacity(0.3),
-//         blurRadius: 35.0,
-//         offset: Offset(0, 8),
-//       ),
-//     ],
-//   ),
-//   child:
-//   TextFormField(
-//   readOnly: _isFormReadOnly,
-//   controller: controllers['product'],
-//   decoration: InputDecoration(
-//     labelText: 'Product',
-//     labelStyle: TextStyle(
-//       color: Colors.deepPurple[300],
-//       fontWeight: FontWeight.w600,
-//       letterSpacing: 1.2,
-//       fontSize: 14.0,
-//       shadows: [
-//         Shadow(
-//           color: Colors.deepPurple[100]!,
-//           offset: Offset(0, 2),
-//           blurRadius: 4,
-//         ),
-//       ],
-//       fontFamily: 'Roboto',
-//       fontStyle: FontStyle.italic,
-//     ),
-    
-//     hintText: 'Enter your product',
-//     hintStyle: TextStyle(
-//       color: Colors.deepPurple[200],
-//       fontStyle: FontStyle.italic,
-//       fontSize: 14.0,
-//     ),
-//     prefixIcon: Icon(
-//      Icons.pets,
-//       color: Colors.deepPurple[400],
-//       size: 20,
-//     ),
-//     filled: true,
-//     fillColor: Colors.white,
-//     border: OutlineInputBorder(
-//       borderRadius: BorderRadius.circular(20.0),
-//       borderSide: BorderSide.none,
-//     ),
-//     enabledBorder: OutlineInputBorder(
-//       borderRadius: BorderRadius.circular(20.0),
-//       borderSide: BorderSide.none,
-//     ),
-//     focusedBorder: OutlineInputBorder(
-//       borderRadius: BorderRadius.circular(20.0),
-//       borderSide: BorderSide(
-//         color: Colors.deepPurple[400]!,
-//         width: 2.0,
-//         style: BorderStyle.solid,
-//       ),
-//     ),
-//     contentPadding: EdgeInsets.symmetric(
-//       vertical: 18.0,
-//       horizontal: 20.0,
-//     ),
-//     // Unique gradient background effect
-//     floatingLabelBehavior: FloatingLabelBehavior.auto,
-//     suffixIcon: Container(
-//       margin: EdgeInsets.all(4.0),
-//       padding: EdgeInsets.all(6.0),
-//       decoration: BoxDecoration(
-//         gradient: LinearGradient(
-//           colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
-//           begin: Alignment.topLeft,
-//           end: Alignment.bottomRight,
-//         ),
-//         shape: BoxShape.circle,
-//       ),
-//       child: Icon(
-//         Icons.pets,
-//         color: Colors.white,
-//         size: 18,
-//       ),
-//     ),
-//   ),
-//   style: TextStyle(
-//     fontSize: 20.0,
-  
-//     color: Colors.deepPurple[800],
-//     fontWeight: FontWeight.w500,
-//     letterSpacing: 0.5,
-//     shadows: [
-//       Shadow(
-//         color: Colors.deepPurple[100]!,
-//         offset: Offset(0, 0.1),
-//         blurRadius: 1,
-//       ),
-//     ],
-//     fontFamily: 'Roboto', // Custom font family
-//   ),
-//   cursorColor: Colors.deepPurple[400],
-//   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-//   // Adding a subtle animation
-//   keyboardAppearance: Brightness.light,
-// ),
-// ),
+
 
 
  Container(
@@ -13420,14 +15445,14 @@ SizedBox(height: 10),
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
      
 
-      
+      SizedBox(height: 10),
        Container(
   decoration: BoxDecoration(
   
@@ -13496,7 +15521,7 @@ SizedBox(height: 10),
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
@@ -13504,159 +15529,10 @@ SizedBox(height: 10),
      
 
      
-       SizedBox(height: 10),
-       Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: _isFormReadOnly,
-  controller: controllers['dimensions'],
-  decoration: InputDecoration(
-    labelText: 'Dimensions',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter Dimensions',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-   prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
    
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-
-
-),
      
 
-       SizedBox(height: 10),
-       Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: true,
-  // readOnly: _isFormReadOnly,
-  controller: controllers['category'],
-  decoration: InputDecoration(
-    labelText: 'Category',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter Category',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-     prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
+     
      
 
        SizedBox(height: 10),
@@ -13916,64 +15792,555 @@ SizedBox(height: 10),
       children: [
 
     const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'Title',
-     hintText:
-            'Mention the key features of your item (e.g. brand, model, age, type)',
-      prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['title']!,
-    ),
-    const SizedBox(height: 10),
-    CustomTextFormField(
-labelText: 'city',
-      hintText: 'Please enter the city',
-     prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['city']!,
-    ),
-    const SizedBox(height: 10),
+
+
   
-    CustomTextFormField(
-      labelText: 'location',
-      hintText: 'Please enter the location',
-        prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['location']!,
+    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly:true,
+   
+  controller: controllers['title'],
 
+  decoration: InputDecoration(
+    labelText: 'Title',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Title',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
     ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
     const SizedBox(height: 10),
-    CustomTextFormField(
-      labelText: 'price',
-      hintText: 'Please enter the price',
-       prefixIcon: Icons.search,
-      readOnly: _isFormReadOnly,
-      controller: controllers['price']!,
-     
-    ),
-    const SizedBox(height: 10),
-
-       
-        TextFormField(
-  controller: controllers['state'], // Using t
-  readOnly: true, // Make it read-only since we're using popup
+ TextFormField(
+  controller: controllers['state'],
+    // onChanged: (value) => _saveFormData(),
+  readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
+    labelStyle: TextStyle(
+      color: Colors.deepPurple[300],
+      fontWeight: FontWeight.w600,
+      letterSpacing: 1.2,
+      fontSize: 14.0,
+      fontFamily: 'Roboto',
+      fontStyle: FontStyle.italic,
+    ),
     hintText: 'Select State',
-    prefixIcon: const Icon(Icons.location_city),
-    suffixIcon: const Icon(Icons.arrow_drop_down),
+    hintStyle: TextStyle(
+      color: Colors.deepPurple[200],
+      fontStyle: FontStyle.italic,
+      fontSize: 14.0,
+    ),
+    prefixIcon: Icon(
+      Icons.location_city,
+      color: Colors.deepPurple[400],
+      size: 22,
+    ),
+    filled: true,
+    fillColor: Colors.white,
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide.none,
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(20.0),
+      borderSide: BorderSide(
+        color: Colors.deepPurple[400]!,
+        width: 2.0,
+      ),
+    ),
+    contentPadding: EdgeInsets.symmetric(
+      vertical: 18.0,
+      horizontal: 20.0,
+    ),
+    // Stylish gradient dropdown icon
+    suffixIcon: Container(
+      margin: EdgeInsets.all(4.0),
+      padding: EdgeInsets.all(6.0),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.deepPurple[400]!, Colors.purple[200]!],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        shape: BoxShape.circle,
+      ),
+      child: Icon(
+        Icons.arrow_drop_down,
+        color: Colors.white,
+        size: 24,
+      ),
     ),
   ),
+  style: TextStyle(
+    fontSize: 20.0,
+    color: Colors.deepPurple[800],
+    fontWeight: FontWeight.w500,
+    letterSpacing: 0.5,
+    shadows: [
+      Shadow(
+        color: Colors.deepPurple[100]!,
+        offset: Offset(0, 0.1),
+        blurRadius: 1,
+      ),
+    ],
+    fontFamily: 'Roboto',
+  ),
+ 
+  cursorColor: Colors.deepPurple[400],
+    validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   onTap: () async {
     final selectedState = await showStateSelectionDialog(context);
     if (selectedState != null) {
       setState(() {
-      controllers['state']?.text = selectedState;
+        controllers['state']?.text = selectedState;
       });
     }
   },
+),
+   
+  
+   SizedBox(height: 10),
+   
+    
+ 
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['city'],
+ onTap: () async {
+    // Debug print to check state value
+    log('Current State Value: ${controllers['state']?.text}');
+    
+    final selectedCity = await showCitySelectionDialog(
+      context,
+      controllers['state']?.text ?? '',
+    );
+    if (selectedCity != null) {
+      setState(() {
+        controllers['city']?.text = selectedCity;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'City',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your city',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+     
+    
+ SizedBox(height: 10),    
+  
+   
+
+
+ Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['location'],
+  onTap: () async {
+    // Debug print to check city value
+    print('Current City Value: ${controllers['city']?.text}');
+    
+    final selectedLocation = await showLocationSelectionDialog(
+      context,
+      controllers['city']?.text ?? '',
+    );
+    if (selectedLocation != null) {
+      setState(() {
+        controllers['location']?.text = selectedLocation;
+      });
+    }
+  },
+  decoration: InputDecoration(
+    labelText: 'Location',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select your Location',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+
+ 
+       
+//         TextFormField(
+//   controller: controllers['state'], // Using t
+//   readOnly: true, // Make it read-only since we're using popup
+//   decoration: InputDecoration(
+//     labelText: 'State',
+//     hintText: 'Select State',
+//     prefixIcon: const Icon(Icons.search),
+//     suffixIcon: const Icon(Icons.arrow_drop_down),
+//     border: OutlineInputBorder(
+//       borderRadius: BorderRadius.circular(12),
+//     ),
+//   ),
+//   onTap: () async {
+//     final selectedState = await showStateSelectionDialog(context);
+//     if (selectedState != null) {
+//       setState(() {
+//       controllers['state']?.text = selectedState;
+//       });
+//     }
+//   },
+// ),
+   SizedBox(height: 10),    
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  // readOnly: _isFormReadOnly,
+  readOnly:true,
+  controller: controllers['category'],
+    // onChanged: (value) => _saveFormData(),
+  decoration: InputDecoration(
+    labelText: 'Category',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Select Category',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+     Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
+),
+ SizedBox(height: 10),
+      Container(
+  decoration: BoxDecoration(
+  
+    color: Colors.white,
+        borderRadius: BorderRadius.circular(25.0),
+   boxShadow: [
+          BoxShadow(
+            color: Colors.grey[300]!.withOpacity(0.5),
+            blurRadius: 10.0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+  ),
+  child:
+  TextFormField(
+  readOnly: _isFormReadOnly,
+  controller: controllers['price'],
+  keyboardType: TextInputType.number,
+  decoration: InputDecoration(
+    labelText: 'Price',
+     labelStyle: TextStyle(
+            color: Colors.grey[800],
+            fontWeight: FontWeight.w600,
+            fontSize: 16.0,
+            fontFamily: 'Roboto',
+          ),
+    hintText: 'Enter the price',
+     hintStyle: TextStyle(
+            color: Colors.grey[600],
+            fontSize: 14.0,
+          ),
+    prefixIcon: Icon(
+      Icons.search,
+        color: Colors.grey[700],
+      size: 22,
+    ),
+     suffixIcon: Icon(
+            Icons.bubble_chart,
+            color: Colors.blue[700],
+          ),
+    // suffixIcon: Row(
+    //   mainAxisSize: MainAxisSize.min,
+    //   children: [
+    //     Icon(
+    //       Icons.bubble_chart,
+    //       color: Colors.blue[700],
+    //     ),
+    //     Text(
+    //       '*',
+    //       style: TextStyle(
+    //         color: Colors.red,
+    //         fontSize: 20.0,
+    //       ),
+    //     ),
+    //   ],
+    // ),
+    filled: true,
+   fillColor: Colors.transparent,
+     border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(20.0),
+            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 18.0,
+            horizontal: 20.0,
+          ),
+    // Unique gradient background effect
+    floatingLabelBehavior: FloatingLabelBehavior.auto,
+   
+  ),
+  style: TextStyle(
+          fontSize: 18.0,
+          color: Colors.grey[900],
+          fontWeight: FontWeight.w500,
+          fontFamily: 'Roboto',
+        ),
+  cursorColor: Colors.blue[600],
+   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  // Adding a subtle animation
+  keyboardAppearance: Brightness.light,
+),
 ),
 
          
@@ -14046,108 +16413,17 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+    onTap: () => _showVaccinationTypeDialog(context),
+ // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),
 ),
 
    
-         
         
-     
-          
-        
-        
-      
-      
-       
-      
-       
-           SizedBox(height: 10),    
-      Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-    readOnly:true,
-  // readOnly: _isFormReadOnly,
-  controller: controllers['category'],
-  decoration: InputDecoration(
-    labelText: 'Category',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Select Category',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-     prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
         SizedBox(height: 10),
-
-
-
-
-
-
-     
+ 
       Container(
   decoration: BoxDecoration(
   
@@ -14205,6 +16481,7 @@ labelText: 'city',
             vertical: 18.0,
             horizontal: 20.0,
           ),
+           
     // Unique gradient background effect
     floatingLabelBehavior: FloatingLabelBehavior.auto,
    
@@ -14216,9 +16493,10 @@ labelText: 'city',
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+//  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
+   onTap: () => _showPetCategoryDialog(context),
 ),
 ),
 
@@ -14298,7 +16576,7 @@ SizedBox(height: 10),
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+ // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
   keyboardAppearance: Brightness.light,
 ),

@@ -15,24 +15,13 @@ import 'dart:ui'; // Import for blur effect
 class CartController extends GetxController {
   List<ProductModel> cartList = [];
   List<String> favouriteIds = [];
-
+final isFavorite = false.obs;
   // Check server-side favorites and load saved favorites
   Future<void> loadFavorites(BuildContext context) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      // if (token == null) {
-
-      //      ScaffoldMessenger.of(context).showSnackBar(
-      //       const SnackBar(content: Text("Token Not Found")),
-      //     );
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(builder: (context) => LoginScreen()),
-      //     );
-
-      //     return;
-      //   }
+   
 
       // First check server favorites
       final response = await http.get(
@@ -81,198 +70,7 @@ class CartController extends GetxController {
     }
   }
 
-  //  // Load saved favorites from SharedPreferences
-  // Future<void> loadSavedFavorites() async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('token');
-
-  //     // First try to load from local storage
-  //     final savedFavorites = prefs.getStringList('favoriteAdposts');
-  //     if (savedFavorites != null && savedFavorites.isNotEmpty) {
-  //       favouriteIds = savedFavorites;
-  //       update();
-  //     }
-
-  //     // Then fetch from server to sync
-  //     final response = await http.get(
-  //       Uri.parse('http://13.200.179.78/favourite_adposts'),
-  //       headers: {
-  //         'Authorization': 'Bearer $token',
-  //         'Content-Type': 'application/json',
-  //       },
-  //     );
-
-  //     if (response.statusCode == 200) {
-  //       final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
-  //       final List<dynamic> data = jsonResponse['data'] ?? [];
-
-  //       // Update favorites list with server data
-  //       favouriteIds = data.map((item) => item['id'].toString()).toList();
-
-  //       // Save updated list to SharedPreferences
-  //       await prefs.setStringList('favoriteAdposts', favouriteIds);
-  //       update();
-  //       log('Loaded favorites: $favouriteIds');
-  //     }
-  //   } catch (e) {
-  //     log('Error loading favorites: $e');
-  //   }
-  // }
-
-  // Add to Favourite
-//   Future<void> addToFavourite(BuildContext context, String adpostId) async {
-//     try {
-//       final prefs = await SharedPreferences.getInstance();
-//       favouriteIds =
-//           prefs.getStringList('favoriteAdposts') ?? []; // Get latest list
-//       final token = prefs.getString('token');
-//       log('Token: $token');
-
-//       if (token == null) {
-//         // ScaffoldMessenger.of(context).showSnackBar(
-//         //   const SnackBar(content: Text("Token Not Found")),
-//         // );
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             content: Container(
-//               padding: EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-//               decoration: BoxDecoration(
-//                 gradient: LinearGradient(
-//                   colors: [Colors.blueAccent, Colors.purpleAccent],
-//                   begin: Alignment.topLeft,
-//                   end: Alignment.bottomRight,
-//                 ),
-//                 borderRadius: BorderRadius.circular(12),
-//                 boxShadow: [
-//                   BoxShadow(
-//                     color: Colors.black26,
-//                     blurRadius: 8,
-//                     offset: Offset(2, 2),
-//                   ),
-//                 ],
-//               ),
-//               child: Row(
-//                 mainAxisSize: MainAxisSize.min,
-//                 children: [
-//                   Icon(Icons.warning_amber_rounded,
-//                       color: Colors.white, size: 22),
-//                   SizedBox(width: 10),
-//                   Text(
-//                     "Login To Continue",
-//                     style: TextStyle(
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.bold,
-//                         color: Colors.white),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//             backgroundColor: Colors.transparent,
-//             behavior: SnackBarBehavior.floating,
-//             elevation: 0,
-//             margin: EdgeInsets.all(16),
-//             duration: Duration(seconds: 3),
-//           ),
-//         );
-
-// // Navigator.push(
-// //   context,
-// //   MaterialPageRoute(builder: (context) => LoginScreen()),
-
-// // );
-//         // Use Get.to instead of Navigator
-//         Get.to(() => LoginScreen());
-//         return;
-//       }
-
-//       final response = await http.post(
-//         Uri.parse('http://13.200.179.78/add_to_favourite'),
-//         headers: {
-//           'Authorization': 'Bearer $token',
-//           'Content-Type': 'application/json',
-//         },
-//         body: jsonEncode({'adpost_id': adpostId}),
-//       );
-
-//       if (response.statusCode == 200) {
-//         if (!favouriteIds.contains(adpostId)) {
-//           favouriteIds.add(adpostId);
-//           await prefs.setStringList('favoriteAdposts', favouriteIds);
-//           update();
-//         }
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             behavior: SnackBarBehavior
-//                 .floating, // Makes it appear above the bottom bar
-//             elevation: 6, // Adds depth
-//             duration: const Duration(seconds: 2), // Auto-dismiss
-//             backgroundColor:
-//                 Colors.transparent, // Transparent for custom styling
-//             content: Center(
-//               child: Container(
-//                 padding:
-//                     const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
-//                 decoration: BoxDecoration(
-//                   gradient: LinearGradient(
-//                     colors: [
-//                       Colors.green.shade700,
-//                       Colors.greenAccent.shade400
-//                     ], // Gradient effect
-//                     begin: Alignment.topLeft,
-//                     end: Alignment.bottomRight,
-//                   ),
-//                   borderRadius:
-//                       BorderRadius.circular(12), // Soft rounded corners
-//                   boxShadow: [
-//                     BoxShadow(
-//                       color: Colors.green.withOpacity(0.3),
-//                       blurRadius: 8,
-//                       offset: const Offset(0, 4),
-//                     ),
-//                   ],
-//                 ),
-//                 child: Row(
-//                   mainAxisSize: MainAxisSize.min,
-//                   children: [
-//                     const Icon(Icons.check_circle,
-//                         color: Colors.white, size: 22), // Success icon
-//                     const SizedBox(width: 10), // Spacing
-//                     const Text(
-//                       "Added to Favourites",
-//                       style: TextStyle(
-//                         color: Colors.white,
-//                         fontSize: 16,
-//                         fontWeight: FontWeight.bold,
-//                         fontFamily: 'Poppins',
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ),
-//         );
-//       } else if (response.statusCode == 400) {
-//         // If already in favorites, make sure it's in our local list
-//         if (!favouriteIds.contains(adpostId)) {
-//           favouriteIds.add(adpostId);
-//           await prefs.setStringList('favoriteAdposts', favouriteIds);
-//           update();
-//         }
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           const SnackBar(content: Text("Adpost already in favourites")),
-//         );
-//       }
-//     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Error: $e")),
-//       );
-//     }
-//   }
-
+  
   Future<void> addToFavourite(BuildContext context, String adpostId, {String? screenName}) async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -326,15 +124,7 @@ class CartController extends GetxController {
         // Check if context is still valid
         if (!context.mounted) return;
 
-        // Get.snackbar(
-        //   'Success',
-        //   'Added to Favourites',
-        //   snackPosition: SnackPosition.TOP,
-        //   backgroundColor: Colors.green.withOpacity(0.8),
-        //   colorText: Colors.white,
-        //   margin: const EdgeInsets.all(10),
-        //   duration: const Duration(seconds: 2),
-        // );
+   
 
         Get.snackbar(
           'Success ✅',
@@ -380,6 +170,7 @@ class CartController extends GetxController {
         );
         update();
       }
+ 
     } catch (e) {
       // Check if context is still valid
       if (!context.mounted) return;

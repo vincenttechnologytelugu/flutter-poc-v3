@@ -19,6 +19,7 @@ class UserChatScreen extends StatefulWidget {
   final String thumb;
   final String title;
   final double price;
+   final bool isFromChatScreen; // Add this parameter
 
   final List<dynamic>? initialMessages;
   const UserChatScreen({
@@ -29,6 +30,7 @@ class UserChatScreen extends StatefulWidget {
     required this.price,
     required this.product,
     this.initialMessages,
+     this.isFromChatScreen = false, // Default to false
   });
 
   @override
@@ -315,8 +317,8 @@ Widget buildThumbImage(ProductModel product) {
   String imageUrl = product.getFirstImageUrl();
 
   return Container(
-    width: 60,
-    height: 60,
+    width: 90,
+    height: 90,
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(8),
     ),
@@ -325,7 +327,7 @@ Widget buildThumbImage(ProductModel product) {
             borderRadius: BorderRadius.circular(8),
             child: Image.network(
               imageUrl,
-              fit: BoxFit.cover,
+              fit: BoxFit.fill,
               errorBuilder: (context, error, stackTrace) {
                 return Container(
                   color: Colors.grey[300],
@@ -368,44 +370,89 @@ Widget buildThumbImage(ProductModel product) {
               color: Colors.black87), // Modern back icon
           onPressed: () => Navigator.pop(context),
         ),
+      
         title: Row(
+mainAxisAlignment: MainAxisAlignment.center,
           children: [
-               buildThumbImage(widget.product), // Thumbnail
-               Container(
-            width: 40,
-            height: 40,
-            margin: const EdgeInsets.only(right: 10),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.grey.shade300),
-            ),
-            child: ClipOval(
-              child: widget.thumb.isNotEmpty
-                  ? Image.network(
-                      widget.thumb,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.image_not_supported,
-                        size: 20,
-                        color: Colors.grey,
-                      ),
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
-                        return Center(
-                          child: CircularProgressIndicator(
-                            value: loadingProgress.expectedTotalBytes != null
-                                ? loadingProgress.cumulativeBytesLoaded /
-                                    loadingProgress.expectedTotalBytes!
-                                : null,
-                          ),
-                        );
-                      },
-                    )
-                  : const Icon(
+            
+
+            //    buildThumbImage(widget.product), // Thumbnail
+            //    Container(
+            // width: 40,
+            // height: 40,
+            // margin: const EdgeInsets.only(right: 10),
+            // decoration: BoxDecoration(
+            //   shape: BoxShape.circle,
+            //   border: Border.all(color: Colors.grey.shade300),
+            // ),
+            // child: ClipOval(
+            //   child: widget.thumb.isNotEmpty
+            //       ? Image.network(
+            //           widget.thumb,
+            //           fit: BoxFit.cover,
+            //           errorBuilder: (context, error, stackTrace) => const Icon(
+            //             Icons.image_not_supported,
+            //             size: 20,
+            //             color: Colors.grey,
+            //           ),
+            //           loadingBuilder: (context, child, loadingProgress) {
+            //             if (loadingProgress == null) return child;
+            //             return Center(
+            //               child: CircularProgressIndicator(
+            //                 value: loadingProgress.expectedTotalBytes != null
+            //                     ? loadingProgress.cumulativeBytesLoaded /
+            //                         loadingProgress.expectedTotalBytes!
+            //                     : null,
+            //               ),
+            //             );
+            //           },
+            //         )
+            //       : const Icon(
+            //           Icons.image_not_supported,
+            //           size: 20,
+            //           color: Colors.grey,
+            //         ),
+             // Show product image only if not from chat screen
+      if (!widget.isFromChatScreen) 
+        buildThumbImage(widget.product),
+      
+      // Show chat thumbnail only if from chat screen
+      if (widget.isFromChatScreen)
+        Container(
+          width: 60,
+          height: 60,
+          margin: const EdgeInsets.only(right: 10),
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: ClipOval(
+            child: widget.thumb.isNotEmpty
+                ? Image.network(
+                    widget.thumb,
+                    fit: BoxFit.fill,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
                       Icons.image_not_supported,
                       size: 20,
                       color: Colors.grey,
                     ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                  )
+                : const Icon(
+                    Icons.image_not_supported,
+                    size: 20,
+                    color: Colors.grey,
+                  ),
             ),
           ),
            

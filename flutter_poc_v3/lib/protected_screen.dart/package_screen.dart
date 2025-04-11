@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/homeappbar_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
@@ -35,7 +37,7 @@ Future<bool> validateUserToken() async {
 
     return response.statusCode == 200;
   } catch (e) {
-    print('Error validating token: $e');
+    log('Error validating token: $e');
     return false;
   }
 }

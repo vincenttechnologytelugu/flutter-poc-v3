@@ -541,6 +541,7 @@ class _ConversationTileState extends State<_ConversationTile> {
                       thumb: fullThumbUrl, // Pass the full URL
                       title: widget.conversation.product.title ?? '',
                       price: widget.conversation.product.price ?? 0.0,
+                       isFromChatScreen: true, // Specify that it's from chat screen
                     ),
                   ),
                 );

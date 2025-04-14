@@ -228,31 +228,27 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                     battery: item['battery']?.toString() ?? '',
                     floorNumber: item['floorNumber']?.toString() ?? '',
                     totalFloors: item['totalFloors']?.toString() ?? '',
-                    type:item['type']?.toString() ?? '',
+                    type: item['type']?.toString() ?? '',
                     ownerType: item['ownerType']?.toString() ?? '',
                     company: item['company']?.toString() ?? '',
                     industry: item['industry']?.toString() ?? '',
                     position: item['position']?.toString() ?? '',
                     experienceLevel: item['experienceLevel']?.toString() ?? '',
-                    salary:item['salary'],
+                    salary: item['salary'],
                     // salary: item['salary']?.toString() ?? '',
                     jobType: item['jobType']?.toString() ?? '',
                     qualifications: item['qualifications']?.toString() ?? '',
                     contact_info: item['contact_info']?.toString() ?? '',
-                     pet_category:item['pet_category']?.toString() ?? '',
-                     vaccinationType: item['vaccinationType']?.toString() ?? '',
-                     breed: item['breed']?.toString() ?? '',
-                     
-                     dimensions:int.tryParse(item['dimensions']?.toString() ?? '0'),
-                     hobby_category:item['hobby_category']?.toString() ?? '',
-                     fashion_category: item['fashion_category']?.toString() ?? '',
-                     size: item['size']?.toString() ?? '',
+                    pet_category: item['pet_category']?.toString() ?? '',
+                    vaccinationType: item['vaccinationType']?.toString() ?? '',
+                    breed: item['breed']?.toString() ?? '',
 
-
-                    
-                    
-
-                  
+                    dimensions:
+                        int.tryParse(item['dimensions']?.toString() ?? '0'),
+                    hobby_category: item['hobby_category']?.toString() ?? '',
+                    fashion_category:
+                        item['fashion_category']?.toString() ?? '',
+                    size: item['size']?.toString() ?? '',
                   ))
               .toList();
 
@@ -570,6 +566,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     }
   }
 
+  // Add this helper function at the top of your file
+  String? formatSalary(dynamic salary) {
+    if (salary == null || salary.toString().isEmpty) return null;
+    try {
+      double salaryValue = 0.0;
+      if (salary is int) {
+        salaryValue = salary.toDouble();
+      } else if (salary is String && salary.isNotEmpty) {
+        salaryValue = double.tryParse(salary) ?? 0.0;
+      } else if (salary is double) {
+        salaryValue = salary;
+      }
+
+      if (salaryValue >= 100000) {
+        return '₹${(salaryValue / 100000).toStringAsFixed(2)} LPA';
+      } else {
+        return '₹${NumberFormat('#,##0', 'en_IN').format(salaryValue)}';
+      }
+    } catch (e) {
+      log('Error formatting salary: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // log('Product ID in details: ${widget.productModel.id}');
@@ -577,7 +597,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     // log('Assets: ${widget.productModel.assets}');
     // log('Image URL: ${widget.productModel.getFirstImageUrl()}');
     return Card(
-       color: const Color.fromARGB(255, 213, 221, 216),
+      color: const Color.fromARGB(255, 213, 221, 216),
       elevation: 10,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -662,19 +682,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               if (widget.productModel.featured_at?.isNotEmpty ==
                                   true)
                                 Container(
+                                  margin: EdgeInsets.only(top: 5, left: 5),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
-                                        Color.fromARGB( 255,
-                                                            252,
-                                                            252,
-                                                            252), // Deep Purple
-                                        Color.fromARGB( 255,
-                                                            252,
-                                                            252,
-                                                            252), // Pink
+                                        Color.fromARGB(
+                                            255, 255, 221, 2), // Deep Purple
+                                        Color.fromARGB(
+                                            255, 255, 221, 2), // Pink
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -682,19 +699,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.3),
+                                        color: const Color.fromARGB(
+                                                255, 252, 250, 250)
+                                            .withAlpha(77), // 0.3 * 255 ≈ 77
+
                                         blurRadius: 4,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
-                                  child: Text(
-                                    "FEATURED",
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color.fromARGB( 255, 1, 179, 25),
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize
+                                        .min, // To keep the container tight
+                                    children: [
+                                      const Icon(
+                                        Icons.check_circle, // Tick mark icon
+                                        size: 16, // Small icon size
+                                        color: Color.fromARGB(255, 251, 250,
+                                            246), // Same color as text
+                                      ),
+                                      const SizedBox(
+                                          width:
+                                              4), // Space between icon and text
+                                      Text(
+                                        "FEATURED",
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFFFAFAFA),
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                             ],
@@ -718,11 +753,54 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
+                            color: Color.fromARGB(255, 12, 8, 8),
+                            // color: Color.fromARGB(255, 251, 38, 38),
                             fontWeight: FontWeight.bold,
-                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            overflow: TextOverflow.ellipsis,
+                            letterSpacing: 1,
                           ),
                         ),
                         const SizedBox(height: 2),
+                        // Container(
+                        //     padding: const EdgeInsets.symmetric(
+                        //         vertical: 6, horizontal: 8),
+                        //     decoration: BoxDecoration(
+                        //       gradient: LinearGradient(
+                        //         colors: [
+                        //           // Color(0xFF046368),
+                        //           Color.fromARGB(255, 1, 179, 25),
+                        //           Color.fromARGB(255, 1, 179, 25),
+                        //         ], // Stylish gradient
+                        //         begin: Alignment.topLeft,
+                        //         end: Alignment.bottomRight,
+                        //       ),
+                        //       borderRadius: BorderRadius.circular(
+                        //           12), // Smooth rounded edges
+                        //       boxShadow: [
+                        //         BoxShadow(
+                        //           color: Colors.black
+                        //               .withOpacity(0.15), // Soft shadow effect
+                        //           blurRadius: 6,
+                        //           offset: Offset(2, 4),
+                        //         ),
+                        //       ],
+                        //     ),
+                        //     child: Text(
+                        //       widget.productModel.price != null
+                        //           ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
+                        //           : 'N/A',
+                        //       style: const TextStyle(
+                        //         fontSize: 15,
+                        //         fontWeight: FontWeight.w900,
+                        //         color: Colors.white,
+                        //         letterSpacing: 1.2,
+                        //         fontFamily: 'Poppins',
+                        //         fontStyle: FontStyle.normal,
+                        //       ),
+                        //       overflow: TextOverflow.ellipsis,
+                        //     )
+                        //     ),
                         Container(
                             padding: const EdgeInsets.symmetric(
                                 vertical: 6, horizontal: 8),
@@ -730,8 +808,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               gradient: LinearGradient(
                                 colors: [
                                   // Color(0xFF046368),
-                                  Color.fromARGB(255, 1, 179, 25),
-                                  Color.fromARGB(255, 1, 179, 25),
+                                  Color.fromARGB(255, 254, 255, 254),
+                                  Color.fromARGB(255, 254, 255, 254),
                                 ], // Stylish gradient
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -741,52 +819,72 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.black
-                                      .withOpacity(0.15), // Soft shadow effect
+                                      .withAlpha(38), // 0.15 * 255 ≈ 38
                                   blurRadius: 6,
                                   offset: Offset(2, 4),
                                 ),
                               ],
                             ),
-                            child:
-                                //  Text(
-                                //   "₹ ${productModel.price.toString()}",
-                                //   style: const TextStyle(
-                                //     color: Colors
-                                //         .white, // White text for contrast
-                                //     fontSize: 15,
-                                //     fontWeight: FontWeight.bold,
-                                //     fontFamily: 'Poppins',
-                                //     fontStyle: FontStyle.normal,
-                                //     letterSpacing:
-                                //         0.8, // Slight spacing for elegance
-                                //   ),
-                                //   overflow: TextOverflow.ellipsis,
-                                // ),
-
-                                Text(
-                              widget.productModel.price != null
-                                  ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
-                                  : 'N/A',
+                            // child: Text(
+                            //   productModel.price != null
+                            //       ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                            //       : 'N/A',
+                            //   style: const TextStyle(
+                            //     fontSize: 15,
+                            //     fontWeight: FontWeight.w900,
+                            //     color: Colors.white,
+                            //     letterSpacing: 1.2,
+                            //     fontFamily: 'Poppins',
+                            //     fontStyle: FontStyle.normal,
+                            //   ),
+                            //   overflow: TextOverflow.ellipsis,
+                            // )
+                            // child: Text(
+                            //   productModel.price != null &&
+                            //           productModel.price != 0
+                            //       ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                            //       : productModel.salary != null &&
+                            //               productModel
+                            //                   .salary != null && productModel.salary! > 0
+                            //           ? 'Salary: ${productModel.salary}'
+                            //           : productModel.category
+                            //                       ?.toLowerCase() ==
+                            //                   'jobs'
+                            //               ? 'Salary: Negotiable'
+                            //               : 'N/A',
+                            //   style: const TextStyle(
+                            //     fontSize: 15,
+                            //     fontWeight: FontWeight.w900,
+                            //     color: Colors.white,
+                            //     letterSpacing: 1.2,
+                            //     fontFamily: 'Poppins',
+                            //     fontStyle: FontStyle.normal,
+                            //   ),
+                            //   overflow: TextOverflow.ellipsis,
+                            // )
+                            child: Text(
+                              widget.productModel.category?.toLowerCase() ==
+                                      'jobs'
+                                  ? 'Salary: ${formatSalary(widget.productModel.salary) ?? 'N/A'}'
+                                  : widget.productModel.price != null &&
+                                          widget.productModel.price != 0
+                                      ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
+                                      : widget.productModel.category
+                                                  ?.toLowerCase() ==
+                                              'jobs'
+                                          ? 'Salary: Negotiable'
+                                          : 'Price: N/A',
                               style: const TextStyle(
                                 fontSize: 15,
-                                fontWeight: FontWeight.w900,
-                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 28, 199, 1),
                                 letterSpacing: 1.2,
-                                fontFamily: 'Poppins',
+                                // fontFamily: 'Poppins',
                                 fontStyle: FontStyle.normal,
                               ),
                               overflow: TextOverflow.ellipsis,
                             )),
 
-                        // Text(
-                        //   '₹ ${widget.productModel.price ?? 'N/A'}',
-                        //   style: const TextStyle(
-                        //     color: Color.fromARGB(255, 243, 6, 176),
-                        //     fontWeight: FontWeight.bold,
-                        //     fontSize: 14,
-                        //   ),
-                        //   overflow: TextOverflow.ellipsis,
-                        // ),
                         const SizedBox(
                           height: 2,
                         ),
@@ -799,12 +897,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 '${widget.productModel.location ?? ''}, ${widget.productModel.city ?? ''}, ${widget.productModel.state ?? ''}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style:  TextStyle(fontSize: 14,
-                                 fontFamily: GoogleFonts.abhayaLibre()
-                                            .fontFamily,
-                                
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w900,
+                                  letterSpacing: 1,
+                                  fontFamily:
+                                      GoogleFonts.abhayaLibre().fontFamily,
                                 ),
-                                
                               ),
                             ),
                           ],
@@ -818,16 +917,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               child: Text(
                                 _formatDateTime(
                                     widget.productModel.publishedAt),
-                                style:  TextStyle(
-                                  fontSize: 16,
-                                  color: Color.fromARGB(255, 122, 120, 120),
+                                style: TextStyle(
+                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
-                                    fontFamily:
-                                          GoogleFonts.abhayaLibre().fontFamily,
+                                  color: Color.fromARGB(255, 47, 46, 46),
+                                  overflow: TextOverflow.ellipsis,
+                                  letterSpacing: 1,
+                                  fontFamily:
+                                      GoogleFonts.abhayaLibre().fontFamily,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                
                               ),
                             ),
                           ],
@@ -844,11 +944,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             right: 5,
             child: Container(
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 203, 203, 189),
+                color: const Color.fromARGB(255, 245, 245, 243),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
                   color: Colors.white,
-                  width: 3.0,
+                  width: 1.0,
                 ),
                 boxShadow: [
                   BoxShadow(
@@ -879,10 +979,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           );
                         } else {
                           cartController.addToFavourite(
-                            context,
-                            widget.productModel.id.toString(),
-                             screenName: 'sub_category_posts_screen'  // Add this parameter
-                          );
+                              context, widget.productModel.id.toString(),
+                              screenName:
+                                  'sub_category_posts_screen' // Add this parameter
+                              );
                         }
                       },
                       icon: Stack(

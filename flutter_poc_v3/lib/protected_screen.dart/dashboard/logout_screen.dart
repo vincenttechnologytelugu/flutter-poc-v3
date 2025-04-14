@@ -127,6 +127,7 @@ class LogoutScreen extends StatelessWidget {
     if (shouldLogout ?? false) {
       try {
         final prefs = await SharedPreferences.getInstance();
+        
         await prefs.clear();
 
         Fluttertoast.showToast(

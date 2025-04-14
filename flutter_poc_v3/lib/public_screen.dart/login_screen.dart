@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/controllers/cart_controller.dart';
 import 'package:flutter_poc_v3/controllers/location_controller.dart';
 import 'package:flutter_poc_v3/controllers/products_controller.dart';
 import 'package:flutter_poc_v3/models/product_model.dart';
@@ -463,6 +464,7 @@ class _LoginScreenState extends State<LoginScreen> {
           // Store the token
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
+          
 
           setState(() {
             loginMessage = 'Login successful! Checking location permissions...';
@@ -519,6 +521,9 @@ class _LoginScreenState extends State<LoginScreen> {
           await getMyAds(context);
           // Call the mixin method with context
           await checkAuthAndNavigate();
+          // Add this to your login success handler
+
+
         } else {
           throw Exception('Session token not received from server');
         }

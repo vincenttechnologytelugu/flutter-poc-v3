@@ -100,6 +100,30 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
     _scrollController.addListener(_scrollListener);
   }
 
+// Add this helper function at the top of your file
+  String? formatSalary(dynamic salary) {
+    if (salary == null || salary.toString().isEmpty) return null;
+    try {
+      double salaryValue = 0.0;
+      if (salary is int) {
+        salaryValue = salary.toDouble();
+      } else if (salary is String && salary.isNotEmpty) {
+        salaryValue = double.tryParse(salary) ?? 0.0;
+      } else if (salary is double) {
+        salaryValue = salary;
+      }
+
+      if (salaryValue >= 100000) {
+        return '₹${(salaryValue / 100000).toStringAsFixed(2)} LPA';
+      } else {
+        return '₹${NumberFormat('#,##0', 'en_IN').format(salaryValue)}';
+      }
+    } catch (e) {
+      log('Error formatting salary: $e');
+      return null;
+    }
+  }
+
 // Function to show the subscription dialog
   void showSubscriptionDialog(BuildContext context) {
     showDialog(
@@ -642,7 +666,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
               "Updated Ads",
               style: GoogleFonts.tenorSans(
                 textStyle: TextStyle(
-                    color: const Color.fromARGB(255, 4, 74, 50),
+                    color: const Color.fromARGB(255, 4, 25, 18),
                     letterSpacing: .1),
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
@@ -836,8 +860,12 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              'Showing ads in: ${locationController.currentCity.value}, ${locationController.currentState.value}',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              'SHOWING ADS IN: ${locationController.currentCity.value.toUpperCase()}, ${locationController.currentState.value.toUpperCase()}',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                fontFamily: 'Poppins',
+              ),
             ),
           ),
           Expanded(
@@ -878,7 +906,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                       child: Card(
                         elevation: 2,
                         // color: const Color.fromARGB(255, 245, 242, 242),
-                        color: const Color.fromARGB(255, 213, 221, 216),
+                        color: const Color.fromARGB(255, 246, 248, 246),
 
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(15)),
@@ -888,7 +916,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                             Padding(
                               padding: const EdgeInsets.all(1.0),
                               child: SizedBox(
-                                height: 105,
+                                height: 120,
                                 child: Stack(
                                   children: [
                                     ClipRRect(
@@ -898,7 +926,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                           product.thumbnailUrl.isNotEmpty
                                               ? Image.network(
                                                   'http://13.200.179.78/${product.thumbnailUrl}',
-                                                  height: 200,
+                                                  height: 300,
                                                   width: double.infinity,
                                                   fit: BoxFit.fill,
                                                   errorBuilder: (context, error,
@@ -1024,11 +1052,11 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                       colors: [
                                                         Color.fromARGB(
                                                             255,
-                                                            252,
-                                                            252,
-                                                            252), // Deep Purple
-                                                        Color.fromARGB(255, 252,
-                                                            252, 252), // Pink
+                                                            255,
+                                                            221,
+                                                            2), // Deep Purple
+                                                        Color.fromARGB(255, 255,
+                                                            221, 2), // Pink
                                                       ],
                                                       begin: Alignment.topLeft,
                                                       end:
@@ -1039,7 +1067,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                             12),
                                                     boxShadow: [
                                                       BoxShadow(
-                                                        color: Colors.black
+                                                        color: const Color
+                                                                .fromARGB(255,
+                                                                252, 250, 250)
                                                             .withAlpha(
                                                                 77), // 0.3 * 255 ≈ 77
 
@@ -1049,16 +1079,43 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                       ),
                                                     ],
                                                   ),
-                                                  child: Text(
-                                                    'FEATURED',
-                                                    style: GoogleFonts.roboto(
-                                                      color: Color.fromARGB(
-                                                          255, 1, 179, 25),
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 13,
-                                                      letterSpacing: 0.5,
-                                                    ),
+                                                  child: Row(
+                                                    mainAxisSize: MainAxisSize
+                                                        .min, // To keep the container tight
+                                                    children: [
+                                                      const Icon(
+                                                        Icons
+                                                            .check_circle, // Tick mark icon
+                                                        size:
+                                                            16, // Small icon size
+                                                        color: Color.fromARGB(
+                                                            255,
+                                                            251,
+                                                            250,
+                                                            246), // Same color as text
+                                                      ),
+                                                      const SizedBox(
+                                                          width:
+                                                              4), // Space between icon and text
+                                                      Text(
+                                                        'FEATURED',
+                                                        style:
+                                                            GoogleFonts.roboto(
+                                                          color:
+                                                              Color(0xFFFAFAFA),
+                                                          // color: Color.fromARGB(
+                                                          //     255,
+                                                          //     251,
+                                                          //     250,
+                                                          //     246),
+                                                          // color: Color.fromARGB(255, 173, 179, 1),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 12,
+                                                          letterSpacing: 0.5,
+                                                        ),
+                                                      ),
+                                                    ],
                                                   ),
                                                 ),
                                               );
@@ -1074,7 +1131,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                       child: Container(
                                         decoration: BoxDecoration(
                                           color: const Color.fromARGB(
-                                              255, 203, 203, 189),
+                                              255, 254, 254, 253),
                                           borderRadius:
                                               BorderRadius.circular(22),
                                           border: Border.all(
@@ -1113,13 +1170,13 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                             productModel.id
                                                                 .toString());
                                                   } else {
-                                                    cartController
-                                                        .addToFavourite(
-                                                            context,
-                                                            productModel.id
-                                                                .toString(),
-                                                                screenName: 'responsive_products_screen'  // Add this parameter 
-                                                                );
+                                                    cartController.addToFavourite(
+                                                        context,
+                                                        productModel.id
+                                                            .toString(),
+                                                        screenName:
+                                                            'responsive_products_screen' // Add this parameter
+                                                        );
                                                   }
                                                 },
                                                 icon: Stack(
@@ -1309,25 +1366,25 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                               ),
                             ),
                             // Product details...
-                            SizedBox(height: 8),
+                            SizedBox(height: 0),
 
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 5,
-                                  vertical: 1), // Reduced padding
+                                  horizontal: 3,
+                                  vertical: 3), // Reduced padding
                               child: Column(
-                                //  crossAxisAlignment: CrossAxisAlignment.start,
-                                // mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
                                       padding: const EdgeInsets.symmetric(
-                                          vertical: 6, horizontal: 8),
+                                          vertical: 6, horizontal: 6),
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
                                             // Color(0xFF046368),
-                                            Color.fromARGB(255, 1, 179, 25),
-                                            Color.fromARGB(255, 1, 179, 25),
+                                            Color.fromARGB(255, 254, 255, 254),
+                                            Color.fromARGB(255, 254, 255, 254),
                                           ], // Stylish gradient
                                           begin: Alignment.topLeft,
                                           end: Alignment.bottomRight,
@@ -1343,35 +1400,72 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                           ),
                                         ],
                                       ),
+                                      // child: Text(
+                                      //   productModel.price != null
+                                      //       ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                                      //       : 'N/A',
+                                      //   style: const TextStyle(
+                                      //     fontSize: 15,
+                                      //     fontWeight: FontWeight.w900,
+                                      //     color: Colors.white,
+                                      //     letterSpacing: 1.2,
+                                      //     fontFamily: 'Poppins',
+                                      //     fontStyle: FontStyle.normal,
+                                      //   ),
+                                      //   overflow: TextOverflow.ellipsis,
+                                      // )
+                                      // child: Text(
+                                      //   productModel.price != null &&
+                                      //           productModel.price != 0
+                                      //       ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                                      //       : productModel.salary != null &&
+                                      //               productModel
+                                      //                   .salary != null && productModel.salary! > 0
+                                      //           ? 'Salary: ${productModel.salary}'
+                                      //           : productModel.category
+                                      //                       ?.toLowerCase() ==
+                                      //                   'jobs'
+                                      //               ? 'Salary: Negotiable'
+                                      //               : 'N/A',
+                                      //   style: const TextStyle(
+                                      //     fontSize: 15,
+                                      //     fontWeight: FontWeight.w900,
+                                      //     color: Colors.white,
+                                      //     letterSpacing: 1.2,
+                                      //     fontFamily: 'Poppins',
+                                      //     fontStyle: FontStyle.normal,
+                                      //   ),
+                                      //   overflow: TextOverflow.ellipsis,
+                                      // )
+                                      
                                       child: Text(
-                                        productModel.price != null
-                                            ? '₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
-                                            : 'N/A',
+                                        productModel.category?.toLowerCase() ==
+                                                'jobs'
+                                            ? 'Salary: ${formatSalary(productModel.salary) ?? 'N/A'}'
+                                            : productModel.price != null &&
+                                                    productModel.price != 0
+                                                ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(productModel.price)}'
+                                                : productModel.category
+                                                            ?.toLowerCase() ==
+                                                        'jobs'
+                                                    ? 'Salary: Negotiable'
+                                                    : 'Price: N/A',
                                         style: const TextStyle(
                                           fontSize: 15,
-                                          fontWeight: FontWeight.w900,
-                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              Color.fromARGB(255, 7, 13, 6),
                                           letterSpacing: 1.2,
-                                          fontFamily: 'Poppins',
+                                          // fontFamily: 'Poppins',
                                           fontStyle: FontStyle.normal,
                                         ),
                                         overflow: TextOverflow.ellipsis,
-                                      )),
+                                      )
+                                      ),
+                                      SizedBox(height: 5,),
                                   Row(
                                     children: [
-                                      // Container(
-                                      //   decoration: BoxDecoration(
-                                      //     shape: BoxShape.circle,
-                                      //     color: const Color.fromARGB(
-                                      //         255, 243, 127, 12),
-                                      //   ),
-                                      //   child: Icon(
-                                      //     Icons.title_rounded,
-                                      //     color: const Color.fromARGB(
-                                      //         255, 245, 241, 241),
-                                      //     size: 18,
-                                      //   ),
-                                      // ),
+                                    
                                       const SizedBox(
                                         width: 3,
                                       ),
@@ -1381,7 +1475,9 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                               .toString()
                                               .toUpperCase(),
                                           style: const TextStyle(
-                                            color: Colors.black,
+                                            color:
+                                                Color.fromARGB(255, 12, 8, 8),
+                                            // color: Color.fromARGB(255, 251, 38, 38),
                                             fontWeight: FontWeight.bold,
                                             fontFamily: 'Poppins',
                                             overflow: TextOverflow.ellipsis,

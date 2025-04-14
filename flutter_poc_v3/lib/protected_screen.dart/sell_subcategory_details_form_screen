@@ -304,17 +304,32 @@ final List<Map<String, dynamic>> colorOptions = [
 
   // First, add this map for city-location mapping
 final Map<String, List<String>> cityLocationMap = {
-  'Hyderabad': ['Ameerpet', 'Hitech City', 'Gachibowli', 'Kukatpally', 
-  'Madhapur',' Banjara Hills', 'Secunderabad', 'Lal Darwaja', 'Nampally', 'Narayanguda', 'Ramanthapur', 'Saidabad', 'Shankar Nagar', 'Somajiguda',
-   'St. George', 'Tarnaka', 'Uppal', 'Vanasthalipuram', 'Vijay Nagar', 'Yousufguda',
-   'Miyapur'
+  'Hyderabad': ["Ameerpet", "Begumpet", "SR Nagar", "Punjagutta",
+   "Khairatabad", "Somajiguda", "Lakdikapool", "Masab Tank", "Nampally",
+    "Abids", "Koti", "Musheerabad", "Chikkadpally", "Himayatnagar", "Domalguda", 
+    "Amberpet", "Barkatpura", "Kachiguda", "Ashok Nagar", "Charminar", "Laad Bazaar",
+     "Mecca Masjid", "Malakpet", "Chaderghat", "Afzal Gunj", "Moghalpura", 
+     "Shah Ali Banda", "Yakutpura", "Falaknuma", "Santoshnagar", "Banjara Hills",
+      "Jubilee Hills", "Film Nagar", "Madhapur", "HITEC City", "Gachibowli",
+       "Kondapur", "Nanakramguda", "Manikonda", "Shaikpet", "Tolichowki", 
+       "Mehdipatnam", "Kukatpally", "KPHB Colony", "Miyapur", "Bachupally", 
+       "Nizampet", "Pragathi Nagar", "Chanda Nagar", "Hafeezpet", "Serilingampally",
+        "Secunderabad", "Alwal", "Bolarum", "Malkajgiri", "Sainikpuri", 
+        "A. S. Rao Nagar", "Kapra", "ECIL", "Keesara", "Kompally", "Jeedimetla",
+         "Quthbullapur", "Uppal", "Habsiguda", "Ramanthapur", "Nagole", "Nacharam",
+          "Boduppal", "Mallapur", "Pocharam", "Ghatkesar", "Dilsukhnagar", "Kothapet",
+           "LB Nagar", "Vanasthalipuram", "Saroornagar", "Champapet", "Hayathnagar",
+            "Attapur", "Rajendranagar", "Bandlaguda", "Gandipet", "Narsingi", "Puppalguda", 
+            "Shamshabad", "Rajiv Gandhi International Airport"
   
   ],
   'Warangal': ['Hanamkonda', 'Kazipet', 'Warangal Fort', 'Pochamma Maidan'],
   'Karimnagar': ['Tower Circle', 'Kaman Road', 'Circuit House', 'Gandhi Road'],
   'Nizamabad': ['Kanteshwar', 'Dubba', 'Namdev Circle', 'Gandhi Chowk'],
-  'Vijayawada': ['Kailaras', 'Chinna Tirumala', 'Gandhi Nagar', 'Ravindra Nagar'],
-  'Visakhapatnam': ['Rajendra Nagar', 'Gajuwaka', 'Narayanaguda', 'Lakdikapool'],
+  "Vijayawada": ["Gunadala", "Patamata", "Benz Circle", "Poranki", "Tadepalle", "Kanuru",
+   "Enikepadu", "Nidamanuru", "Gollapudi", "Ibrahimpatnam"],
+ "Visakhapatnam":[ "Anakapalle", "Bheemunipatnam", "Gajuwaka", "Pendurthi", "Parawada",
+  "Mulakuddu", "Pedagantyada", "Chinamushidiwada", "Madhurawada", "Yendada"],
   'Guntur': ['Guntur City', 'Guntur Rural', 'Guntur Urban'],
   'Nellore': ['Nellore City', 'Nellore Rural', 'Nellore Urban'],
   'Mumbai': ['Mumbai City', 'Mumbai Suburban', 'Navi Mumbai'],
@@ -324,6 +339,9 @@ final Map<String, List<String>> cityLocationMap = {
     'Nuzvid City', 'Nuzvid Rural', 'Nuzvid Urban'
 
   ]
+
+
+  
 
   // Add more cities and locations as needed
 };
@@ -346,6 +364,7 @@ Future<String?> showLocationSelectionDialog(BuildContext context, String city) a
     context: context,
     builder: (BuildContext context) {
       final locations = cityLocationMap[city] ?? [];
+      
       final searchController = TextEditingController();
       List<String> filteredLocations = List.from(locations);
 
@@ -479,8 +498,44 @@ Future<void> _showPetCategoryDialog(BuildContext context) {
 // First, create a map of states and their cities
 final Map<String, List<String>> stateCityMap = {
 
-  'Telangana': ['Hyderabad', 'Warangal', 'Karimnagar', 'Nizamabad'],
-  'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Guntur', 'Nellore'],
+  'Telangana': ["Hyderabad",
+"Warangal",
+"Nizamabad",
+"Karimnagar",
+"Khammam",
+"Ramagundam",
+"Mahbubnagar",
+"Nalgonda",
+"Adilabad",
+"Siddipet",
+"Miryalaguda",
+"Jagtial",
+"Suryapet",
+"Mancherial",
+"Kothagudem",
+"Zaheerabad",
+"Bodhan",
+"Vikarabad",
+"Jangaon",
+"Bhupalpally",
+"Gadwal",
+"Kagaznagar",
+"Palwancha",
+"Bellampalli",
+"Medak",
+"Narayanpet",
+"Wanaparthy",
+"Kamareddy",
+"Mahabubabad",
+"Hanamkonda",
+"Yellandu",
+"Korutla",
+"Luxettipet"
+
+  ],
+  'Andhra Pradesh': ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Rajamahendravaram", "Kurnool", "Kakinada", "Kadapa", "Tirupati", "Mangalagiri-Tadepalli", "Anantapuram", "Ongole", "Vizianagaram", "Eluru", "Proddatur", "Nandyal", "Adoni", "Madanapalle", "Machilipatnam", "Tenali", "Chittoor", "Hindupur", "Srikakulam", "Bhimavaram", "Tadepalligudem", "Guntakal", "Dharmavaram",
+   "Gudivada", "Narasaraopet", "Kadiri", "Tadipatri", "Chilakaluripet"
+  ],
   'Maharashtra': ['Mumbai', 'Pune', 'Nagpur', 'Thane'],
   'Karnataka': ['Bangalore', 'Mysuru', 'Hubli-Dharwad', 'Belagavi'],
   'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli'],
@@ -972,11 +1027,12 @@ void initState() {
     'industry': TextEditingController(),
     'position': TextEditingController(),
     'experienceLevel': TextEditingController(),
-    'salary': TextEditingController(),
+     'salary': TextEditingController(),
     'jobType': TextEditingController(),
     'qualifications': TextEditingController(),
     'fashion_category': TextEditingController(),
     'size': TextEditingController(),
+      // controllers['salary'] = TextEditingController();
  
   
 
@@ -1150,7 +1206,7 @@ await prefs.setString('saved_color', widget.categoryColor.value.toRadixString(16
         'industry':controllers['industry']?.text?.trim() ?? '',
         'position':controllers['position']?.text?.trim() ?? '',
         
-        //  'salary': controllers['salary']?.text?.trim() ?? '',
+         'salary': controllers['salary']?.text?.trim() ?? '',
         'jobType': controllers['jobType']?.text?.trim() ?? '',
         'experienceLevel': controllers['experienceLevel']?.text?.trim() ?? '',
         'qualifications': controllers['qualifications']?.text?.trim() ?? '',
@@ -1161,16 +1217,27 @@ await prefs.setString('saved_color', widget.categoryColor.value.toRadixString(16
         //  'price': double.parse(controllers['price']?.text ?? '0'),
         //  'price': parseStringToDouble(controllers['price']?.text), // Modified
         //  'salary': double.parse(controllers['salary']?.text ?? '0'),
-        //  'salary': parseStringToDouble(controllers['salary']?.text), // Modified
+         // 'salary': parseStringToDouble(controllers['salary']?.text), // Modified
         'year': int.parse(controllers['year']?.text ?? '0'),
-        
-       
-      
-        
-        
+          
         
       };
-      
+       // Add salary if category is Jobs
+  if (widget.category.toLowerCase() == 'jobs') {
+    // Convert salary string to number and add to formData
+    if (controllers['salary']?.text?.isNotEmpty ?? false) {
+      formData['salary'] = int.tryParse(controllers['salary']!.text.trim()) ?? 0;
+    }
+       // Add other job-specific fields
+    formData.addAll({
+      'company': controllers['company']?.text?.trim() ?? '',
+      'industry': controllers['industry']?.text?.trim() ?? '',
+      'position': controllers['position']?.text?.trim() ?? '',
+      'jobType': controllers['jobType']?.text?.trim() ?? '',
+      'experienceLevel': controllers['experienceLevel']?.text?.trim() ?? '',
+      'qualifications': controllers['qualifications']?.text?.trim() ?? '',
+    });
+  }
 
       final response = await http.post(
         Uri.parse('http://13.200.179.78/adposts'),
@@ -1185,6 +1252,8 @@ await prefs.setString('saved_color', widget.categoryColor.value.toRadixString(16
       });
       log('Response status: ${response.statusCode}');
       log('Response body: ${response.body}');
+      log('Salary value: ${controllers['salary']?.text}');
+
 
       if (response.statusCode == 200 || response.statusCode == 201) {
           //  _clearSavedData(); // Clear saved data only on successful submission
@@ -1284,7 +1353,7 @@ else if (response.statusCode == 401) {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Subscription Limit Reached Take New Subscription',
+              title: const Text('Subscription Limit Reached Take New Subscription (OR) Upgrade Your Subscription',
               style: TextStyle(
                 color: Colors.red,
                 fontWeight: FontWeight.bold,
@@ -5599,14 +5668,15 @@ SizedBox(height: 10),
   controller: controllers['salary'],
    keyboardType: TextInputType.number, // Numeric keyboard
   decoration: InputDecoration(
-    labelText: 'Salary',
+    labelText: 'Annual Salary (in ₹)',
      labelStyle: TextStyle(
             color: Colors.grey[800],
             fontWeight: FontWeight.w600,
             fontSize: 16.0,
             fontFamily: 'Roboto',
           ),
-    hintText: 'Enter Salary',
+    hintText: 'Enter annual salary in rupees',
+     helperText: 'Enter salary in rupees (e.g., 500000 for 5 LPA)',
      hintStyle: TextStyle(
             color: Colors.grey[600],
             fontSize: 14.0,
@@ -5649,8 +5719,22 @@ SizedBox(height: 10),
           fontFamily: 'Roboto',
         ),
   cursorColor: Colors.blue[600],
-   validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
+  //  validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
   // Adding a subtle animation
+  validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter salary';
+          }
+          final salary = double.tryParse(value);
+          if (salary == null) {
+            return 'Please enter a valid number';
+          }
+          if (salary < 0) {
+            return 'Salary cannot be negative';
+          }
+          return null;
+        },
+      
 
   keyboardAppearance: Brightness.light,
 ),
@@ -7184,82 +7268,7 @@ SizedBox(height: 10),
 ),
 ),
 SizedBox(height: 10),
-      Container(
-  decoration: BoxDecoration(
-  
-    color: Colors.white,
-        borderRadius: BorderRadius.circular(25.0),
-   boxShadow: [
-          BoxShadow(
-            color: Colors.grey[300]!.withOpacity(0.5),
-            blurRadius: 10.0,
-            offset: const Offset(0, 2),
-          ),
-        ],
-  ),
-  child:
-  TextFormField(
-  readOnly: _isFormReadOnly,
-  keyboardType: TextInputType.number,
-  controller: controllers['mileage'],
-  decoration: InputDecoration(
-    labelText: 'Mileage',
-     labelStyle: TextStyle(
-            color: Colors.grey[800],
-            fontWeight: FontWeight.w600,
-            fontSize: 16.0,
-            fontFamily: 'Roboto',
-          ),
-    hintText: 'Enter Mileage(Km driven)',
-     hintStyle: TextStyle(
-            color: Colors.grey[600],
-            fontSize: 14.0,
-          ),
-    prefixIcon: Icon(
-      Icons.search,
-        color: Colors.grey[700],
-      size: 22,
-    ),
-     suffixIcon: Icon(
-            Icons.bubble_chart,
-            color: Colors.blue[700],
-          ),
-    filled: true,
-   fillColor: Colors.transparent,
-     border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.grey[300]!, width: 1.0),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(20.0),
-            borderSide: BorderSide(color: Colors.blue[400]!, width: 2.0),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            vertical: 18.0,
-            horizontal: 20.0,
-          ),
-    // Unique gradient background effect
-    floatingLabelBehavior: FloatingLabelBehavior.auto,
-   
-  ),
-  style: TextStyle(
-          fontSize: 18.0,
-          color: Colors.grey[900],
-          fontWeight: FontWeight.w500,
-          fontFamily: 'Roboto',
-        ),
-  cursorColor: Colors.blue[600],
-  
- // validator: (value) => value?.isEmpty ?? true ? 'Required' : null,
-  // Adding a subtle animation
-  keyboardAppearance: Brightness.light,
-),
-),
-SizedBox(height: 10),
+     
       Container(
   decoration: BoxDecoration(
   

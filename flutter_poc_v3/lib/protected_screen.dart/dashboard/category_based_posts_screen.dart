@@ -16,7 +16,6 @@ import 'dart:math' show sin, pi;
 class CategoryBasedPostsScreen extends StatefulWidget {
   final String apiUrl;
   final String title;
-  
 
   const CategoryBasedPostsScreen({
     super.key,
@@ -42,6 +41,29 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
   int page = 0;
   final int pageSize = 50;
   String location = "Select Location"; // Add this line
+
+    String? formatSalary(dynamic salary) {
+    if (salary == null || salary.toString().isEmpty) return null;
+    try {
+      double salaryValue = 0.0;
+      if (salary is int) {
+        salaryValue = salary.toDouble();
+      } else if (salary is String && salary.isNotEmpty) {
+        salaryValue = double.tryParse(salary) ?? 0.0;
+      } else if (salary is double) {
+        salaryValue = salary;
+      }
+
+      if (salaryValue >= 100000) {
+        return '₹${(salaryValue / 100000).toStringAsFixed(2)} LPA';
+      } else {
+        return '₹${NumberFormat('#,##0', 'en_IN').format(salaryValue)}';
+      }
+    } catch (e) {
+      log('Error formatting salary: $e');
+      return null;
+    }
+  }
   @override
   void initState() {
     super.initState();
@@ -435,7 +457,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
-                                            255, 203, 203, 189),
+                                            255, 250, 250, 250),
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
                                           color: Colors.white,
@@ -473,10 +495,11 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                   );
                                                 } else {
                                                   cartController.addToFavourite(
-                                                    context,
-                                                    post.id.toString(),
-                                                     screenName: 'category_based_posts_screen'  // Add this parameter
-                                                  );
+                                                      context,
+                                                      post.id.toString(),
+                                                      screenName:
+                                                          'category_based_posts_screen' // Add this parameter
+                                                      );
                                                 }
                                               },
                                               icon: Stack(
@@ -697,10 +720,10 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color.fromARGB(255, 252, 252,
-                                                    252), // Deep Purple
+                                                Color.fromARGB(255, 255, 221,
+                                                    2), // Deep Purple
                                                 Color.fromARGB(
-                                                    255, 252, 252, 252), // Pink
+                                                    255, 255, 221, 2), // Pink
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
@@ -719,15 +742,39 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                               ),
                                             ],
                                           ),
-                                          child: const Text(
-                                            'FEATURED',
-                                            style: TextStyle(
-                                              color: Color.fromARGB(
-                                                  255, 1, 179, 25),
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 12,
-                                              letterSpacing: 0.5,
-                                            ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize
+                                                .min, // To keep the container tight
+                                            children: [
+                                              const Icon(
+                                                Icons
+                                                    .check_circle, // Tick mark icon
+                                                size: 16, // Small icon size
+                                                color: Color.fromARGB(
+                                                    255,
+                                                    251,
+                                                    250,
+                                                    246), // Same color as text
+                                              ),
+                                              const SizedBox(
+                                                  width:
+                                                      4), // Space between icon and text
+                                              Text(
+                                                'FEATURED',
+                                                style: GoogleFonts.roboto(
+                                                  color: Color(0xFFFAFAFA),
+                                                  // color: Color.fromARGB(
+                                                  //     255,
+                                                  //     251,
+                                                  //     250,
+                                                  //     246),
+                                                  // color: Color.fromARGB(255, 173, 179, 1),
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  letterSpacing: 0.5,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       );
@@ -768,26 +815,18 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           ),
                                         ),
 
-                                        // Text(
-                                        //   '₹${post.price ?? 'N/A'}',
-                                        //   style: const TextStyle(
-                                        //     fontSize: 20,
-                                        //     fontWeight: FontWeight.bold,
-                                        //     color: Color.fromARGB(255, 3, 151, 20),
-                                        //     // color: Color.fromARGB(
-                                        //     //     255, 243, 6, 176),
-                                        //   ),
-                                        // ),
+                                       
 
                                         Container(
                                           padding: const EdgeInsets.symmetric(
                                               vertical: 10, horizontal: 16),
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
-                                              colors: [
-                                                Color.fromARGB(255, 1, 179, 25),
-                                                Color.fromARGB(255, 1, 179, 25)
-                                              ], // Green gradient
+                                                colors: [
+                                            // Color(0xFF046368),
+                                            Color.fromARGB(255, 254, 255, 254),
+                                            Color.fromARGB(255, 254, 255, 254),
+                                          ], 
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
                                             ),
@@ -805,30 +844,47 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                               ),
                                             ],
                                           ),
-                                          child: Row(
+                                          child: 
+                                          Row(
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
-                                              Text(
-                                                post.price != null
-                                                    ? '₹${NumberFormat('#,##0', 'en_IN').format(post.price)}'
-                                                    : 'N/A',
-                                                style: const TextStyle(
-                                                  fontSize: 20,
-                                                  fontWeight: FontWeight.w900,
-                                                  color: Colors.white,
-                                                  letterSpacing: 1.2,
-                                                ),
-                                              )
-
                                               // Text(
-                                              //   post.price != null ? '₹${post.price}' : 'N/A',
+                                              //   post.price != null
+                                              //       ? '₹${NumberFormat('#,##0', 'en_IN').format(post.price)}'
+                                              //       : 'N/A',
                                               //   style: const TextStyle(
                                               //     fontSize: 20,
-                                              //     fontWeight: FontWeight.bold,
+                                              //     fontWeight: FontWeight.w900,
                                               //     color: Colors.white,
                                               //     letterSpacing: 1.2,
                                               //   ),
-                                              // ),
+                                              // )
+                                               Text(
+                                        post.category?.toLowerCase() ==
+                                                'jobs'
+                                            ? 'Salary: ${formatSalary(post.salary) ?? 'N/A'}'
+                                            : post.price != null &&
+                                                    post.price != 0
+                                                ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(post.price)}'
+                                                : post.category
+                                                            ?.toLowerCase() ==
+                                                        'jobs'
+                                                    ? 'Salary: Negotiable'
+                                                    : 'Price: N/A',
+                                         style: const TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color:
+                                              Color.fromARGB(255, 28, 199, 1),
+                                          letterSpacing: 1.2,
+                                          // fontFamily: 'Poppins',
+                                          fontStyle: FontStyle.normal,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      )
+                                              
+
+                                           
                                             ],
                                           ),
                                         )
@@ -854,13 +910,12 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                                     item.isNotEmpty)
                                                 .join(', '),
                                             style: TextStyle(
-                                              color: const Color.fromARGB(
-                                                  255, 23, 22, 22),
-                                              fontSize: 16,
-                                              fontFamily:
-                                                  GoogleFonts.abhayaLibre()
-                                                      .fontFamily,
-                                            ),
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w900,
+                                        letterSpacing: 1,
+                                        fontFamily: GoogleFonts.abhayaLibre()
+                                            .fontFamily,
+                                      ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -899,13 +954,14 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                         Text(
                                           'Published: ${post.published_at != null ? DateFormat('MMM dd, yyyy').format(DateTime.parse(post.published_at!)) : 'Not available'}',
                                           style: TextStyle(
-                                            color: const Color.fromARGB(
-                                                255, 23, 22, 22),
-                                            fontSize: 16,
-                                            fontFamily:
-                                                GoogleFonts.abhayaLibre()
-                                                    .fontFamily,
-                                          ),
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 47, 46, 46),
+                                      overflow: TextOverflow.ellipsis,
+                                      letterSpacing: 1,
+                                      fontFamily:
+                                          GoogleFonts.abhayaLibre().fontFamily,
+                                    ),
                                         ),
                                       ],
                                     ),

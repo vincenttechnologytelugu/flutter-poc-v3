@@ -65,7 +65,7 @@ class ProductModel {
   // Jobs specific
   final String? position;
   final String? company;
-  final int? salary;
+  final double? salary;
   final String? experienceLevel;
   final String? jobType;
   final String? industry;
@@ -374,13 +374,21 @@ class ProductModel {
         // Jobs specific
         position: map['position']?.toString(),
         company: map['company']?.toString(),
-        salary: map['salary'] != null
-            ? (map['salary'] is int  
-                ? map['salary']
-                : int.tryParse(map['salary'].toString()))
-            : null,
-     
-        // salary: map['salary']?.toString(),
+        
+        // salary: map['salary'] != null
+        //     ? (map['salary'] is double
+        //         ? map['salary']
+        //         : double.tryParse(map['salary'].toString()))
+        //     : null,
+          // salary: map['salary']?.toDouble(),
+             // Modify the salary parsing
+      salary: map['salary'] != null 
+          ? (map['salary'] is num 
+              ? (map['salary'] as num).toDouble()
+              : map['salary'].toString().isNotEmpty 
+                  ? double.tryParse(map['salary'].toString()) ?? 0.0
+                  : 0.0)
+          : 0.0,
         experienceLevel: map['experienceLevel']?.toString(),
 
         jobType: map['jobType']?.toString(),

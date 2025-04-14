@@ -1,6 +1,8 @@
 // lib/screens/deactivate_screen.dart
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
@@ -39,10 +41,27 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 16),
+                    // ClipRRect(
+                    //   borderRadius: BorderRadius.circular(8),
+                    //   child: Image.network(
+                    //     widget.ad['thumb'] ?? '',
+                    //     height: 200,
+                    //     width: double.infinity,
+                    //     fit: BoxFit.cover,
+                    //     errorBuilder: (context, error, stackTrace) => Center(
+                    //       child: Container(
+                    //         height: 200,
+                    //         color: Colors.grey[300],
+                    //         child: Icon(Icons.image_not_supported, size: 200),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.network(
-                        widget.ad['thumb'] ?? '',
+                        'http://13.200.179.78/${widget.ad['assets']?[0]?['url'] ?? widget.ad['thumb'] ?? ''}',
                         height: 200,
                         width: double.infinity,
                         fit: BoxFit.cover,
@@ -55,6 +74,7 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                         ),
                       ),
                     ),
+
                     SizedBox(height: 16),
                     Text(
                       'Title: ${widget.ad['title'] ?? ''}',
@@ -64,16 +84,15 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                       ),
                     ),
                     SizedBox(height: 8),
-                      // Text(
-                      //                       "₹ ${productModel.price.toString()}",
-                      //                       style: const TextStyle(
-                      //                           color: Color.fromARGB(
-                      //                               255, 243, 6, 176),
-                      //                           fontSize: 16,
-                      //                           fontWeight: FontWeight.bold)),
-                     Text(
-
-                       'Price: ₹${widget.ad['price'] ?? ''}',
+                    // Text(
+                    //                       "₹ ${productModel.price.toString()}",
+                    //                       style: const TextStyle(
+                    //                           color: Color.fromARGB(
+                    //                               255, 243, 6, 176),
+                    //                           fontSize: 16,
+                    //                           fontWeight: FontWeight.bold)),
+                    Text(
+                      'Price: ₹${widget.ad['price'] ?? ''}',
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -88,7 +107,8 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                           ElevatedButton(
                             onPressed: () async {
                               try {
-                                await _myAdsService.publishAd(context,widget.ad['_id']);
+                                await _myAdsService.publishAd(
+                                    context, widget.ad['_id']);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       content:

@@ -48,12 +48,14 @@ class _EditMyAdScreenState extends State<EditMyAdScreen> {
           'price',
           'brand',
           'model',
-          'ownerType',
-          'condition',
           'year',
+           'condition',
+          'ownerType',
+         
+          
           'description'
         ];
-      case 'mobile phones':
+      case 'mobiles':
         return [
           'title',
           'state',
@@ -62,9 +64,178 @@ class _EditMyAdScreenState extends State<EditMyAdScreen> {
           'price',
           'brand',
           'model',
+          'warranty',
+          'storage',
+          'color',
+
           'condition',
+          'operatingSystem',
+          'screenSize',
+          'camera',
+          'battery',
+          'year',
+
           'description'
         ];
+        case 'jobs':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'comapany'
+          'industry',
+          'position',
+
+          'salary',
+          'experienceLevel',
+         
+          'jobType',
+          'year',
+           'price',
+
+         
+          'qualifications',
+          'condition',
+          'description'
+         
+          
+        ];
+        case 'electronics & appliances':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+          'brand',
+  "electronics_category"
+         
+
+          'condition',
+          'product',
+          'warranty',
+         
+          'year',
+
+          'description'
+        ];
+        case 'furniture':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+          'product',
+          'material',
+          'condition',
+          'year',
+          'description'
+        ];
+        case 'pets':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+          'vaccinationType',
+          'pet_category'
+          'breed',
+          'condition',
+          'year',
+          'description'
+        ];
+        case 'properties':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+         
+          'type',
+          'condition',
+           'price',
+            'area',
+          'bedrooms',
+          'bathrooms',
+          'ownerType',
+          'furnishing',
+         'floorNumber',
+         'totalFloors',
+ 
+          'year',
+          'description'
+        ];
+      case 'fashion':
+      return [
+        'title',
+        'state',
+        'city',
+        'location',
+        'fashion_category',
+        'price',
+        'brand',
+        'product',
+      
+        'size',
+         'year',
+        'condition',
+       
+        'description'
+      ];
+      case 'Books, Sports & Hobbies':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+           'year',
+           'product',
+          'hobby_category',
+         
+          'condition',
+
+          'description'
+        ];
+        case 'services':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+        
+          'condition',
+          'year',
+          'description'
+        ];
+        case 'Commercial Vehicles & Spares':
+        return [
+          'title',
+          'state',
+          'city',
+          'location',
+          'price',
+          'fuelType',
+          'brand',
+          'model',
+          'warranty',
+          'transmission',
+          'color'
+
+          'condition',
+          'year',
+          
+          'description'
+         
+        ];
+
+      
+        
+
       // Add more categories as needed
       default:
         return ['title', 'state', 'city', 'location', 'price', 'description'];

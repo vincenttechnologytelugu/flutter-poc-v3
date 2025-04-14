@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/sell_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/offer_package_screen.dart';
+import 'package:flutter_poc_v3/public_screen.dart/login_screen.dart';
 import 'package:intl/intl.dart';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -343,7 +344,27 @@ Future<bool> _checkFreePackageStatus() async {
       log('User ID: $userId');
 
       if (userId == null || userId.isEmpty) {
-        throw Exception('User not logged in');
+        log('User not logged in');
+        await prefs.setString('previous_route', 'razorpayment_gateway');
+        
+           // Show login required message
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please login to continue'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      // Navigate to login screen
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+      return; // Exit the method
+       // throw Exception('User not logged in');
       }
 
       var options = {

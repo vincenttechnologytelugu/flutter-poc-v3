@@ -15,13 +15,13 @@ import 'dart:ui'; // Import for blur effect
 class CartController extends GetxController {
   List<ProductModel> cartList = [];
   List<String> favouriteIds = [];
-final isFavorite = false.obs;
+
   // Check server-side favorites and load saved favorites
   Future<void> loadFavorites(BuildContext context) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-   
+    
 
       // First check server favorites
       final response = await http.get(
@@ -124,7 +124,15 @@ final isFavorite = false.obs;
         // Check if context is still valid
         if (!context.mounted) return;
 
-   
+        // Get.snackbar(
+        //   'Success',
+        //   'Added to Favourites',
+        //   snackPosition: SnackPosition.TOP,
+        //   backgroundColor: Colors.green.withOpacity(0.8),
+        //   colorText: Colors.white,
+        //   margin: const EdgeInsets.all(10),
+        //   duration: const Duration(seconds: 2),
+        // );
 
         Get.snackbar(
           'Success ✅',
@@ -170,7 +178,6 @@ final isFavorite = false.obs;
         );
         update();
       }
- 
     } catch (e) {
       // Check if context is still valid
       if (!context.mounted) return;
@@ -226,169 +233,7 @@ final isFavorite = false.obs;
     update();
   }
 
-  // Remove from Favourite
-//   Future<void> removeFromFavourite(
-//       BuildContext context, String adpostId) async {
-//     try {
-//       final prefs = await SharedPreferences.getInstance();
-//       final token = prefs.getString('token');
-//       log('Removing post with ID: $adpostId'); // Debug log
-//       //  if (token == null) {
-
-//       //    ScaffoldMessenger.of(context).showSnackBar(
-//       //     const SnackBar(content: Text("Token Not Found")),
-//       //   );
-//       //   Navigator.pushReplacement(
-//       //     context,
-//       //     MaterialPageRoute(builder: (context) => LoginScreen()),
-//       //   );
-
-//       //   return;
-//       // }
-//       final response = await http.post(
-//         Uri.parse('http://13.200.179.78/remove_from_favourite'),
-//         headers: {
-//           'Authorization': 'Bearer $token',
-//           'Content-Type': 'application/json',
-//         },
-//         body: jsonEncode({'adpost_id': adpostId}),
-//       );
-
-//       if (response.statusCode == 200) {
-//         favouriteIds.remove(adpostId);
-//         await prefs.setStringList('favoriteAdposts', favouriteIds);
-//         update();
-//         // ScaffoldMessenger.of(context).showSnackBar(
-//         //   const SnackBar(content: Text("Removed from Favourites")),
-//         // );
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             behavior: SnackBarBehavior.floating, // Floating for a sleek UI
-//             elevation: 0, // Removes default shadow for custom styling
-//             duration: const Duration(seconds: 2), // Auto-dismiss
-//             backgroundColor: Colors.transparent, // Transparent for blur effect
-//             content: Center(
-//               child: ClipRRect(
-//                 borderRadius: BorderRadius.circular(15), // Soft rounded edges
-//                 child: BackdropFilter(
-//                   filter: ImageFilter.blur(
-//                       sigmaX: 8, sigmaY: 8), // Glassmorphism effect
-//                   child: Container(
-//                     padding: const EdgeInsets.symmetric(
-//                         vertical: 16, horizontal: 20),
-//                     decoration: BoxDecoration(
-//                       color:
-//                           Colors.red.withOpacity(0.2), // Semi-transparent red
-//                       borderRadius: BorderRadius.circular(15),
-//                       border: Border.all(
-//                           color: Colors.redAccent
-//                               .withOpacity(0.4)), // Light red glow border
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.redAccent.withOpacity(0.3),
-//                           blurRadius: 10,
-//                           offset: const Offset(0, 4),
-//                         ),
-//                       ],
-//                     ),
-//                     child: Row(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: [
-//                         Icon(Icons.delete,
-//                             color: Colors.white, size: 22), // Trash icon
-//                         const SizedBox(width: 10), // Spacing
-//                         const Text(
-//                           "Removed from Favourites",
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: 16,
-//                             fontWeight: FontWeight.w600,
-//                             fontFamily: 'Poppins',
-//                             letterSpacing: 0.5,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         );
-//       } else {
-//         // ScaffoldMessenger.of(context).showSnackBar(
-//         //   const SnackBar(content: Text("Failed to remove from favourites")),
-//         // );
-
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//             behavior: SnackBarBehavior.floating, // Floating for modern look
-//             elevation: 0, // Removes default shadow
-//             duration: const Duration(seconds: 3), // Auto-dismiss after 3 sec
-//             backgroundColor: Colors.transparent, // Transparent for blur effect
-//             content: Center(
-//               child: ClipRRect(
-//                 borderRadius: BorderRadius.circular(15), // Smooth rounded edges
-//                 child: BackdropFilter(
-//                   filter:
-//                       ImageFilter.blur(sigmaX: 8, sigmaY: 8), // Glass effect
-//                   child: Container(
-//                     padding: const EdgeInsets.symmetric(
-//                         vertical: 16, horizontal: 20),
-//                     decoration: BoxDecoration(
-//                       gradient: LinearGradient(
-//                         colors: [
-//                           Colors.redAccent.withOpacity(0.8),
-//                           Colors.red.withOpacity(0.9)
-//                         ],
-//                         begin: Alignment.topLeft,
-//                         end: Alignment.bottomRight,
-//                       ),
-//                       borderRadius: BorderRadius.circular(15),
-//                       border: Border.all(
-//                           color: Colors.redAccent
-//                               .withOpacity(0.5)), // Subtle border
-//                       boxShadow: [
-//                         BoxShadow(
-//                           color: Colors.red.withOpacity(0.4),
-//                           blurRadius: 12,
-//                           offset: const Offset(0, 4),
-//                         ),
-//                       ],
-//                     ),
-//                     child: Row(
-//                       mainAxisSize: MainAxisSize.min,
-//                       children: [
-//                         const Icon(Icons.error_outline,
-//                             color: Colors.white, size: 22), // Error icon
-//                         const SizedBox(width: 10), // Spacing
-//                         const Text(
-//                           "Failed to remove from favourites",
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: 16,
-//                             fontWeight: FontWeight.w600,
-//                             fontFamily: 'Poppins',
-//                             letterSpacing: 0.5,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                   ),
-//                 ),
-//               ),
-//             ),
-//           ),
-//         );
-//       }
-//     } catch (e) {
-//       ScaffoldMessenger.of(context).showSnackBar(
-//         SnackBar(content: Text("Error: $e")),
-//       );
-//     }
-//   }
-// }
+ 
 
   Future<void> removeFromFavourite(
       BuildContext context, String adpostId) async {
@@ -525,47 +370,3 @@ Get.snackbar(
 
 
 
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:get/get_state_manager/get_state_manager.dart';
-// import 'package:flutter_poc_v3/models/product_model.dart';
-
-// class CartController extends GetxController {
-//   List<ProductModel> cartList = [];
-  
-
-
-//   addToCart(BuildContext context, ProductModel productModel) {
-//     cartList.add(productModel);
-//     ScaffoldMessenger.of(context)
-//         .showSnackBar(const SnackBar(content: Text("Added to Favourite")));
-//     update();
-//   }
-  
-
-//   removeFromCart(BuildContext context, ProductModel productModel) {
-//     // Find the index of the first matching item
-//     final index = cartList.indexWhere((e) => e.id == productModel.id);
-//     if (index != -1) {
-//       // Remove only one item at that index
-//       cartList.removeAt(index);
-//       ScaffoldMessenger.of(context)
-//           .showSnackBar(const SnackBar(content: Text("Removed from Favourite")));
-//       update();
-//       } else {
-//       // Handle the case where the item is not found in the cartList
-//       ScaffoldMessenger.of(context)
-//           .showSnackBar(const SnackBar(content: Text("Item not found in cart")));
-//       update();
-//     }
-
-// }
-
-
-//   // removeFromCart(BuildContext context, ProductModel productModel) {
-//   //   cartList.removeWhere((e) => e.id == productModel.id);
-//   //   ScaffoldMessenger.of(context)
-//   //       .showSnackBar(const SnackBar(content: Text("Added to cart")));
-//   //   update();
-//   // }
-// }

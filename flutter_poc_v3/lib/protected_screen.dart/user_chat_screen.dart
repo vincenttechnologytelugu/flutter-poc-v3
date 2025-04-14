@@ -227,90 +227,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
     }
   }
 
-  // Widget buildThumbImage(String? thumbUrl, {double size = 60}) {
-  //   return thumbUrl != null && thumbUrl.isNotEmpty
-  //       ? Image.network(
-  //           thumbUrl,
-  //           width: size,
-  //           height: size,
-  //           fit: BoxFit.cover,
-  //           errorBuilder: (context, error, stackTrace) => Icon(
-  //             Icons.image_not_supported,
-  //             size: size * 0.75,
-  //             color: const Color.fromARGB(255, 217, 137, 137),
-  //           ),
-  //           loadingBuilder: (context, child, loadingProgress) {
-  //             if (loadingProgress == null) return child;
-  //             return Center(
-  //               child: CircularProgressIndicator(
-  //                 value: loadingProgress.expectedTotalBytes != null
-  //                     ? loadingProgress.cumulativeBytesLoaded /
-  //                         loadingProgress.expectedTotalBytes!
-  //                     : null,
-  //               ),
-  //             );
-  //           },
-  //         )
-  //       : Icon(
-  //           Icons.image_not_supported,
-  //           size: size * 0.75,
-  //           color: const Color.fromARGB(255, 227, 33, 33),
-  //         );
-  // }
-
-// Widget buildThumbImage(ProductModel product) {
-//   String imageUrl = '';
   
-//   // Get first image URL using the ProductModel method
-//   if (product.assets != null && product.assets!.isNotEmpty) {
-//     // Find first image asset
-//     var imageAsset = product.assets!.firstWhere(
-//       (asset) => asset['type'].toString().startsWith('image/'),
-//       orElse: () => {},
-//     );
-    
-//     if (imageAsset.containsKey('url')) {
-//       imageUrl = 'http://13.200.179.78/${imageAsset['url']}';
-//     }
-//   }
-
-//   return Container(
-//     width: 60,
-//     height: 60,
-//     decoration: BoxDecoration(
-//       borderRadius: BorderRadius.circular(8),
-//     ),
-//     child: imageUrl.isNotEmpty
-//         ? ClipRRect(
-//             borderRadius: BorderRadius.circular(8),
-//             child: Image.network(
-//               imageUrl,
-//               fit: BoxFit.cover,
-//               errorBuilder: (context, error, stackTrace) {
-//                 return Container(
-//                   color: Colors.grey[300],
-//                   child: const Icon(Icons.error),
-//                 );
-//               },
-//               loadingBuilder: (context, child, loadingProgress) {
-//                 if (loadingProgress == null) return child;
-//                 return Center(
-//                   child: CircularProgressIndicator(
-//                     value: loadingProgress.expectedTotalBytes != null
-//                         ? loadingProgress.cumulativeBytesLoaded /
-//                             loadingProgress.expectedTotalBytes!
-//                         : null,
-//                   ),
-//                 );
-//               },
-//             ),
-//           )
-//         : Container(
-//             color: Colors.grey[300],
-//             child: const Icon(Icons.image_not_supported),
-//           ),
-//   );
-// }
 
 Widget buildThumbImage(ProductModel product) {
   // Use the existing getFirstImageUrl() method from ProductModel
@@ -376,42 +293,7 @@ mainAxisAlignment: MainAxisAlignment.center,
           children: [
             
 
-            //    buildThumbImage(widget.product), // Thumbnail
-            //    Container(
-            // width: 40,
-            // height: 40,
-            // margin: const EdgeInsets.only(right: 10),
-            // decoration: BoxDecoration(
-            //   shape: BoxShape.circle,
-            //   border: Border.all(color: Colors.grey.shade300),
-            // ),
-            // child: ClipOval(
-            //   child: widget.thumb.isNotEmpty
-            //       ? Image.network(
-            //           widget.thumb,
-            //           fit: BoxFit.cover,
-            //           errorBuilder: (context, error, stackTrace) => const Icon(
-            //             Icons.image_not_supported,
-            //             size: 20,
-            //             color: Colors.grey,
-            //           ),
-            //           loadingBuilder: (context, child, loadingProgress) {
-            //             if (loadingProgress == null) return child;
-            //             return Center(
-            //               child: CircularProgressIndicator(
-            //                 value: loadingProgress.expectedTotalBytes != null
-            //                     ? loadingProgress.cumulativeBytesLoaded /
-            //                         loadingProgress.expectedTotalBytes!
-            //                     : null,
-            //               ),
-            //             );
-            //           },
-            //         )
-            //       : const Icon(
-            //           Icons.image_not_supported,
-            //           size: 20,
-            //           color: Colors.grey,
-            //         ),
+          
              // Show product image only if not from chat screen
       if (!widget.isFromChatScreen) 
         buildThumbImage(widget.product),
@@ -647,62 +529,7 @@ mainAxisAlignment: MainAxisAlignment.center,
         ],
       ),
 
-      // appBar: AppBar(
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back),
-      //     onPressed: () => Navigator.pop(context),
-      //   ),
-      //   title: Row(
-      //     children: [
-      //       CircleAvatar(
-      //         backgroundColor: Colors.grey[200],
-      //         child: buildThumbImage(widget.product.thumb),
-      //       ),
-      //       const SizedBox(width: 8),
-      //       Expanded(
-      //         child: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             // Text(
-      //             //   userName ?? 'User',
-      //             //   style: const TextStyle(fontSize: 16),
-      //             // ),
-
-      //             Text(
-      //               widget.product.title ?? 'No Title',
-      //               style: const TextStyle(fontSize: 12),
-      //               overflow: TextOverflow.ellipsis,
-      //             ),
-      //             Text(
-      //               '₹${widget.product.price?.toString() ?? '0.0'}',
-      //               style: const TextStyle(fontSize: 14),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      //   actions: [
-      //     IconButton(
-      //       icon: const Icon(Icons.call),
-      //       onPressed: () {
-      //         // Implement call functionality
-      //       },
-      //     ),
-      //     PopupMenuButton(
-      //       itemBuilder: (context) => [
-      //         const PopupMenuItem(
-      //           value: 'block',
-      //           child: Text('Block User'),
-      //         ),
-      //         const PopupMenuItem(
-      //           value: 'report',
-      //           child: Text('Report'),
-      //         ),
-      //       ],
-      //     ),
-      //   ],
-      // ),
+     
       body: Column(
         children: [
           Expanded(
@@ -805,106 +632,7 @@ mainAxisAlignment: MainAxisAlignment.center,
   }
 }
 
-// class _MessageBubble extends StatefulWidget {
-//   final Message message;
 
-//   const _MessageBubble({required this.message});
-
-//   @override
-//   State<_MessageBubble> createState() => _MessageBubbleState();
-// }
-
-// class _MessageBubbleState extends State<_MessageBubble> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Align(
-//       alignment: widget.message.isFromCurrentUser
-//           ? Alignment.centerRight
-//           : Alignment.centerLeft,
-//       child: Container(
-//         margin: const EdgeInsets.symmetric(vertical: 4),
-//         padding: const EdgeInsets.symmetric(
-//           horizontal: 16,
-//           vertical: 10,
-//         ),
-//         decoration: BoxDecoration(
-//           color:
-//               widget.message.isFromCurrentUser ? Colors.blue : Colors.grey[200],
-//           borderRadius: BorderRadius.circular(16),
-//         ),
-//         child: Text(
-//           widget.message.content,
-//           style: TextStyle(
-//             color:
-//                 widget.message.isFromCurrentUser ? Colors.white : Colors.black,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-
-// class _MessageBubble extends StatefulWidget {
-//   final Message message;
-
-//   const _MessageBubble({required this.message});
-
-//   @override
-//   State<_MessageBubble> createState() => _MessageBubbleState();
-// }
-
-// class _MessageBubbleState extends State<_MessageBubble> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Align(
-//       alignment: widget.message.isFromCurrentUser
-//           ? Alignment.centerRight
-//           : Alignment.centerLeft,
-//       child: Column(
-//         crossAxisAlignment: widget.message.isFromCurrentUser
-//             ? CrossAxisAlignment.end
-//             : CrossAxisAlignment.start,
-//         children: [
-//           if (!widget.message.isFromCurrentUser && 
-//               (widget.message.firstName != null || widget.message.lastName != null))
-//             Padding(
-//               padding: const EdgeInsets.only(left: 8, bottom: 4),
-//               child: Text(
-//                 '${widget.message.firstName ?? ''} ${widget.message.lastName ?? ''}'.trim(),
-//                 style: TextStyle(
-//                   fontSize: 12,
-//                   color: Colors.grey[600],
-//                   fontWeight: FontWeight.w500,
-//                 ),
-//               ),
-//             ),
-//           Container(
-//             margin: const EdgeInsets.symmetric(vertical: 4),
-//             padding: const EdgeInsets.symmetric(
-//               horizontal: 16,
-//               vertical: 10,
-//             ),
-//             decoration: BoxDecoration(
-//               color: widget.message.isFromCurrentUser 
-//                   ? Colors.blue 
-//                   : Colors.grey[200],
-//               borderRadius: BorderRadius.circular(16),
-//             ),
-//             child: Text(
-//               widget.message.content,
-//               style: TextStyle(
-//                 color: widget.message.isFromCurrentUser 
-//                     ? Colors.white 
-//                     : Colors.black,
-//               ),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
 
 class _MessageBubble extends StatefulWidget {
   final Message message;
@@ -921,53 +649,7 @@ class _MessageBubble extends StatefulWidget {
 
 class _MessageBubbleState extends State<_MessageBubble> {
 
-  // String getMessageTime() {
-  //   final messageDate = widget.message.createdAt.toLocal();
-  //   final now = DateTime.now();
-  //   final difference = now.difference(messageDate);
-    
-  //   final timeFormat = DateFormat('hh:mm a'); // 12-hour format with AM/PM
-
-  //   if (difference.inDays == 0) {
-  //     return 'Today ${timeFormat.format(messageDate)}';
-  //   } else if (difference.inDays == 1) {
-  //     return 'Yesterday ${timeFormat.format(messageDate)}';
-  //   } else if (difference.inDays < 7) {
-  //     return '${difference.inDays} days ago';
-  //   } else {
-  //     return '${DateFormat('MMM d, y').format(messageDate)} ${timeFormat.format(messageDate)}';
-  //   }
-  // }
-
-//   String getMessageTime() {
-//   final messageDate = widget.message.createdAt.toLocal();
-//   final now = DateTime.now();
-//   final difference = now.difference(messageDate);
   
-//   // ignore: unused_local_variable
-//   final timeFormat = DateFormat('h:mm a');
-
-//   if (difference.inMinutes < 1) {
-//     return 'Just now';
-//   } else if (difference.inMinutes < 60) {
-//     final minutes = difference.inMinutes;
-//     return '$minutes ${minutes == 1 ? 'minute' : 'minutes'} ago';
-//   } else if (difference.inHours < 24) {
-//     final hours = difference.inHours;
-//     return '$hours ${hours == 1 ? 'hour' : 'hours'} ago';
-//   } else if (difference.inDays < 7) {
-//     final days = difference.inDays;
-//     return '$days ${days == 1 ? 'day' : 'days'} ago';
-//   } else if (difference.inDays < 30) {
-//     final weeks = (difference.inDays / 7).floor();
-//     return '$weeks ${weeks == 1 ? 'week' : 'weeks'} ago';
-//   } else if (difference.inDays < 365) {
-//     final months = (difference.inDays / 30).floor();
-//     return '$months ${months == 1 ? 'month' : 'months'} ago';
-//   } else {
-//     return DateFormat('MMMM d, y').format(messageDate); // Full month name, day and year
-//   }
-// }
 
 String getMessageTime() {
   final messageDate = widget.message.createdAt.toLocal();

@@ -673,6 +673,16 @@ final ScrollController _scrollController = ScrollController();
   //     ],
   //   );
   // }
+  // Add this method to format salary
+String formatSalary(double? salary) {
+  if (salary == null) return 'N/A';
+  if (salary >= 100000) {
+    final lakhValue = (salary / 100000).toStringAsFixed(2);
+    return '₹$lakhValue LPA';
+  } else {
+    return '₹${NumberFormat('#,##0', 'en_IN').format(salary)}';
+  }
+}
 
   Widget _buildJobDetails() {
     return Container(
@@ -712,8 +722,9 @@ final ScrollController _scrollController = ScrollController();
           _buildInfoCard([
             _buildInfoRow('Company', widget.productModel.company),
             _buildInfoRow('Industry', widget.productModel.industry),
-            _buildInfoRow('Position', widget.productModel.position),
-            _buildInfoRow('Salary', widget.productModel.salary?.toString() ?? 'N/A'),
+           
+            // _buildInfoRow('Salary', widget.productModel.salary?.toString() ?? 'N/A'),
+             _buildInfoRow('Salary', formatSalary(widget.productModel.salary)),
          
             _buildInfoRow('Job Type', widget.productModel.jobType ?? 'N/A'),
             _buildInfoRow('Experiance Level',
@@ -724,8 +735,7 @@ final ScrollController _scrollController = ScrollController();
           const SizedBox(height: 20),
           _buildSectionHeader('Additional Information'),
           _buildInfoCard([
-            _buildInfoRow(
-                'Contact Info', widget.productModel.contact_info ?? 'N/A'),
+           _buildInfoRow('Position', widget.productModel.position),
           ]),
         ],
       ),

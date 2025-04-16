@@ -522,7 +522,16 @@ class _LevenCategoryDetailsScreen extends State<LevenCategoryDetailsScreen> {
       ],
   
       'Fashion': [
-        {'name': 'Clothes', 'findkey': 'women'},
+        {'name': 'Women', 'findkey': 'women'},
+        {'name': 'Clothing', 'findkey': 'clothing'},
+      
+        {'name': 'Men', 'findkey': 'men'},
+       
+      
+      
+       
+     
+
         {'name': 'Shoes', 'findkey': 'shoes'},
         {'name': 'Men', 'findkey': 'men'},
         {'name': 'Footwear', 'findkey': 'Footwear'},

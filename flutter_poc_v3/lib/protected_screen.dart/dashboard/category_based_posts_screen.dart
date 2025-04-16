@@ -720,10 +720,15 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           decoration: BoxDecoration(
                                             gradient: const LinearGradient(
                                               colors: [
-                                                Color.fromARGB(255, 255, 221,
-                                                    2), // Deep Purple
+                                                Color.fromARGB(   255,
+                                                            240,
+                                                            107,
+                                                            31), // Deep Purple
                                                 Color.fromARGB(
-                                                    255, 255, 221, 2), // Pink
+                                                       255,
+                                                            240,
+                                                            107,
+                                                            31), // Pink
                                               ],
                                               begin: Alignment.topLeft,
                                               end: Alignment.bottomRight,
@@ -875,7 +880,7 @@ class _CategoryBasedPostsScreenState extends State<CategoryBasedPostsScreen> {
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
                                           color:
-                                              Color.fromARGB(255, 28, 199, 1),
+                                              Color.fromARGB(255, 7, 13, 6),
                                           letterSpacing: 1.2,
                                           // fontFamily: 'Poppins',
                                           fontStyle: FontStyle.normal,

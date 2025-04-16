@@ -311,7 +311,7 @@ final ScrollController _scrollController = ScrollController();
               style: const TextStyle(
                 fontSize: 16,
                  fontWeight: FontWeight.bold,
-                color: Color.fromARGB(221, 252, 252, 254),
+                color: Color.fromARGB(221, 7, 7, 10),
                 overflow: TextOverflow.ellipsis,
             
               ),
@@ -383,7 +383,7 @@ final ScrollController _scrollController = ScrollController();
             flex: 2,
             child: Text(
               label,
-              style: GoogleFonts.abel(
+              style: GoogleFonts.lato(
                 fontSize: 18,
                 color: const Color.fromARGB(179, 13, 2, 2),
                 fontWeight: FontWeight.w500,
@@ -395,7 +395,7 @@ final ScrollController _scrollController = ScrollController();
             flex: 3,
             child: Text(
               value ?? 'N/A',
-              style: GoogleFonts.abel(
+              style: GoogleFonts.lato(
                 fontSize: 18,
                 color: Color.fromARGB(179, 1, 1, 9),
                 fontWeight: FontWeight.bold,
@@ -470,7 +470,7 @@ final ScrollController _scrollController = ScrollController();
             color: const Color.fromARGB(255, 147, 133, 230)
                 .withAlpha((0.9 * 255).round()),
             spreadRadius: 2,
-            blurRadius: 15,
+            blurRadius: 0,
             offset: const Offset(0, 3),
           ),
         ],
@@ -1257,6 +1257,7 @@ String formatSalary(double? salary) {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
        appBar: AnimatedBackButtonAppBar(
     title:widget.productModel.title,
     onBackButtonPressed: () {
@@ -1282,8 +1283,8 @@ String formatSalary(double? salary) {
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
         colors: [
-          Color(0xFFE8CBC0), // Soft pink
-          Color(0xFF636FA4), // Muted blue
+          Color.fromARGB(255, 255, 255, 255), // Soft pink
+          Color.fromARGB(255, 255, 255, 255), // Muted blue
         ],
       ),
     ),
@@ -1570,8 +1571,8 @@ String formatSalary(double? salary) {
                                       gradient: LinearGradient(
                                         colors: [
                                           // Color(0xFF046368),
-                                           Color.fromARGB(255, 1, 179, 25),
-                                               Color.fromARGB(255, 1, 179, 25),
+                                           Color.fromARGB(255, 254, 255, 254),
+                                               Color.fromARGB(255, 254, 255, 254),
                                         ], // Stylish gradient
                                         begin: Alignment.topLeft,
                                         end: Alignment.bottomRight,
@@ -1610,7 +1611,7 @@ String formatSalary(double? salary) {
   style: const TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.w900,
-    color: Colors.white,
+    color: Color.fromARGB(255, 7, 13, 6),
     letterSpacing: 1.2,
     fontFamily: 'Poppins',
                                          fontStyle: FontStyle.normal,
@@ -1701,7 +1702,7 @@ String formatSalary(double? salary) {
                       style: TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromARGB(221, 252, 252, 254),
+                        color: Color.fromARGB(221, 7, 7, 10),
                       ),
                     ),
         
@@ -1731,7 +1732,7 @@ String formatSalary(double? salary) {
                             padding: const EdgeInsets.all(16),
                             child: Text(
                               widget.productModel.description!,
-                              style:GoogleFonts.abel(
+                              style:GoogleFonts.lato(
                                 fontSize: 18,
                                 height: 1.6,
                                 color: Color.fromARGB(221, 14, 1, 1),

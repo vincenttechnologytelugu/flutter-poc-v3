@@ -96,7 +96,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                           const Text(
                             'Find ',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 33, 4, 221),
+                              color: Color.fromARGB(255, 4, 4, 7),
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),
@@ -117,7 +117,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                               searchTexts[currentIndex],
                               key: ValueKey<int>(currentIndex),
                               style: const TextStyle(
-                                color: Color.fromARGB(255, 33, 4, 221),
+                                color: Color.fromARGB(255, 4, 4, 7),
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -126,7 +126,7 @@ class _DashhomeScreenState extends State<DashhomeScreen> {
                           const Text(
                             '...',
                             style: TextStyle(
-                              color: Color.fromARGB(255, 33, 4, 221),
+                              color: Color.fromARGB(255, 4, 4, 7),
                               fontSize: 16,
                               fontWeight: FontWeight.w500,
                             ),

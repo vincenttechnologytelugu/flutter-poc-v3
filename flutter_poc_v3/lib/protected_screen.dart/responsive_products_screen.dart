@@ -44,6 +44,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
 
   late Worker _locationWorker;
   late Worker _refreshWorker;
+  List<String> favoriteAdpostIds = [];
   @override
   void initState() {
     super.initState();
@@ -720,8 +721,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                 ),
               ),
               Positioned(
-                top: 6,
-                right: 55,
+                top: 15,
+                right: 68,
                 child: Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -909,29 +910,332 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                         color: const Color.fromARGB(255, 246, 248, 246),
 
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
+                            borderRadius: BorderRadius.circular(1),
+                            side: const BorderSide(
+                                color: Colors.black,
+                                width: 0.4,
+                                style: BorderStyle.solid)),
                         margin: const EdgeInsets.all(2),
                         child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(1.0),
+                              padding: const EdgeInsets.all(4.0),
                               child: SizedBox(
                                 height: 120,
                                 child: Stack(
                                   children: [
+                                    // ClipRRect(
+                                    //   borderRadius: BorderRadius.circular(20),
+                                    //   child: Stack(
+                                    //     children: [
+                                    //       product.thumbnailUrl.isNotEmpty
+                                    //           ? Image.network(
+                                    //               'http://13.200.179.78/${product.thumbnailUrl}',
+                                    //               height: 300,
+                                    //               width: double.infinity,
+                                    //               fit: BoxFit.fill,
+                                    //               errorBuilder: (context, error,
+                                    //                   stackTrace) {
+                                    //                 return Container(
+                                    //                   height: 200,
+                                    //                   width: double.infinity,
+                                    //                   decoration: BoxDecoration(
+                                    //                     color: const Color
+                                    //                         .fromARGB(
+                                    //                         255, 245, 242, 242),
+                                    //                     borderRadius:
+                                    //                         BorderRadius
+                                    //                             .circular(20),
+                                    //                   ),
+                                    //                   child: const Column(
+                                    //                     mainAxisAlignment:
+                                    //                         MainAxisAlignment
+                                    //                             .center,
+                                    //                     children: [
+                                    //                       Icon(
+                                    //                         Icons
+                                    //                             .image_not_supported_outlined,
+                                    //                         size: 50,
+                                    //                         color:
+                                    //                             Color.fromARGB(
+                                    //                                 255,
+                                    //                                 123,
+                                    //                                 74,
+                                    //                                 74),
+                                    //                       ),
+                                    //                       SizedBox(height: 8),
+                                    //                       Text(
+                                    //                         'Image not available',
+                                    //                         style: TextStyle(
+                                    //                           color: Color
+                                    //                               .fromARGB(
+                                    //                                   255,
+                                    //                                   123,
+                                    //                                   74,
+                                    //                                   74),
+                                    //                           fontSize: 12,
+                                    //                         ),
+                                    //                       ),
+                                    //                     ],
+                                    //                   ),
+                                    //                 );
+                                    //               },
+                                    //             )
+                                    //           : Container(
+                                    //               height: 200,
+                                    //               width: double.infinity,
+                                    //               decoration: BoxDecoration(
+                                    //                 color: const Color.fromARGB(
+                                    //                     255, 245, 242, 242),
+                                    //                 borderRadius:
+                                    //                     BorderRadius.circular(
+                                    //                         20),
+                                    //               ),
+                                    //               child: const Column(
+                                    //                 mainAxisAlignment:
+                                    //                     MainAxisAlignment
+                                    //                         .center,
+                                    //                 children: [
+                                    //                   Icon(
+                                    //                     Icons
+                                    //                         .image_not_supported_outlined,
+                                    //                     size: 50,
+                                    //                     color: Color.fromARGB(
+                                    //                         255, 123, 74, 74),
+                                    //                   ),
+                                    //                   SizedBox(height: 8),
+                                    //                   Text(
+                                    //                     'Image not available',
+                                    //                     style: TextStyle(
+                                    //                       color: Color.fromARGB(
+                                    //                           255, 123, 74, 74),
+                                    //                       fontSize: 12,
+                                    //                     ),
+                                    //                   ),
+                                    //                 ],
+                                    //               ),
+                                    //             ),
+                                    //       Builder(
+                                    //         builder: (context) {
+                                    //           // More detailed debug prints
+                                    //           // log('Raw product data: ${jsonEncode(product.toJson())}'); // Add toJson() method if not exists
+                                    //           // log('Featured at: ${product.featured_at}');
+                                    //           // log('Valid till: ${product.valid_till}');
+                                    //           // log('Current time: ${DateTime.now().millisecondsSinceEpoch ~/ 1000}');
+
+                                    //           // Simplified featured check
+                                    //           bool isFeatured = false;
+                                    //           if (product.featured_at != null &&
+                                    //               product.valid_till != null) {
+                                    //             final now = DateTime.now()
+                                    //                     .millisecondsSinceEpoch ~/
+                                    //                 1000;
+                                    //             isFeatured = product
+                                    //                         .featured_at! <=
+                                    //                     now &&
+                                    //                 product.valid_till! >= now;
+                                    //             // log('Time check: $now is between ${product.featured_at} and ${product.valid_till}');
+                                    //           }
+
+                                    //           // log('Is Featured: $isFeatured');
+
+                                    //           if (!isFeatured) {
+                                    //             return const SizedBox.shrink();
+                                    //           }
+
+                                    //           return Positioned(
+                                    //             top: 10,
+                                    //             left: 10,
+                                    //             child: Container(
+                                    //               padding: const EdgeInsets
+                                    //                   .symmetric(
+                                    //                   horizontal: 8,
+                                    //                   vertical: 4),
+                                    //               decoration: BoxDecoration(
+                                    //                 gradient:
+                                    //                     const LinearGradient(
+                                    //                   colors: [
+                                    //                     Color.fromARGB(
+                                    //                         255,
+                                    //                         255,
+                                    //                         221,
+                                    //                         2), // Deep Purple
+                                    //                     Color.fromARGB(255, 255,
+                                    //                         221, 2), // Pink
+                                    //                   ],
+                                    //                   begin: Alignment.topLeft,
+                                    //                   end:
+                                    //                       Alignment.bottomRight,
+                                    //                 ),
+                                    //                 borderRadius:
+                                    //                     BorderRadius.circular(
+                                    //                         12),
+                                    //                 boxShadow: [
+                                    //                   BoxShadow(
+                                    //                     color: const Color
+                                    //                             .fromARGB(255,
+                                    //                             252, 250, 250)
+                                    //                         .withAlpha(
+                                    //                             77), // 0.3 * 255 ≈ 77
+
+                                    //                     blurRadius: 4,
+                                    //                     offset:
+                                    //                         const Offset(0, 2),
+                                    //                   ),
+                                    //                 ],
+                                    //               ),
+                                    //               child: Row(
+                                    //                 mainAxisSize: MainAxisSize
+                                    //                     .min, // To keep the container tight
+                                    //                 children: [
+                                    //                   const Icon(
+                                    //                     Icons
+                                    //                         .check_circle, // Tick mark icon
+                                    //                     size:
+                                    //                         16, // Small icon size
+                                    //                     color: Color.fromARGB(
+                                    //                         255,
+                                    //                         251,
+                                    //                         250,
+                                    //                         246), // Same color as text
+                                    //                   ),
+                                    //                   const SizedBox(
+                                    //                       width:
+                                    //                           4), // Space between icon and text
+                                    //                   Text(
+                                    //                     'FEATURED',
+                                    //                     style:
+                                    //                         GoogleFonts.roboto(
+                                    //                       color:
+                                    //                           Color(0xFFFAFAFA),
+                                    //                       // color: Color.fromARGB(
+                                    //                       //     255,
+                                    //                       //     251,
+                                    //                       //     250,
+                                    //                       //     246),
+                                    //                       // color: Color.fromARGB(255, 173, 179, 1),
+                                    //                       fontWeight:
+                                    //                           FontWeight.bold,
+                                    //                       fontSize: 12,
+                                    //                       letterSpacing: 0.5,
+                                    //                     ),
+                                    //                   ),
+                                    //                 ],
+                                    //               ),
+                                    //             ),
+                                    //           );
+                                    //         },
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // ),
                                     ClipRRect(
-                                      borderRadius: BorderRadius.circular(20),
+                                      borderRadius: BorderRadius.circular(3),
                                       child: Stack(
                                         children: [
-                                          product.thumbnailUrl.isNotEmpty
-                                              ? Image.network(
-                                                  'http://13.200.179.78/${product.thumbnailUrl}',
-                                                  height: 300,
-                                                  width: double.infinity,
-                                                  fit: BoxFit.fill,
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return Container(
+                                          if (product.featured_at != null &&
+                                              product.valid_till != null)
+                                            Container(
+                                              width:
+                                                  double.infinity, // Add this
+                                              decoration: BoxDecoration(
+                                                border: Border(
+                                                  left: BorderSide(
+                                                    color:
+                                                        const Color(0xFFFF5733),
+                                                    width: 4.0,
+                                                  ),
+                                                ),
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                    const Color(0xFFFF8C00)
+                                                        .withOpacity(0.2),
+                                                    Colors.transparent,
+                                                  ],
+                                                ),
+                                                // boxShadow: [
+                                                //   BoxShadow(
+                                                //     color:
+                                                //         const Color(0xFFFF5733)
+                                                //             .withOpacity(0.2),
+                                                //     spreadRadius: 0,
+                                                //     blurRadius: 1,
+                                                //     offset: const Offset(-2, 0),
+                                                //   ),
+                                                // ],
+                                              ),
+
+                                              // decoration: BoxDecoration(
+                                              //   border: Border(
+                                              //     left: BorderSide(
+                                              //       color: const Color.fromARGB(
+                                              //          255, 240, 107, 31), // Yellow color
+                                              //       width: 4.0, // Border width
+                                              //     ),
+                                              //   ),
+                                              // ),
+                                              child: product
+                                                      .thumbnailUrl.isNotEmpty
+                                                  ? Image.network(
+                                                      'http://13.200.179.78/${product.thumbnailUrl}',
+                                                      height: 300,
+                                                      width: double.infinity,
+                                                      fit: BoxFit.fill,
+                                                      errorBuilder: (context,
+                                                          error, stackTrace) {
+                                                        return Container(
+                                                          height: 200,
+                                                          width:
+                                                              double.infinity,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: const Color
+                                                                .fromARGB(255,
+                                                                245, 242, 242),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20),
+                                                          ),
+                                                          child: const Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              Icon(
+                                                                Icons
+                                                                    .image_not_supported_outlined,
+                                                                size: 50,
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        123,
+                                                                        74,
+                                                                        74),
+                                                              ),
+                                                              SizedBox(
+                                                                  height: 8),
+                                                              Text(
+                                                                'Image not available',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: Color
+                                                                      .fromARGB(
+                                                                          255,
+                                                                          123,
+                                                                          74,
+                                                                          74),
+                                                                  fontSize: 12,
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
+                                                    )
+                                                  : Container(
                                                       height: 200,
                                                       width: double.infinity,
                                                       decoration: BoxDecoration(
@@ -973,43 +1277,106 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                           ),
                                                         ],
                                                       ),
-                                                    );
-                                                  },
-                                                )
-                                              : Container(
-                                                  height: 200,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: const Color.fromARGB(
-                                                        255, 245, 242, 242),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
-                                                  ),
-                                                  child: const Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    children: [
-                                                      Icon(
-                                                        Icons
-                                                            .image_not_supported_outlined,
-                                                        size: 50,
-                                                        color: Color.fromARGB(
-                                                            255, 123, 74, 74),
-                                                      ),
-                                                      SizedBox(height: 8),
-                                                      Text(
-                                                        'Image not available',
-                                                        style: TextStyle(
+                                                    ),
+                                            )
+                                          else
+                                            product.thumbnailUrl.isNotEmpty
+                                                ? Image.network(
+                                                    'http://13.200.179.78/${product.thumbnailUrl}',
+                                                    height: 300,
+                                                    width: double.infinity,
+                                                    fit: BoxFit.fill,
+                                                    errorBuilder: (context,
+                                                        error, stackTrace) {
+                                                      // Your existing error builder code
+                                                      return Container(
+                                                        height: 200,
+                                                        width: double.infinity,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          color: const Color
+                                                              .fromARGB(255,
+                                                              245, 242, 242),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                        ),
+                                                        child: const Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Icon(
+                                                              Icons
+                                                                  .image_not_supported_outlined,
+                                                              size: 50,
+                                                              color: Color
+                                                                  .fromARGB(
+                                                                      255,
+                                                                      123,
+                                                                      74,
+                                                                      74),
+                                                            ),
+                                                            SizedBox(height: 8),
+                                                            Text(
+                                                              'Image not available',
+                                                              style: TextStyle(
+                                                                color: Color
+                                                                    .fromARGB(
+                                                                        255,
+                                                                        123,
+                                                                        74,
+                                                                        74),
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      );
+                                                    },
+                                                  )
+                                                : Container(
+                                                    height: 200,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255,
+                                                              245,
+                                                              242,
+                                                              242),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
+                                                    child: const Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      children: [
+                                                        Icon(
+                                                          Icons
+                                                              .image_not_supported_outlined,
+                                                          size: 50,
                                                           color: Color.fromARGB(
                                                               255, 123, 74, 74),
-                                                          fontSize: 12,
                                                         ),
-                                                      ),
-                                                    ],
+                                                        SizedBox(height: 8),
+                                                        Text(
+                                                          'Image not available',
+                                                          style: TextStyle(
+                                                            color:
+                                                                Color.fromARGB(
+                                                                    255,
+                                                                    123,
+                                                                    74,
+                                                                    74),
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
                                           Builder(
                                             builder: (context) {
                                               // More detailed debug prints
@@ -1039,8 +1406,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                               }
 
                                               return Positioned(
-                                                top: 10,
-                                                left: 10,
+                                                top: 93,
+                                                left: 83,
                                                 child: Container(
                                                   padding: const EdgeInsets
                                                       .symmetric(
@@ -1052,11 +1419,11 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                                       colors: [
                                                         Color.fromARGB(
                                                             255,
-                                                            255,
-                                                            221,
-                                                            2), // Deep Purple
-                                                        Color.fromARGB(255, 255,
-                                                            221, 2), // Pink
+                                                            240,
+                                                            107,
+                                                            31), // Deep Purple
+                                                        Color.fromARGB(255, 240,
+                                                            107, 31), // Pink
                                                       ],
                                                       begin: Alignment.topLeft,
                                                       end:
@@ -1121,6 +1488,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                               );
                                             },
                                           ),
+                                          // Your existing FEATURED badge code remains the same
                                         ],
                                       ),
                                     ),
@@ -1373,8 +1741,8 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                   horizontal: 3,
                                   vertical: 3), // Reduced padding
                               child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                 mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Container(
                                       padding: const EdgeInsets.symmetric(
@@ -1437,7 +1805,7 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                       //   ),
                                       //   overflow: TextOverflow.ellipsis,
                                       // )
-                                      
+
                                       child: Text(
                                         productModel.category?.toLowerCase() ==
                                                 'jobs'
@@ -1453,19 +1821,18 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                         style: const TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.bold,
-                                          color:
-                                              Color.fromARGB(255, 7, 13, 6),
+                                          color: Color.fromARGB(255, 7, 13, 6),
                                           letterSpacing: 1.2,
                                           // fontFamily: 'Poppins',
                                           fontStyle: FontStyle.normal,
                                         ),
                                         overflow: TextOverflow.ellipsis,
-                                      )
-                                      ),
-                                      SizedBox(height: 5,),
+                                      )),
+                                  SizedBox(
+                                    height: 5,
+                                  ),
                                   Row(
                                     children: [
-                                    
                                       const SizedBox(
                                         width: 3,
                                       ),
@@ -1478,10 +1845,10 @@ class _ResponsiveProductsScreenState extends State<ResponsiveProductsScreen> {
                                             color:
                                                 Color.fromARGB(255, 12, 8, 8),
                                             // color: Color.fromARGB(255, 251, 38, 38),
-                                            fontWeight: FontWeight.bold,
+                                            fontWeight: FontWeight.w500,
                                             fontFamily: 'Poppins',
                                             overflow: TextOverflow.ellipsis,
-                                            letterSpacing: 1,
+                                            letterSpacing: 0.5,
                                           ),
                                           maxLines: 1,
                                         ),

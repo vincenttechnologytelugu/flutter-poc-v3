@@ -80,7 +80,7 @@ class _SearchScreenState extends State<SearchScreen> {
       'activa 1G',
     ],
     'Properties': [
-      'House',
+      'For Sale: Houses & Apartments',
       'rent',
       'Apartment',
       'Plot',
@@ -102,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
     ],
     'Mobiles': [
       'iPhone',
-      'Samsung',
+      'samsung',
       'Xiaomi',
       'OnePlus',
       'Oppo',
@@ -597,24 +597,51 @@ class _SearchScreenState extends State<SearchScreen> {
     filteredCategories = categoryMap.entries.toList();
   }
 
+  // void filterCategories(String query) {
+  //   if (query.isEmpty) {
+  //     setState(() {
+  //       isSearching = false;
+  //       filteredCategories = categoryMap.entries.toList();
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isSearching = true;
+  //       filteredCategories = categoryMap.entries
+  //           .where((entry) =>
+  //               entry.key.toLowerCase().contains(query.toLowerCase()) ||
+  //               entry.value.any((subCategory) =>
+  //                   subCategory.toLowerCase().contains(query.toLowerCase())))
+  //           .toList();
+  //     });
+  //   }
+  // }
   void filterCategories(String query) {
-    if (query.isEmpty) {
-      setState(() {
-        isSearching = false;
-        filteredCategories = categoryMap.entries.toList();
-      });
-    } else {
-      setState(() {
-        isSearching = true;
+  if (query.isEmpty) {
+    setState(() {
+      isSearching = false;
+      filteredCategories = categoryMap.entries.toList();
+    });
+  } else {
+    setState(() {
+      isSearching = true;
+      // Show only categories that match the search query
+      filteredCategories = categoryMap.entries
+          .where((entry) => 
+              entry.key.toLowerCase() == query.toLowerCase()) // Only exact category match
+          .toList();
+          
+      // If no exact category match found, then search in subcategories
+      if (filteredCategories.isEmpty) {
         filteredCategories = categoryMap.entries
             .where((entry) =>
-                entry.key.toLowerCase().contains(query.toLowerCase()) ||
                 entry.value.any((subCategory) =>
                     subCategory.toLowerCase().contains(query.toLowerCase())))
             .toList();
-      });
-    }
+      }
+    });
   }
+}
+
 
   void navigateToSubCategoryPosts(String category, String subCategory) {
     log('Navigating to: Category: $category, SubCategory: $subCategory'); // Debug log

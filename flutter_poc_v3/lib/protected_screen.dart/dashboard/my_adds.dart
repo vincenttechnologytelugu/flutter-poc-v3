@@ -16,7 +16,9 @@ import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_poc_v3/utils/widgets/auth_guard.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math'; // Import dart:math for sin function
+import 'dart:math';
+
+import 'package:intl/intl.dart'; // Import dart:math for sin function
 
 class MyAdds extends StatefulWidget {
   final bool? showDialogAfterSubmit; // Add this parameter
@@ -35,13 +37,27 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _animation;
 
+  String? formatSalary(dynamic salary) {
+    if (salary == null) return null;
+    try {
+      final amount = salary is num
+          ? salary.toDouble()
+          : double.tryParse(salary.toString());
+      if (amount == null) return null;
+      return '₹${NumberFormat('#,##0', 'en_IN').format(amount)}';
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     tabController = TabController(length: 2, vsync: this);
-        // Add listener to tab controller
+    // Add listener to tab controller
     tabController.addListener(() {
-      if (tabController.index == 1) { // PROMOTIONS tab
+      if (tabController.index == 1) {
+        // PROMOTIONS tab
         _loadMyAds();
       }
     });
@@ -63,10 +79,6 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
     }
     _loadMyAds();
   }
-
-  
-
- 
 
   void _showInitialDialog(BuildContext context) {
     showDialog(
@@ -142,9 +154,9 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
   }
 
   Future<void> _loadMyAds() async {
-      if (!mounted) return; // Add this check at the start
+    if (!mounted) return; // Add this check at the start
     try {
-        setState(() => isLoading = true);
+      setState(() => isLoading = true);
       final ads = await _myAdsService.getMyAds(context);
       if (mounted) {
         setState(() {
@@ -158,10 +170,10 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
       //   SnackBar(content: Text('Failed to load ads: $e')),
       // );
       // setState(() => isLoading = false);
-        if (mounted) { // Check mounted before setState
-      setState(() => isLoading = false);
-    }
-     
+      if (mounted) {
+        // Check mounted before setState
+        setState(() => isLoading = false);
+      }
     }
   }
 
@@ -479,16 +491,12 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
           overlayColor: MaterialStateProperty.resolveWith(
               (states) => Colors.white.withOpacity(0.1)), // Subtle hover effect
           tabs: [
-               Tab(text: "FAVOURITES"),
-             Tab(text: "PROMOTIONS"),
-           
-            
-           
-           
+            Tab(text: "PROMOTIONS"),
+            Tab(text: "FAVOURITES"),
           ],
         ),
       ),
-    
+
       // appBar: AppBar(
       //   backgroundColor: const Color.fromARGB(255, 172, 179, 181),
       //     title: Text(
@@ -540,456 +548,534 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
       body: TabBarView(
         controller: tabController,
         children: [
-              FavouriteScreen(),
+          // FavouriteScreen(),
           isLoading
               ? Center(child: CircularProgressIndicator())
               : RefreshIndicator(
-               onRefresh: _loadMyAds,
-              child: myAds.isEmpty
-            ? const Center(child: Text('No ads available'))
-             : ListView.builder(
-                  itemCount: myAds.length,
-                  itemBuilder: (context, index) {
-                    final ad = myAds[index];
-                    return Card(
-                      elevation: 5,
-                      color: const Color.fromARGB(255, 175, 180, 179)
-                          .withOpacity(0.95),
-                      margin: EdgeInsets.all(2),
-                      child: Column(
-                        children: [
-                          ListTile(
-                            leading: Opacity(
-                              opacity: ad['action_flags']['mark_as_sold']
-                                  ? 1.0
-                                  : 0.5,
-                              child: ad['assets']?.isNotEmpty == true
-                                  ? CachedNetworkImage(
-                                      imageUrl:
-                                          'http://13.200.179.78/${ad['assets'][0]['url']}',
-                                      width: 80,
-                                      height: 80,
-                                      fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                      errorWidget: (context, url, error) =>
-                                          Center(
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Icon(
-                                              Icons.image_outlined,
-                                              size: 40,
-                                              color: const Color.fromARGB(
-                                                  255, 127, 85, 85),
-                                            ),
-                                            Text(
-                                              'No Image Available',
-                                              style: TextStyle(
-                                                color: Colors.grey[600],
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500,
-                                                overflow: TextOverflow.ellipsis,
+                  onRefresh: _loadMyAds,
+                  child: myAds.isEmpty
+                      ? const Center(child: Text('No ads available'))
+                      : ListView.builder(
+                          itemCount: myAds.length,
+                          itemBuilder: (context, index) {
+                            final ad = myAds[index];
+                            return Card(
+                              elevation: 5,
+                              color: const Color.fromARGB(255, 233, 233, 230)
+                                  .withOpacity(0.95),
+                              margin: EdgeInsets.all(2),
+                              child: Column(
+                                children: [
+                                  ListTile(
+                                    leading: Opacity(
+                                      opacity: ad['action_flags']
+                                              ['mark_as_sold']
+                                          ? 1.0
+                                          : 0.5,
+                                      child: ad['assets']?.isNotEmpty == true
+                                          ? CachedNetworkImage(
+                                              imageUrl:
+                                                  'http://13.200.179.78/${ad['assets'][0]['url']}',
+                                              width: 80,
+                                              height: 80,
+                                              fit: BoxFit.cover,
+                                              placeholder: (context, url) =>
+                                                  Center(
+                                                child:
+                                                    CircularProgressIndicator(),
                                               ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Center(
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Icon(
+                                                      Icons.image_outlined,
+                                                      size: 40,
+                                                      color:
+                                                          const Color.fromARGB(
+                                                              255, 127, 85, 85),
+                                                    ),
+                                                    Text(
+                                                      'No Image Available',
+                                                      style: TextStyle(
+                                                        color: Colors.grey[600],
+                                                        fontSize: 10,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            )
+                                          : Column(
+                                              children: [
+                                                Icon(
+                                                  Icons.image_outlined,
+                                                  size: 40,
+                                                  color: const Color.fromARGB(
+                                                      255, 127, 85, 85),
+                                                ),
+                                                Text(
+                                                  'No Image Available',
+                                                  style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.w500,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+
+                                      // child: Image.network(
+                                      //   ad['thumb'] ?? '',
+                                      //   width: 80,
+                                      //   height: 80,
+                                      //   fit: BoxFit.cover,
+                                      //   errorBuilder: (context, error, stackTrace) =>
+                                      //       Icon(
+                                      //     Icons.image_not_supported,
+                                      //     size: 110,
+                                      //     color: Colors.grey,
+                                      //   ),
+                                      // ),
+                                    ),
+                                    title: Text(
+                                      ad['title'] ?? '',
+                                      style: TextStyle(
+                                        color: ad['action_flags']
+                                                ['mark_as_sold']
+                                            ? Colors.black
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                    // title: Text(ad['title'] ?? ''),
+                                    // subtitle: Text(
+                                    //   '₹${ad['price'] ?? ''}',
+                                    //   style: TextStyle(
+                                    //     color: ad['action_flags']['mark_as_sold']
+                                    //         ? Colors.black
+                                    //         : Colors.grey,
+                                    //   ),
+                                    // ),
+                                    subtitle: Text(
+                                      ad['category']
+                                                  ?.toString()
+                                                  .toLowerCase() ==
+                                              'jobs'
+                                          ? 'Salary: ${formatSalary(ad['salary']) ?? 'N/A'}'
+                                          : ad['price'] != null &&
+                                                  ad['price'] != 0
+                                              ? '₹${NumberFormat('#,##0', 'en_IN').format(ad['price'])}'
+                                              : ad['category']
+                                                          ?.toString()
+                                                          .toLowerCase() ==
+                                                      'jobs'
+                                                  ? 'Salary: Negotiable'
+                                                  : 'Price: N/A',
+                                      style: TextStyle(
+                                        color: ad['action_flags']
+                                                    ?['mark_as_sold'] ==
+                                                true
+                                            ? Colors.black
+                                            : Colors.grey,
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.2,
+                                        fontStyle: FontStyle.normal,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              "Active",
+                                              style: TextStyle(
+                                                color: ad['isActive']
+                                                    ? Colors.green
+                                                    : Colors.red,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                                width:
+                                                    4), // Space between text and icon
+                                            Icon(
+                                              ad['isActive']
+                                                  ? Icons.check_circle
+                                                  : Icons.cancel,
+                                              color: ad['isActive']
+                                                  ? Colors.green
+                                                  : Colors.red,
                                             ),
                                           ],
                                         ),
-                                      ),
-                                    )
-                                  : Column(
-                                      children: [
-                                        Icon(
-                                          Icons.image_outlined,
-                                          size: 40,
-                                          color: const Color.fromARGB(
-                                              255, 127, 85, 85),
-                                        ),
-                                        Text(
-                                          'No Image Available',
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w500,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
+
+                                        // Text("Active",
+                                        // style: TextStyle(
+                                        //   color: ad['isActive'] ? Colors.green : Colors.red,
+                                        // ),
+                                        // ),
+
+                                        IconButton(
+                                          icon: Icon(Icons.more_vert),
+                                          onPressed: () =>
+                                              _showOptionsDialog(ad),
                                         ),
                                       ],
                                     ),
-                 
-                              // child: Image.network(
-                              //   ad['thumb'] ?? '',
-                              //   width: 80,
-                              //   height: 80,
-                              //   fit: BoxFit.cover,
-                              //   errorBuilder: (context, error, stackTrace) =>
-                              //       Icon(
-                              //     Icons.image_not_supported,
-                              //     size: 110,
-                              //     color: Colors.grey,
-                              //   ),
-                              // ),
-                            ),
-                            title: Text(
-                              ad['title'] ?? '',
-                              style: TextStyle(
-                                color: ad['action_flags']['mark_as_sold']
-                                    ? Colors.black
-                                    : Colors.grey,
-                              ),
-                            ),
-                            // title: Text(ad['title'] ?? ''),
-                            subtitle: Text(
-                              '₹${ad['price'] ?? ''}',
-                              style: TextStyle(
-                                color: ad['action_flags']['mark_as_sold']
-                                    ? Colors.black
-                                    : Colors.grey,
-                              ),
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Active",
-                                      style: TextStyle(
-                                        color: ad['isActive']
-                                            ? Colors.green
-                                            : Colors.red,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                        width:
-                                            4), // Space between text and icon
-                                    Icon(
-                                      ad['isActive']
-                                          ? Icons.check_circle
-                                          : Icons.cancel,
-                                      color: ad['isActive']
-                                          ? Colors.green
-                                          : Colors.red,
-                                    ),
-                                  ],
-                                ),
-                 
-                                // Text("Active",
-                                // style: TextStyle(
-                                //   color: ad['isActive'] ? Colors.green : Colors.red,
-                                // ),
-                                // ),
-                 
-                                IconButton(
-                                  icon: Icon(Icons.more_vert),
-                                  onPressed: () => _showOptionsDialog(ad),
-                                ),
-                              ],
-                            ),
-                          ),
-                          OverflowBar(
-                            spacing: 8,
-                            alignment: MainAxisAlignment.spaceEvenly,
-                            // alignment: MainAxisAlignment.end, // Align buttons to the end (right)
-                            children: [
-                              if (ad['action_flags']['mark_as_sold'])
-                                TextButton(
-                                  onPressed: ad['action_flags']['mark_as_sold']
-                                      ? () => _showSoldConfirmation(ad['_id'])
-                                      : null,
-                                  child: Text(
-                                    'MARK AS SOLD',
-                                    style: TextStyle(
-                                      color: ad['action_flags']['mark_as_sold']
-                                          ? const Color.fromARGB(
-                                              255, 247, 251, 2)
-                                          : Colors.grey,
-                                    ),
                                   ),
-                                ),
-                              TextButton(
-                                onPressed: ad['action_flags']['featured']
-                                    ? () async {
-                                        // Store the ScaffoldMessenger context
-                                        final scaffoldMessenger =
-                                            ScaffoldMessenger.of(context);
-                                        try {
-                                          final success = await _myAdsService
-                                              .makeFeatured(context, ad['_id']);
-                 
-                                          if (success) {
-                                            scaffoldMessenger.showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    'Ad featured successfully'),
-                                                backgroundColor: Colors.green,
-                                              ),
-                                            );
-                                            // Refresh the ads list to show updated status
-                                            await _loadMyAds(); // Make sure you have this method to refresh the ads
-                                          } else {
-                                            scaffoldMessenger.showSnackBar(
-                                              const SnackBar(
-                                                content: Text(
-                                                    'Failed to feature ad'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        } catch (e) {
-                                          if (mounted) {
-                                            scaffoldMessenger.showSnackBar(
-                                              SnackBar(
-                                                content: Text(
-                                                    'Error: ${e.toString()}'),
-                                                backgroundColor: Colors.red,
-                                              ),
-                                            );
-                                          }
-                                        }
-                                      }
-                                    : null, // Disable if not featured
-                                child: Container(
-                                    margin: const EdgeInsets.only(right: 8),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          const Color.fromARGB(255, 57, 113, 1),
-                                          const Color.fromARGB(
-                                              255, 223, 210, 227)
-                                        ],
-                                      ),
-                                      border: Border.all(
-                                        color: ad['action_flags']['featured']
-                                            ? const Color.fromARGB(
-                                                255, 23, 0, 71)
-                                            : Colors.grey,
-                                      ),
-                                      borderRadius: BorderRadius.circular(5),
-                                    ),
-                 
-                                    // Add this to your State class
-                 
-                                    // Replace the existing Text widget with this:
-                                    child: Stack(
-                                      children: [
-                                        Text(
-                                          'FEATURED',
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            color: ad['action_flags']
-                                                    ['featured']
-                                                ? const Color.fromARGB(
-                                                    255, 30, 1, 66)
-                                                : !ad['isActive'] ||
-                                                        !ad['action_flags']
-                                                            ['edit'] ||
-                                                        !ad['action_flags']
-                                                            ['remove'] ||
-                                                        !ad['action_flags']
-                                                            ['mark_as_sold'] ||
-                                                        !ad['action_flags']
-                                                            ['mark_as_inactive']
-                                                    ? Colors.red
-                                                    : const Color.fromARGB(
-                                                        255, 252, 251, 251),
+                                  OverflowBar(
+                                    spacing: 8,
+                                    alignment: MainAxisAlignment.spaceEvenly,
+                                    // alignment: MainAxisAlignment.end, // Align buttons to the end (right)
+                                    children: [
+                                      if (ad['action_flags']['mark_as_sold'])
+                                        TextButton(
+                                          onPressed: ad['action_flags']
+                                                  ['mark_as_sold']
+                                              ? () => _showSoldConfirmation(
+                                                  ad['_id'])
+                                              : null,
+                                          child: Text(
+                                            'MARK AS SOLD',
+                                            style: TextStyle(
+                                              color: ad['action_flags']
+                                                      ['mark_as_sold']
+                                                  ? const Color.fromARGB(255, 24, 24, 11)
+                                                  : Colors.grey,
+                                            ),
                                           ),
                                         ),
-                                        if (ad['action_flags'][
-                                            'featured']) // Only show animation when featured is true
-                                          // AnimatedBuilder(
-                                          //   animation: _animation,
-                                          //   builder: (context, child) {
-                                          //     return Positioned(
-                                          //       left: (_animation.value + 1) * 50,
-                                          //       top: 2,
-                                          //       child: Container(
-                                          //         width: 6,
-                                          //         height: 6,
-                                          //         decoration: BoxDecoration(
-                                          //           shape: BoxShape.circle,
-                                          //           color: const Color.fromARGB(255, 3, 77, 25).withOpacity(0.6),
-                                          //           boxShadow: [
-                                          //             BoxShadow(
-                                          //               color: const Color.fromARGB(255, 3, 77, 25).withOpacity(0.3),
-                                          //               blurRadius: 4,
-                                          //               spreadRadius: 1,
-                                          //             ),
-                                          //           ],
-                                          //         ),
-                                          //       ),
-                                          //     );
-                                          //   },
-                                          // ),
-                 
-                                          AnimatedBuilder(
-                                            animation: _animation,
-                                            builder: (context, child) {
-                                              return Positioned(
-                                                left:
-                                                    (_animation.value + 1) * 80,
-                                                top: 2,
-                                                child: Transform.scale(
-                                                  scale: 0.9 +
-                                                      (_animation.value * 0.9)
-                                                          .abs(), // Pulsing effect
-                                                  child: Container(
-                                                    width: 15,
-                                                    height: 15,
-                                                    decoration: BoxDecoration(
-                                                      shape: BoxShape.circle,
-                                                      gradient: RadialGradient(
-                                                        colors: [
-                                                          const Color.fromARGB(
-                                                                  255,
-                                                                  15,
-                                                                  255,
-                                                                  3)
-                                                              .withOpacity(0.9),
-                                                          const Color.fromARGB(
-                                                                  255,
-                                                                  32,
-                                                                  251,
-                                                                  3)
-                                                              .withOpacity(0.6),
-                                                        ],
-                                                        center:
-                                                            Alignment.topLeft,
+                                      TextButton(
+                                        onPressed: ad['action_flags']
+                                                ['featured']
+                                            ? () async {
+                                                // Store the ScaffoldMessenger context
+                                                final scaffoldMessenger =
+                                                    ScaffoldMessenger.of(
+                                                        context);
+                                                try {
+                                                  final success =
+                                                      await _myAdsService
+                                                          .makeFeatured(context,
+                                                              ad['_id']);
+
+                                                  if (success) {
+                                                    scaffoldMessenger
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Ad featured successfully'),
+                                                        backgroundColor:
+                                                            Colors.green,
                                                       ),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: const Color(
-                                                                  0xFF2ECC71)
-                                                              .withOpacity(0.4),
-                                                          blurRadius: 8,
-                                                          spreadRadius: 2,
-                                                        ),
-                                                        BoxShadow(
-                                                          color: const Color(
-                                                                  0xFF27AE60)
-                                                              .withOpacity(0.2),
-                                                          blurRadius: 12,
-                                                          spreadRadius: -2,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    child: Stack(
-                                                      children: [
-                                                        Positioned(
-                                                          top: 2,
-                                                          left: 2,
+                                                    );
+                                                    // Refresh the ads list to show updated status
+                                                    await _loadMyAds(); // Make sure you have this method to refresh the ads
+                                                  } else {
+                                                    scaffoldMessenger
+                                                        .showSnackBar(
+                                                      const SnackBar(
+                                                        content: Text(
+                                                            'Failed to feature ad'),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                  }
+                                                } catch (e) {
+                                                  if (mounted) {
+                                                    scaffoldMessenger
+                                                        .showSnackBar(
+                                                      SnackBar(
+                                                        content: Text(
+                                                            'Error: ${e.toString()}'),
+                                                        backgroundColor:
+                                                            Colors.red,
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                              }
+                                            : null, // Disable if not featured
+                                        child: Container(
+                                            margin:
+                                                const EdgeInsets.only(right: 8),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  const Color.fromARGB(
+                                                      255, 57, 113, 1),
+                                                  const Color.fromARGB(
+                                                      255, 223, 210, 227)
+                                                ],
+                                              ),
+                                              border: Border.all(
+                                                color: ad['action_flags']
+                                                        ['featured']
+                                                    ? const Color.fromARGB(
+                                                        255, 23, 0, 71)
+                                                    : Colors.grey,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                            ),
+
+                                            // Add this to your State class
+
+                                            // Replace the existing Text widget with this:
+                                            child: Stack(
+                                              children: [
+                                                Text(
+                                                  'FEATURED',
+                                                  style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    color: ad['action_flags']
+                                                            ['featured']
+                                                        ? const Color.fromARGB(
+                                                            255, 30, 1, 66)
+                                                        : !ad['isActive'] ||
+                                                                !ad['action_flags']
+                                                                    ['edit'] ||
+                                                                !ad['action_flags']
+                                                                    [
+                                                                    'remove'] ||
+                                                                !ad['action_flags']
+                                                                    [
+                                                                    'mark_as_sold'] ||
+                                                                !ad['action_flags']
+                                                                    [
+                                                                    'mark_as_inactive']
+                                                            ? Colors.red
+                                                            : const Color
+                                                                .fromARGB(255,
+                                                                252, 251, 251),
+                                                  ),
+                                                ),
+                                                if (ad['action_flags'][
+                                                    'featured']) // Only show animation when featured is true
+                                                  // AnimatedBuilder(
+                                                  //   animation: _animation,
+                                                  //   builder: (context, child) {
+                                                  //     return Positioned(
+                                                  //       left: (_animation.value + 1) * 50,
+                                                  //       top: 2,
+                                                  //       child: Container(
+                                                  //         width: 6,
+                                                  //         height: 6,
+                                                  //         decoration: BoxDecoration(
+                                                  //           shape: BoxShape.circle,
+                                                  //           color: const Color.fromARGB(255, 3, 77, 25).withOpacity(0.6),
+                                                  //           boxShadow: [
+                                                  //             BoxShadow(
+                                                  //               color: const Color.fromARGB(255, 3, 77, 25).withOpacity(0.3),
+                                                  //               blurRadius: 4,
+                                                  //               spreadRadius: 1,
+                                                  //             ),
+                                                  //           ],
+                                                  //         ),
+                                                  //       ),
+                                                  //     );
+                                                  //   },
+                                                  // ),
+
+                                                  AnimatedBuilder(
+                                                    animation: _animation,
+                                                    builder: (context, child) {
+                                                      return Positioned(
+                                                        left:
+                                                            (_animation.value +
+                                                                    1) *
+                                                                80,
+                                                        top: 2,
+                                                        child: Transform.scale(
+                                                          scale: 0.9 +
+                                                              (_animation.value *
+                                                                      0.9)
+                                                                  .abs(), // Pulsing effect
                                                           child: Container(
-                                                            width: 4,
-                                                            height: 4,
+                                                            width: 15,
+                                                            height: 15,
                                                             decoration:
                                                                 BoxDecoration(
                                                               shape: BoxShape
                                                                   .circle,
-                                                              color: Colors
-                                                                  .white
-                                                                  .withOpacity(
-                                                                      0.8),
+                                                              gradient:
+                                                                  RadialGradient(
+                                                                colors: [
+                                                                  const Color
+                                                                          .fromARGB(
+                                                                          255,
+                                                                          15,
+                                                                          255,
+                                                                          3)
+                                                                      .withOpacity(
+                                                                          0.9),
+                                                                  const Color
+                                                                          .fromARGB(
+                                                                          255,
+                                                                          32,
+                                                                          251,
+                                                                          3)
+                                                                      .withOpacity(
+                                                                          0.6),
+                                                                ],
+                                                                center: Alignment
+                                                                    .topLeft,
+                                                              ),
+                                                              boxShadow: [
+                                                                BoxShadow(
+                                                                  color: const Color(
+                                                                          0xFF2ECC71)
+                                                                      .withOpacity(
+                                                                          0.4),
+                                                                  blurRadius: 8,
+                                                                  spreadRadius:
+                                                                      2,
+                                                                ),
+                                                                BoxShadow(
+                                                                  color: const Color(
+                                                                          0xFF27AE60)
+                                                                      .withOpacity(
+                                                                          0.2),
+                                                                  blurRadius:
+                                                                      12,
+                                                                  spreadRadius:
+                                                                      -2,
+                                                                ),
+                                                              ],
+                                                            ),
+                                                            child: Stack(
+                                                              children: [
+                                                                Positioned(
+                                                                  top: 2,
+                                                                  left: 2,
+                                                                  child:
+                                                                      Container(
+                                                                    width: 4,
+                                                                    height: 4,
+                                                                    decoration:
+                                                                        BoxDecoration(
+                                                                      shape: BoxShape
+                                                                          .circle,
+                                                                      color: Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.8),
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ],
                                                             ),
                                                           ),
                                                         ),
-                                                      ],
-                                                    ),
+                                                      );
+                                                    },
                                                   ),
-                                                ),
+                                              ],
+                                            )
+
+                                            // child: Text(
+                                            //   'FEATURED',
+                                            //   style: TextStyle(
+                                            //     fontWeight: FontWeight.bold,
+                                            //     color: ad['action_flags']['featured']
+                                            //         ? const Color.fromARGB(255, 3, 77, 25) // Blue when featured is true
+                                            //         : !ad['isActive'] ||
+                                            //                 !ad['action_flags']['edit'] ||
+                                            //                 !ad['action_flags']['remove'] ||
+                                            //                 !ad['action_flags']
+                                            //                     ['mark_as_sold'] ||
+                                            //                 !ad['action_flags']
+                                            //                     ['mark_as_inactive']
+                                            //             ? Colors.red
+                                            //             : Colors.grey,
+                                            //   ),
+                                            // ),
+                                            ),
+                                      ),
+                                      if (!ad['isActive'] &&
+                                          ad['action_flags']['publish'])
+                                        TextButton(
+                                          onPressed: () async {
+                                            try {
+                                              await _myAdsService.publishAd(
+                                                  context, ad['_id']);
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Ad published successfully')),
                                               );
-                                            },
-                                          ),
-                                      ],
-                                    )
-                 
-                                    // child: Text(
-                                    //   'FEATURED',
-                                    //   style: TextStyle(
-                                    //     fontWeight: FontWeight.bold,
-                                    //     color: ad['action_flags']['featured']
-                                    //         ? const Color.fromARGB(255, 3, 77, 25) // Blue when featured is true
-                                    //         : !ad['isActive'] ||
-                                    //                 !ad['action_flags']['edit'] ||
-                                    //                 !ad['action_flags']['remove'] ||
-                                    //                 !ad['action_flags']
-                                    //                     ['mark_as_sold'] ||
-                                    //                 !ad['action_flags']
-                                    //                     ['mark_as_inactive']
-                                    //             ? Colors.red
-                                    //             : Colors.grey,
-                                    //   ),
-                                    // ),
-                                    ),
-                              ),
-                              if (!ad['isActive'] &&
-                                  ad['action_flags']['publish'])
-                                TextButton(
-                                  onPressed: () async {
-                                    try {
-                                      await _myAdsService.publishAd(
-                                          context, ad['_id']);
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content: Text(
-                                                'Ad published successfully')),
-                                      );
-                                      _loadMyAds(); // Reload the ads list
-                                      // Add navigation here after successful publish
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => HomeScreen()),
-                                        (route) => false,
-                                      );
-                                    } catch (e) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        SnackBar(
-                                            content:
-                                                Text('Failed to publish ad')),
-                                      );
-                                    }
-                                  },
-                                  child: Text('PUBLISH'),
-                                ),
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => PackageScreen()
-                                        // OfferPackageScreen(adId: ad['_id']),
+                                              _loadMyAds(); // Reload the ads list
+                                              // Add navigation here after successful publish
+                                              Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        HomeScreen()),
+                                                (route) => false,
+                                              );
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                    content: Text(
+                                                        'Failed to publish ad')),
+                                              );
+                                            }
+                                          },
+                                          child: Text('PUBLISH'),
                                         ),
-                                  );
-                                },
-                                child: Text(
-                                  'SELL FAST',
-                                  style: TextStyle(
-                                      color: const Color.fromARGB(
-                                          255, 254, 4, 137)),
-                                ),
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PackageScreen()
+                                                // OfferPackageScreen(adId: ad['_id']),
+                                                ),
+                                          );
+                                        },
+                                        child: Text(
+                                          'SELL FAST',
+                                          style: TextStyle(
+                                              color: const Color.fromARGB(
+                                                  255, 254, 4, 137)),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                            );
+                          },
+                        ),
                 ),
-              ),
-              
+          FavouriteScreen(),
         ],
       ),
-        bottomNavigationBar: CustomBottomNavBar(currentIndex: 3),
+      bottomNavigationBar: CustomBottomNavBar(currentIndex: 3),
     );
   }
-   @override
+
+  @override
   void dispose() {
     tabController.dispose();
     _animationController.dispose();

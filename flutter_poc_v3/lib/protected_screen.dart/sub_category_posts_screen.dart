@@ -144,140 +144,252 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
   //   }
   // }
 
-  Future<void> fetchPosts() async {
-    if (isLoading) return;
+  // Future<void> fetchPosts() async {
+  //   if (isLoading) return;
 
-    setState(() {
-      isLoading = true;
-    });
+  //   setState(() {
+  //     isLoading = true;
+  //   });
 
-    try {
-      // Get current location from shared preferences
-      final prefs = await SharedPreferences.getInstance();
-      final currentCity = prefs.getString('city') ?? '';
-      final currentState = prefs.getString('state') ?? '';
+  //   try {
+  //     // Get current location from shared preferences
+  //     final prefs = await SharedPreferences.getInstance();
+  //     final currentCity = prefs.getString('city') ?? '';
+  //     final currentState = prefs.getString('state') ?? '';
 
-      final encodedCategory =
-          Uri.encodeComponent(widget.category.toLowerCase());
-      final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
+  //     final encodedCategory =
+  //         Uri.encodeComponent(widget.category.toLowerCase());
+  //     final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
 
-      // Add location parameters to the URL
-      final url = 'http://13.200.179.78/adposts?'
-          'category=$encodedCategory'
-          '&page=$currentPage'
-          '&psize=50'
-          '&findkey=$encodedSubCategory'
-          '&city=${Uri.encodeComponent(currentCity)}'
-          '&state=${Uri.encodeComponent(currentState)}';
+  //     // Add location parameters to the URL
+  //     final url = 'http://13.200.179.78/adposts?'
+  //         'category=$encodedCategory'
+  //         '&page=$currentPage'
+  //         '&psize=50'
+  //         '&findkey=$encodedSubCategory'
+  //         '&city=${Uri.encodeComponent(currentCity)}'
+  //         '&state=${Uri.encodeComponent(currentState)}';
 
-      log('Fetching URL: $url');
+  //     log('Fetching URL: $url');
 
-      final response = await http.get(Uri.parse(url));
-      log('Response Status: ${response.statusCode}');
-      log('Response Body: ${response.body}');
+  //     final response = await http.get(Uri.parse(url));
+  //     log('Response Status: ${response.statusCode}');
+  //     log('Response Body: ${response.body}');
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['data'] != null && data['data'] is List) {
-          final List<dynamic> jsonList = data['data'];
-          log('First item featured_at: ${jsonList.isNotEmpty ? jsonList[0]['featured_at'] : 'no items'}');
-          final List<ProductModel> newPosts = jsonList
-              .map((item) => ProductModel(
-                    id: item['_id']?.toString(),
-                    icon: item['icon'] ?? '',
-                    title: item['title']?.toString() ?? 'No Title',
-                    description: item['description']?.toString() ?? '',
-                    price: double.tryParse(item['price']?.toString() ?? '0'),
-                    location: item['location']?.toString() ?? '',
-                    city: item['city']?.toString() ?? '',
-                    category: item['category']?.toString() ?? '',
-                    thumb: item['thumb']?.toString() ?? '',
-                    posted_at: item['posted_at']?.toString() ?? '',
-                    brand: item['brand']?.toString() ?? '',
-                    warranty: item['warranty']?.toString() ?? '',
-                    condition: item['condition']?.toString() ?? '',
-                    bedrooms: item['bedrooms']?.toString() ?? '',
-                    bathrooms: item['bathrooms']?.toString() ?? '',
-                    area: item['area']?.toString() ?? '',
-                    furnishing: item['furnishing']?.toString() ?? '',
-                    year: int.tryParse(item['year']?.toString() ?? '0'),
-                    kilometers:
-                        int.tryParse(item['kilometers']?.toString() ?? '0'),
-                    fuelType: item['fuelType']?.toString() ?? '',
-                    transmission: item['transmission']?.toString() ?? '',
-                    model: item['model']?.toString() ?? '',
-                    storage: item['storage']?.toString() ?? '',
-                    ram: item['ram']?.toString() ?? '',
-                    material: item['material']?.toString() ?? '',
-                    publishedAt: item['published_at']?.toString() ?? '',
-                    assets: item['assets'] != null
-                        ? List<Map<String, dynamic>>.from(item['assets'])
-                        : [], // Make sure to parse
-                    featured_at: item['featured_at']?.toString() ??
-                        '', // Update this line
-                    valid_till:
-                        item['valid_till']?.toString() ?? '', // Update this
-                    state: item['state']?.toString() ?? '',
-                    electronics_category:
-                        item['electronics_category']?.toString() ?? '',
-                    product: item['product']?.toString() ?? '',
-                    operatingSystem: item['operatingSystem']?.toString() ?? '',
-                    camera: item['camera']?.toString() ?? '',
-                    screenSize: item['screenSize']?.toString() ?? '',
-                    color: item['color']?.toString() ?? '',
-                    battery: item['battery']?.toString() ?? '',
-                    floorNumber: item['floorNumber']?.toString() ?? '',
-                    totalFloors: item['totalFloors']?.toString() ?? '',
-                    type: item['type']?.toString() ?? '',
-                    ownerType: item['ownerType']?.toString() ?? '',
-                    company: item['company']?.toString() ?? '',
-                    industry: item['industry']?.toString() ?? '',
-                    position: item['position']?.toString() ?? '',
-                    experienceLevel: item['experienceLevel']?.toString() ?? '',
-                    salary: item['salary'],
-                    // salary: item['salary']?.toString() ?? '',
-                    jobType: item['jobType']?.toString() ?? '',
-                    qualifications: item['qualifications']?.toString() ?? '',
-                    contact_info: item['contact_info']?.toString() ?? '',
-                    pet_category: item['pet_category']?.toString() ?? '',
-                    vaccinationType: item['vaccinationType']?.toString() ?? '',
-                    breed: item['breed']?.toString() ?? '',
+  //     if (response.statusCode == 200) {
+  //       final data = json.decode(response.body);
+  //       if (data['data'] != null && data['data'] is List) {
+  //         final List<dynamic> jsonList = data['data'];
+  //         log('First item featured_at: ${jsonList.isNotEmpty ? jsonList[0]['featured_at'] : 'no items'}');
+  //         final List<ProductModel> newPosts = jsonList
+  //             .map((item) => ProductModel(
+  //                   id: item['_id']?.toString(),
+  //                   icon: item['icon'] ?? '',
+  //                   title: item['title']?.toString() ?? 'No Title',
+  //                   description: item['description']?.toString() ?? '',
+  //                   price: double.tryParse(item['price']?.toString() ?? '0'),
+  //                   location: item['location']?.toString() ?? '',
+  //                   city: item['city']?.toString() ?? '',
+  //                   category: item['category']?.toString() ?? '',
+  //                   thumb: item['thumb']?.toString() ?? '',
+  //                   posted_at: item['posted_at']?.toString() ?? '',
+  //                   brand: item['brand']?.toString() ?? '',
+  //                   warranty: item['warranty']?.toString() ?? '',
+  //                   condition: item['condition']?.toString() ?? '',
+  //                   bedrooms: item['bedrooms']?.toString() ?? '',
+  //                   bathrooms: item['bathrooms']?.toString() ?? '',
+  //                   area: item['area']?.toString() ?? '',
+  //                   furnishing: item['furnishing']?.toString() ?? '',
+  //                   year: int.tryParse(item['year']?.toString() ?? '0'),
+  //                   kilometers:
+  //                       int.tryParse(item['kilometers']?.toString() ?? '0'),
+  //                   fuelType: item['fuelType']?.toString() ?? '',
+  //                   transmission: item['transmission']?.toString() ?? '',
+  //                   model: item['model']?.toString() ?? '',
+  //                   storage: item['storage']?.toString() ?? '',
+  //                   ram: item['ram']?.toString() ?? '',
+  //                   material: item['material']?.toString() ?? '',
+  //                   publishedAt: item['published_at']?.toString() ?? '',
+  //                   assets: item['assets'] != null
+  //                       ? List<Map<String, dynamic>>.from(item['assets'])
+  //                       : [], // Make sure to parse
+  //                   featured_at: item['featured_at']?.toString() ??
+  //                       '', // Update this line
+  //                   valid_till:
+  //                       item['valid_till']?.toString() ?? '', // Update this
+  //                   state: item['state']?.toString() ?? '',
+  //                   electronics_category:
+  //                       item['electronics_category']?.toString() ?? '',
+  //                   product: item['product']?.toString() ?? '',
+  //                   operatingSystem: item['operatingSystem']?.toString() ?? '',
+  //                   camera: item['camera']?.toString() ?? '',
+  //                   screenSize: item['screenSize']?.toString() ?? '',
+  //                   color: item['color']?.toString() ?? '',
+  //                   battery: item['battery']?.toString() ?? '',
+  //                   floorNumber: item['floorNumber']?.toString() ?? '',
+  //                   totalFloors: item['totalFloors']?.toString() ?? '',
+  //                   type: item['type']?.toString() ?? '',
+  //                   ownerType: item['ownerType']?.toString() ?? '',
+  //                   company: item['company']?.toString() ?? '',
+  //                   industry: item['industry']?.toString() ?? '',
+  //                   position: item['position']?.toString() ?? '',
+  //                   experienceLevel: item['experienceLevel']?.toString() ?? '',
+  //                   salary: item['salary'],
+  //                   // salary: item['salary']?.toString() ?? '',
+  //                   jobType: item['jobType']?.toString() ?? '',
+  //                   qualifications: item['qualifications']?.toString() ?? '',
+  //                   contact_info: item['contact_info']?.toString() ?? '',
+  //                   pet_category: item['pet_category']?.toString() ?? '',
+  //                   vaccinationType: item['vaccinationType']?.toString() ?? '',
+  //                   breed: item['breed']?.toString() ?? '',
 
-                    dimensions:
-                        int.tryParse(item['dimensions']?.toString() ?? '0'),
-                    hobby_category: item['hobby_category']?.toString() ?? '',
-                    fashion_category:
-                        item['fashion_category']?.toString() ?? '',
-                    size: item['size']?.toString() ?? '',
-                  ))
-              .toList();
+  //                   dimensions:
+  //                       int.tryParse(item['dimensions']?.toString() ?? '0'),
+  //                   hobby_category: item['hobby_category']?.toString() ?? '',
+  //                   fashion_category:
+  //                       item['fashion_category']?.toString() ?? '',
+  //                   size: item['size']?.toString() ?? '',
+  //                 ))
+  //             .toList();
 
-          setState(() {
-            posts.addAll(newPosts);
-            currentPage++;
-            hasMore = newPosts.length == 50;
-          });
+  //         setState(() {
+  //           posts.addAll(newPosts);
+  //           currentPage++;
+  //           hasMore = newPosts.length == 50;
+  //         });
 
-          log('Loaded ${newPosts.length} new posts');
-        } else {
-          setState(() {
-            hasMore = false;
-          });
-          log('No data in response or invalid format');
-        }
+  //         log('Loaded ${newPosts.length} new posts');
+  //       } else {
+  //         setState(() {
+  //           hasMore = false;
+  //         });
+  //         log('No data in response or invalid format');
+  //       }
+  //     }
+  //   } catch (e, stackTrace) {
+  //     log('Error fetching posts: $e');
+  //     log('Stack trace: $stackTrace');
+  //     setState(() {
+  //       hasMore = false;
+  //     });
+  //   } finally {
+  //     setState(() {
+  //       isLoading = false;
+  //     });
+  //   }
+  // }
+
+Future<void> fetchPosts() async {
+  if (isLoading) return;
+
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    final currentCity = prefs.getString('city') ?? '';
+    final currentState = prefs.getString('state') ?? '';
+
+    final encodedCategory = Uri.encodeComponent(widget.category.toLowerCase());
+    final encodedSubCategory = Uri.encodeComponent(widget.subCategory);
+
+    final url = 'http://13.200.179.78/adposts?'
+        'category=$encodedCategory'
+        '&page=$currentPage'
+        '&psize=50'
+        '&findkey=$encodedSubCategory'
+        '&city=${Uri.encodeComponent(currentCity)}'
+        '&state=${Uri.encodeComponent(currentState)}';
+
+    log('Fetching URL: $url');
+
+    final response = await http.get(Uri.parse(url));
+    
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['data'] != null && data['data'] is List) {
+        final List<dynamic> jsonList = data['data'];
+        final List<ProductModel> newPosts = jsonList.map((item) {
+          // Safe conversion of price
+          double convertedPrice = 0.0;
+                double convertedSalary = 0.0;
+          try {
+            if (item['price'] != null) {
+              if (item['price'] is num) {
+                convertedPrice = (item['price'] as num).toDouble();
+              } else if (item['price'] is String) {
+                convertedPrice = double.tryParse(item['price']) ?? 0.0;
+              }
+            }
+                 // Convert salary
+            if (item['salary'] != null) {
+              if (item['salary'] is num) {
+                convertedSalary = (item['salary'] as num).toDouble();
+              } else if (item['salary'] is String) {
+                convertedSalary = double.tryParse(item['salary']) ?? 0.0;
+              }
+            }
+          } catch (e) {
+            log('Price conversion error: $e');
+          }
+
+          return ProductModel(
+            icon: item['icon']?.toString() ?? '', // Add the required 'icon' parameter
+            id: item['_id']?.toString() ?? '',
+            title: item['title']?.toString() ?? '',
+            description: item['description']?.toString() ?? '',
+            price: convertedPrice,
+             salary: convertedSalary, // Add salary here
+            location: item['location']?.toString() ?? '',
+            city: item['city']?.toString() ?? '',
+            category: item['category']?.toString() ?? '',
+            thumb: item['thumb']?.toString() ?? '',
+            brand: item['brand']?.toString() ?? '',
+            model: item['model']?.toString() ?? '',
+            year: item['year'] != null ? int.tryParse(item['year'].toString()) ?? 0 : 0,
+            condition: item['condition']?.toString() ?? '',
+            fuelType: item['fuelType']?.toString() ?? '',
+            transmission: item['transmission']?.toString() ?? '',
+            kilometers: item['kilometers'] != null 
+                ? int.tryParse(item['kilometers'].toString()) ?? 0 
+                : 0,
+            posted_at: item['created_at']?.toString() ?? '',
+            publishedAt: item['published_at']?.toString() ?? '',
+            featured_at: item['featured_at']?.toString() ?? '',
+            valid_till: item['valid_till']?.toString() ?? '',
+            assets: (item['assets'] as List<dynamic>?)
+                ?.map((asset) => Map<String, dynamic>.from(asset))
+                ?.toList() ?? [],
+            // Add other fields as needed
+          );
+        }).toList();
+
+        setState(() {
+          if (currentPage == 0) {
+            posts.clear(); // Clear existing posts if it's the first page
+          }
+          posts.addAll(newPosts);
+          currentPage++;
+          hasMore = newPosts.length == 50;
+        });
       }
-    } catch (e, stackTrace) {
-      log('Error fetching posts: $e');
-      log('Stack trace: $stackTrace');
-      setState(() {
-        hasMore = false;
-      });
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
     }
+  } catch (e, stackTrace) {
+    log('Error fetching posts: $e');
+    log('Stack trace: $stackTrace');
+    setState(() {
+      hasMore = false;
+    });
+  } finally {
+    setState(() {
+      isLoading = false;
+    });
   }
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -489,11 +601,11 @@ class _SubCategoryPostsScreenState extends State<SubCategoryPostsScreen> {
                 builder: (context, constraints) {
                   return GridView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(2),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: constraints.maxWidth > 600 ? 3 : 2,
                       //  mainAxisExtent: constraints.maxWidth > 600 ? 400 : 300,
-                      childAspectRatio: constraints.maxWidth > 600 ? 0.9 : 0.7,
+                      childAspectRatio: constraints.maxWidth > 900 ? 0.9 : 0.7,
                       crossAxisSpacing: 1,
                       mainAxisSpacing: 1,
                     ),
@@ -597,10 +709,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     // log('Assets: ${widget.productModel.assets}');
     // log('Image URL: ${widget.productModel.getFirstImageUrl()}');
     return Card(
-      color: const Color.fromARGB(255, 213, 221, 216),
-      elevation: 10,
+      color: const Color.fromARGB(255, 246, 248, 246),
+      elevation: 8,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(2),
         side: const BorderSide(
           color: Color.fromARGB(255, 40, 19, 19),
           width: 1,
@@ -626,13 +738,54 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     // Image Container
                     Container(
-                      padding: const EdgeInsets.all(0),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: const Color.fromARGB(255, 210, 216, 212),
-                      ),
+
+                      padding: const EdgeInsets.all(3),
+                      // decoration: BoxDecoration(
+                      //    border: Border(
+                      //                             left: BorderSide(
+                      //                               color: const Color.fromARGB(
+                      //                                   255,
+                      //                                   255,
+                      //                                   221,
+                      //                                   2), // Yellow color
+                      //                               width: 4.0, // Border width
+                      //                             ),
+                      //                           ),
+                      //   borderRadius: BorderRadius.circular(1),
+                      //   color: const Color.fromARGB(255, 239, 240, 239),
+                      
+                      // ),
+                         decoration: BoxDecoration(
+                                                border: Border(
+                                                  left: BorderSide(
+                                                    color:
+                                                        const Color(0xFFFF5733),
+                                                    width: 4.0,
+                                                  ),
+                                                ),
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
+                                                  colors: [
+                                                    const Color(0xFFFF8C00)
+                                                        .withOpacity(0.2),
+                                                    Colors.transparent,
+                                                  ],
+                                                ),
+                                                // boxShadow: [
+                                                //   BoxShadow(
+                                                //     color:
+                                                //         const Color(0xFFFF5733)
+                                                //             .withOpacity(0.2),
+                                                //     spreadRadius: 0,
+                                                //     blurRadius: 1,
+                                                //     offset: const Offset(-2, 0),
+                                                //   ),
+                                                // ],
+                                              ),
+                      
                       height: 130,
-                      width: double.infinity,
+                      width: 200,
                       child: Builder(
                         builder: (context) {
                           final imageUrl =
@@ -647,6 +800,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               // Image
                               imageUrl.isNotEmpty
                                   ? Image.network(
+                                    
+                                    width:double.infinity,
+                                    height:200,
                                       imageUrl,
                                       fit: BoxFit.fill,
                                       errorBuilder:
@@ -682,16 +838,22 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               if (widget.productModel.featured_at?.isNotEmpty ==
                                   true)
                                 Container(
-                                  margin: EdgeInsets.only(top: 5, left: 5),
+                                  margin: EdgeInsets.only(top: 100, left: 75),
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     gradient: const LinearGradient(
                                       colors: [
                                         Color.fromARGB(
-                                            255, 255, 221, 2), // Deep Purple
+                                            255,
+                                                            240,
+                                                            107,
+                                                            31), // Deep Purple
                                         Color.fromARGB(
-                                            255, 255, 221, 2), // Pink
+                                           255,
+                                                            240,
+                                                            107,
+                                                            31), // Pink
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -743,25 +905,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 Flexible(
                   flex: 2,
                   child: Padding(
-                    padding: EdgeInsets.only(left: 9, right: 5),
+                    padding: EdgeInsets.only(left: 3, right: 5),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          (widget.productModel.title ?? 'No Title')
-                              .toUpperCase(),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            color: Color.fromARGB(255, 12, 8, 8),
-                            // color: Color.fromARGB(255, 251, 38, 38),
-                            fontWeight: FontWeight.bold,
-                            fontFamily: 'Poppins',
-                            overflow: TextOverflow.ellipsis,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
+                       
+                        const SizedBox(height: 8),
                         // Container(
                         //     padding: const EdgeInsets.symmetric(
                         //         vertical: 6, horizontal: 8),
@@ -862,34 +1011,54 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             //   ),
                             //   overflow: TextOverflow.ellipsis,
                             // )
-                            child: Text(
-                              widget.productModel.category?.toLowerCase() ==
-                                      'jobs'
-                                  ? 'Salary: ${formatSalary(widget.productModel.salary) ?? 'N/A'}'
-                                  : widget.productModel.price != null &&
-                                          widget.productModel.price != 0
-                                      ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
-                                      : widget.productModel.category
-                                                  ?.toLowerCase() ==
-                                              'jobs'
-                                          ? 'Salary: Negotiable'
-                                          : 'Price: N/A',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(255, 28, 199, 1),
-                                letterSpacing: 1.2,
-                                // fontFamily: 'Poppins',
-                                fontStyle: FontStyle.normal,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            )),
+                         child: Center(
+                           child: Text(
+                                          widget.productModel.category?.toLowerCase() ==
+                                                  'jobs'
+                                              ? 'Salary: ${formatSalary(widget.productModel.salary) ?? 'N/A'}'
+                                              : widget.productModel.price != null &&
+                                                      widget.productModel.price != 0
+                                                  ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(widget.productModel.price)}'
+                                                  : widget.productModel.category
+                                                              ?.toLowerCase() ==
+                                                          'jobs'
+                                                      ? 'Salary: Negotiable'
+                                                      : 'Price: N/A',
+                                          style: const TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color.fromARGB(255, 7, 13, 6),
+                                            letterSpacing: 1.2,
+                                            // fontFamily: 'Poppins',
+                                            fontStyle: FontStyle.normal,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                         )
+                            ),
 
                         const SizedBox(
-                          height: 2,
+                          height: 3,
+                        ),
+                           Text(
+                          (widget.productModel.title ?? 'No Title')
+                              .toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 12, 8, 8),
+                            // color: Color.fromARGB(255, 251, 38, 38),
+                               fontWeight: FontWeight.w500,
+                            fontFamily: 'Poppins',
+                            overflow: TextOverflow.ellipsis,
+                            letterSpacing: 1,
+                          ),
+                        ),
+                         const SizedBox(
+                          height: 3,
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             const Icon(Icons.location_on_outlined, size: 18),
                             Expanded(
@@ -908,11 +1077,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 3),
                         Row(
                           children: [
-                            const Icon(Icons.access_time, size: 16),
-                            const SizedBox(width: 4),
+                            // const Icon(Icons.access_time, size: 16),
+                            // const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 _formatDateTime(

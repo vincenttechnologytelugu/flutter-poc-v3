@@ -152,7 +152,7 @@ class CategoryData {
     'Cars': [
     
       
-      "kia",
+      "Kia",
       'Hyundai',
       'Honda', 
       'Mercedes',
@@ -285,17 +285,7 @@ class CategoryData {
       'Agricultural Equipment',
       'Other Commercial Vehicles & Spares'
     ],
-    'Pets':[
-      'Fishes & Aquarium',
-      'Birds',
-      'Pets Foods &',
-      'Horses & Ponds',
-      'Pet Training',
-      'Pet Grooming',
-      'Pets Tools',
-      'Cats',
-      'Other Commercial Vehicles & Spares'
-    ],
+
     'Pets':[
       'Fishes & Aquarium',
       'Birds',

@@ -31,10 +31,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final pageController = PageController();
-  final Color selectedColor = Color.fromARGB(255, 1, 179, 25);
+  final Color selectedColor = Color.fromARGB(255, 240, 107, 31);
 
   final Color unselectedColor = Color.fromARGB(255, 15, 12, 17);
-  final Color backgroundColor = Color.fromARGB(255, 169, 171, 168);
+  final Color backgroundColor = Color.fromARGB(255, 200, 200, 200);
 
   // Add this helper method in your widget class
   Color getIconColor(int index) {

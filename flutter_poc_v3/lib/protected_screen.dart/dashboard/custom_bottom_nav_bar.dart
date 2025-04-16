@@ -123,8 +123,8 @@ class _CustomBottomNavBarState extends State<CustomBottomNavBar> {
   Widget build(BuildContext context) {
     return CurvedNavigationBar(
       backgroundColor: Colors.transparent,
-      color: const Color.fromARGB(255, 169, 171, 168),
-      buttonBackgroundColor: const Color.fromARGB(255, 1, 179, 25),
+      color: const Color.fromARGB(255, 200, 200, 200),
+      buttonBackgroundColor: const Color.fromARGB(255, 240, 107, 31),
       height: 70,
       index: currentIndex,
       items: [

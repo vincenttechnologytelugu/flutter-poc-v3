@@ -115,6 +115,7 @@ class CartController extends GetxController {
       );
 
       if (response.statusCode == 200) {
+        
         if (!favouriteIds.contains(adpostId)) {
           favouriteIds.add(adpostId);
           await prefs.setStringList('favoriteAdposts', favouriteIds);

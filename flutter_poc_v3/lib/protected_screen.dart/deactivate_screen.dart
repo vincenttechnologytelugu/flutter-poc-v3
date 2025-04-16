@@ -6,6 +6,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/package_screen.dart';
 import 'package:flutter_poc_v3/services/my_ads_sevice.dart';
+import 'package:intl/intl.dart';
 
 class DeactivateScreen extends StatefulWidget {
   final Map<String, dynamic> ad;
@@ -18,6 +19,17 @@ class DeactivateScreen extends StatefulWidget {
 
 class _DeactivateScreenState extends State<DeactivateScreen> {
   final MyAdsService _myAdsService = MyAdsService();
+  String? formatSalary(dynamic salary) {
+  if (salary == null) return null;
+  try {
+    final amount = salary is num ? salary.toDouble() : double.tryParse(salary.toString());
+    if (amount == null) return null;
+    return '₹${NumberFormat('#,##0', 'en_IN').format(amount)}';
+  } catch (e) {
+    return null;
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,21 +95,35 @@ class _DeactivateScreenState extends State<DeactivateScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
+                    
                     SizedBox(height: 8),
+                    
+                   
                     // Text(
-                    //                       "₹ ${productModel.price.toString()}",
-                    //                       style: const TextStyle(
-                    //                           color: Color.fromARGB(
-                    //                               255, 243, 6, 176),
-                    //                           fontSize: 16,
-                    //                           fontWeight: FontWeight.bold)),
+                    //   'Price: ₹${widget.ad['price'] ?? ''}',
+                    //   style: TextStyle(
+                    //     fontSize: 20,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
                     Text(
-                      'Price: ₹${widget.ad['price'] ?? ''}',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+  widget.ad['category']?.toString().toLowerCase() == 'jobs'
+      ? 'Salary: ${formatSalary(widget.ad['salary']) ?? 'N/A'}'
+      : widget.ad['price'] != null && widget.ad['price'] != 0
+          ? 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(widget.ad['price'])}'
+          : widget.ad['category']?.toString().toLowerCase() == 'jobs'
+              ? 'Salary: Negotiable'
+              : 'Price: N/A',
+  style: const TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: Color.fromARGB(255, 7, 13, 6),
+    letterSpacing: 1.2,
+    fontStyle: FontStyle.normal,
+  ),
+  overflow: TextOverflow.ellipsis,
+),
+
                     SizedBox(height: 24),
                     if (widget.ad['action_flags']['publish'])
                       Row(

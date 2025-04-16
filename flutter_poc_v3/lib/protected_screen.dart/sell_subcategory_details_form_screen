@@ -263,43 +263,178 @@ final List<Map<String, dynamic>> colorOptions = [
 ];
 
   // Add this method to load saved data
-  // void _loadSavedData() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     // controllers['title']?.text = prefs.getString('saved_title') ?? '';
-  //     controllers['city']?.text = prefs.getString('saved_city') ?? '';
-  //     controllers['price']?.text = prefs.getString('saved_price') ?? '';
-  //     controllers['description']?.text = prefs.getString('saved_description') ?? '';
-  //     controllers['location']?.text = prefs.getString('saved_location') ?? '';
-  //     controllers['state']?.text = prefs.getString('saved_state') ?? '';
-  //     // Add other fields as needed
-  //   });
-  // }
+  void _loadSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // controllers['title']?.text = prefs.getString('saved_title') ?? '';
+      controllers['city']?.text = prefs.getString('saved_city') ?? '';
+      controllers['price']?.text = prefs.getString('saved_price') ?? '';
+      controllers['description']?.text = prefs.getString('saved_description') ?? '';
+      controllers['location']?.text = prefs.getString('saved_location') ?? '';
+      controllers['state']?.text = prefs.getString('saved_state') ?? '';
+   
+      controllers['brand']?.text = prefs.getString('saved_brand') ?? '';
+      controllers['model']?.text = prefs.getString('saved_model') ?? '';
+      controllers['color']?.text = prefs.getString('saved_color') ?? '';
+      controllers['condition']?.text = prefs.getString('saved_condition') ?? '';
+     
+      controllers['subcategory']?.text = prefs.getString('saved_subcategory') ?? '';
+      controllers['type']?.text = prefs.getString('saved_type') ?? '';
+      controllers['year']?.text = prefs.getString('saved_year') ?? '';
+      controllers['fuelType']?.text = prefs.getString('saved_fuelType') ?? '';
+      controllers['ownerType']?.text = prefs.getString('saved_ownerType') ?? '';
+      controllers['transmision']?.text = prefs.getString('saved_transmision') ?? '';
+      controllers['area']?.text = prefs.getString('saved_area') ?? '';
+       controllers['bedrooms']?.text = prefs.getString('save_bedrooms') ?? '';
+        controllers['bathrooms']?.text = prefs.getString('save_bathrooms') ?? '';
+         controllers['furnishing']?.text = prefs.getString('save_furnushing') ?? '';
+           controllers['floorNumber']?.text = prefs.getString('save_floorNumber') ?? '';
+            controllers['totalFloors']?.text = prefs.getString('save_totalFloors') ?? '';
+            controllers['warranty']?.text = prefs.getString('saved_warranty') ?? '';
+            controllers['storage']?.text = prefs.getString('saved_storage') ?? '';
+            controllers['operatingSystem']?.text = prefs.getString('saved_operatingSystem') ?? '';
+            controllers['screenSize']?.text = prefs.getString('saved_screenSize') ?? '';
+            controllers['camera']?.text = prefs.getString('saved_camera') ?? '';
+            controllers['battery']?.text = prefs.getString('saved_battery') ?? '';
+            controllers['company']?.text = prefs.getString('saved_company') ?? '';
+             controllers['industry']?.text = prefs.getString('saved_industry') ?? '';
+             controllers['position']?.text = prefs.getString('saved_position') ?? '';
+              controllers['salary']?.text = prefs.getString('saved_salary') ?? '';
+              controllers['experienceLevel']?.text = prefs.getString('saved_experienceLevel') ?? '';
+              controllers['qualifications']?.text = prefs.getString('saved_qualifications') ?? '';
+               controllers['jobType']?.text = prefs.getString('saved_jobType') ?? '';
+                controllers['fashion_category']?.text = prefs.getString('saved_fashion_category') ?? '';
+              controllers['product']?.text = prefs.getString('saved_product') ?? '';
+              controllers['size']?.text = prefs.getString('saved_size') ?? '';
+              controllers['hobby_category']?.text = prefs.getString('saved_hobby_category') ?? '';
+              controllers['electronics_category']?.text = prefs.getString('saved_electronics_category') ?? '';
+              controllers['material']?.text = prefs.getString('saved_material') ?? '';
+              controllers['breed']?.text = prefs.getString('saved_breed') ?? '';
+              controllers['pet_category']?.text = prefs.getString('saved_petcategory') ?? '';
+              controllers['vaccinationType']?.text = prefs.getString('saved_vaccinationType') ?? '';
+             
+
+            
+            
+             
+            
+            
+
+           
+
+          
+
+
+
+      // Add other fields as needed
+    });
+  }
 
   // Add this method to save data
-  // void _saveFormData() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   // await prefs.setString('saved_title', controllers['title']?.text ?? '');
-  //   await prefs.setString('saved_city', controllers['city']?.text ?? '');
-  //   await prefs.setString('saved_price', controllers['price']?.text ?? '');
-  //   await prefs.setString('saved_description', controllers['description']?.text ?? '');
-  //   await prefs.setString('saved_location', controllers['location']?.text ?? '');
-  //   await prefs.setString('saved_state', controllers['state']?.text ?? '');
-  //   // Add other fields as needed
-  // }
+  void _saveFormData() async {
+    final prefs = await SharedPreferences.getInstance();
+    // await prefs.setString('saved_title', controllers['title']?.text ?? '');
+    await prefs.setString('saved_city', controllers['city']?.text ?? '');
+    await prefs.setString('saved_price', controllers['price']?.text ?? '');
+    await prefs.setString('saved_description', controllers['description']?.text ?? '');
+    await prefs.setString('saved_location', controllers['location']?.text ?? '');
+    await prefs.setString('saved_state', controllers['state']?.text ?? '');
+  
+    await prefs.setString('saved_brand', controllers['brand']?.text ?? '');
+    await prefs.setString('saved_model', controllers['model']?.text ?? '');
+    await prefs.setString('saved_color', controllers['color']?.text ?? '');
+    await prefs.setString('saved_condition', controllers['condition']?.text ?? '');
+   
+    await prefs.setString('saved_subcategory', controllers['subcategory']?.text ?? '');
+    await prefs.setString('saved_type', controllers['type']?.text ?? '');
+    await prefs.setString('saved_year', controllers['year']?.text ?? '');
+    await prefs.setString('saved_fuelType', controllers['fuelType']?.text ?? '');
+    await prefs.setString('saved_ownerType', controllers['ownerType']?.text ?? '');
+    await prefs.setString('saved_transmision', controllers['transmision']?.text ?? '');
+    await prefs.setString('saved_area', controllers['area']?.text ?? '');
+    await prefs.setString('save_bedrooms', controllers['bedrooms']?.text ?? '');
+    await prefs.setString('save_bathrooms', controllers['bathrooms']?.text ?? '');
+    await prefs.setString('save_furnushing', controllers['furnishing']?.text ?? '');
+    await prefs.setString('save_floorNumber', controllers['floorNumber']?.text ?? '');
+    await prefs.setString('save_totalFloors', controllers['totalFloors']?.text ?? '');
+    await prefs.setString('saved_warranty', controllers['warranty']?.text ?? '');
+    await prefs.setString('saved_storage', controllers['storage']?.text ?? '');
+    await prefs.setString('saved_operatingSystem', controllers['operatingSystem']?.text ?? '');
+    await prefs.setString('saved_screenSize', controllers['screenSize']?.text ?? '');
+    await prefs.setString('saved_camera', controllers['camera']?.text ?? '');
+    await prefs.setString('saved_battery', controllers['battery']?.text ?? '');
+    await prefs.setString('saved_company', controllers['company']?.text ?? '');
+    await prefs.setString('saved_industry', controllers['industry']?.text ?? '');
+    await prefs.setString('saved_position', controllers['position']?.text ?? '');
+    await prefs.setString('saved_salary', controllers['salary']?.text ?? '');
+    await prefs.setString('saved_experienceLevel', controllers['experienceLevel']?.text ?? '');
+    await prefs.setString('saved_qualifications', controllers['qualifications']?.text ?? '');
+    await prefs.setString('saved_jobType', controllers['jobType']?.text ?? '');
+    await prefs.setString('saved_fashion_category', controllers['fashion_category']?.text ?? '');
+    await prefs.setString('saved_product', controllers['product']?.text ?? '');
+    await prefs.setString('saved_size', controllers['size']?.text ?? '');
+    await prefs.setString('saved_hobby_category', controllers['hobby_category']?.text ?? '');
+    await prefs.setString('saved_electronics_category', controllers['electronics_category']?.text ?? '');
+    await prefs.setString('saved_material', controllers['material']?.text ?? '');
+    await prefs.setString('saved_breed', controllers['breed']?.text ?? '');
+    await prefs.setString('saved_petcategory', controllers['pet_category']?.text ?? '');
+    await prefs.setString('saved_vaccinationType', controllers['vaccinationType']?.text ?? '');
+
+    
+    // Add other fields as needed
+  }
 
 
 // Clear saved data after successful form submission
-  // void _clearSavedData() async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   // await prefs.remove('saved_title');
-  //   await prefs.remove('saved_city');
-  //   await prefs.remove('saved_price');
-  //   await prefs.remove('saved_description');
-  //   await prefs.remove('saved_location');
-  //   await prefs.remove('saved_state');
-  //   // Add other fields as needed
-  // }
+  void _clearSavedData() async {
+    final prefs = await SharedPreferences.getInstance();
+    // await prefs.remove('saved_title');
+    await prefs.remove('saved_city');
+    await prefs.remove('saved_price');
+    await prefs.remove('saved_description');
+    await prefs.remove('saved_location');
+    await prefs.remove('saved_state');
+  
+    await prefs.remove('saved_brand');
+    await prefs.remove('saved_model');
+    await prefs.remove('saved_color');
+    await prefs.remove('saved_condition');
+  
+    await prefs.remove('saved_subcategory');
+    await prefs.remove('saved_type');
+    await prefs.remove('saved_year');
+    await prefs.remove('saved_fuelType');
+    await prefs.remove('saved_ownerType');
+    await prefs.remove('saved_transmision');
+    await prefs.remove('saved_area');
+    await prefs.remove('save_bedrooms');
+    await prefs.remove('save_bathrooms');
+    await prefs.remove('save_furnushing');
+    await prefs.remove('save_floorNumber');
+    await prefs.remove('save_totalFloors');
+    await prefs.remove('saved_warranty');
+    await prefs.remove('saved_storage');
+    await prefs.remove('saved_operatingSystem');
+    await prefs.remove('saved_screenSize');
+    await prefs.remove('saved_camera');
+    await prefs.remove('saved_battery');
+    await prefs.remove('saved_company');
+    await prefs.remove('saved_industry');
+    await prefs.remove('saved_position');
+    await prefs.remove('saved_salary');
+    await prefs.remove('saved_experienceLevel');
+    await prefs.remove('saved_qualifications');
+    await prefs.remove('saved_jobType');
+    await prefs.remove('saved_fashion_category');
+    await prefs.remove('saved_product');
+    await prefs.remove('saved_size');
+    await prefs.remove('saved_hobby_category');
+    await prefs.remove('saved_electronics_category');
+    await prefs.remove('saved_material');
+
+    
+    // Add other fields as needed
+  }
   
 
   // First, add this map for city-location mapping
@@ -498,7 +633,7 @@ Future<void> _showPetCategoryDialog(BuildContext context) {
 // First, create a map of states and their cities
 final Map<String, List<String>> stateCityMap = {
 
-  'Telangana': ["Hyderabad",
+  'Telangana': ["Hyderabad","Miyapur",
 "Warangal",
 "Nizamabad",
 "Karimnagar",
@@ -971,7 +1106,7 @@ Widget _buildOwnershipTile(BuildContext context, String ownerType, StateSetter s
 @override
 void initState() {
   super.initState();
-    // _loadSavedData(); // Add this line
+    _loadSavedData(); // Add this line
   controllers = {
     'category': TextEditingController(text: widget.category),
     'title': TextEditingController(text: widget.subcategory),  // Initialize with subcategory
@@ -1256,7 +1391,7 @@ await prefs.setString('saved_color', widget.categoryColor.value.toRadixString(16
 
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-          //  _clearSavedData(); // Clear saved data only on successful submission
+           _clearSavedData(); // Clear saved data only on successful submission
         try {
           final Map<String, dynamic> responseData = json.decode(response.body);
           print('Parsed response data: $responseData');
@@ -1559,7 +1694,8 @@ ElevatedButton(
   
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -1582,7 +1718,8 @@ ElevatedButton(
    
  TextFormField(
   controller: controllers['state'],
-    // onChanged: (value) => _saveFormData(),
+ onChanged: (value) => _saveFormData(),
+ 
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -1694,6 +1831,8 @@ ElevatedButton(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
+
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -1789,6 +1928,8 @@ ElevatedButton(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
+
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -1958,6 +2099,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['type'],
+ onChanged: (value) => _saveFormData(),
+
   onTap: () {
     showModalBottomSheet(
       context: context,
@@ -2122,6 +2265,9 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+ 
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -2207,6 +2353,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -2283,6 +2430,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['area'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Area',
@@ -2365,6 +2513,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['bedrooms'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Bedrooms',
@@ -2448,6 +2597,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['bathrooms'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Bathrooms',
@@ -2524,6 +2674,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['ownerType'],
+ onChanged: (value) => _saveFormData(),
     onTap: () async {
     final selectedOwnerType = await showDialog<String>(
       context: context,
@@ -2738,6 +2889,7 @@ SizedBox(height: 10),
     );
   },
   controller: controllers['furnishing'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Furnishing',
      labelStyle: TextStyle(
@@ -2812,6 +2964,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['floorNumber'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Floor Number',
@@ -2887,6 +3040,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['totalFloors'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Total Floors',
@@ -2968,6 +3122,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -3053,6 +3208,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -3207,6 +3363,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -3319,6 +3476,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -3414,6 +3572,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -3488,7 +3647,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -3603,6 +3763,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Enter Price',
@@ -3665,7 +3826,8 @@ SizedBox(height: 10),
        
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -3705,6 +3867,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+ onChanged: (value) => _saveFormData(),
  onTap: () {
     final selectedTitle = controllers['title']?.text ?? '';
     if (selectedTitle.isEmpty) {
@@ -3883,6 +4046,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['model'],
+ onChanged: (value) => _saveFormData(),
    onTap: () {
     final selectedBrand = controllers['brand']?.text ?? '';
     if (selectedBrand.isEmpty) {
@@ -4067,6 +4231,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['warranty'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Warranty',
      labelStyle: TextStyle(
@@ -4148,6 +4313,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['storage'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Storage',
@@ -4225,6 +4391,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['color'],
+ onChanged: (value) => _saveFormData(),
    onTap: () {
     showDialog(
       context: context,
@@ -4401,6 +4568,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -4478,6 +4647,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['operatingSystem'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Operating System',
      labelStyle: TextStyle(
@@ -4553,6 +4723,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['screenSize'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'screenSize',
      labelStyle: TextStyle(
@@ -4628,6 +4799,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['camera'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Camera',
      labelStyle: TextStyle(
@@ -4703,6 +4875,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['battery'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Battery',
      labelStyle: TextStyle(
@@ -4783,6 +4956,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -4869,6 +5043,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -5029,7 +5204,8 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
-    // onChanged: (value) => _saveFormData(),
+ onChanged: (value) => _saveFormData(),
+  
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -5140,7 +5316,9 @@ SizedBox(height: 10),
   child:
   TextFormField(
   readOnly: _isFormReadOnly,
+      onChanged: (value) => _saveFormData(),
   controller: controllers['city'],
+
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -5236,6 +5414,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -5310,7 +5489,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -5425,6 +5605,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['company'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Company',
      labelStyle: TextStyle(
@@ -5503,6 +5684,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['industry'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Industry',
      labelStyle: TextStyle(
@@ -5584,6 +5766,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['position'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Position',
      labelStyle: TextStyle(
@@ -5666,6 +5849,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['salary'],
+ onChanged: (value) => _saveFormData(),
    keyboardType: TextInputType.number, // Numeric keyboard
   decoration: InputDecoration(
     labelText: 'Annual Salary (in ₹)',
@@ -5762,6 +5946,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['experienceLevel'],
+ onChanged: (value) => _saveFormData(),
 
   decoration: InputDecoration(
     labelText: 'Experience Level',
@@ -5838,6 +6023,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['jobType'],
+ onChanged: (value) => _saveFormData(),
 
   decoration: InputDecoration(
     labelText: 'Job Type',
@@ -5914,6 +6100,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
  keyboardType: TextInputType.number, // Numeric keyboard
   decoration: InputDecoration(
     labelText: 'year',
@@ -5999,6 +6186,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'price',
@@ -6099,6 +6287,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['qualifications'],
+ onChanged: (value) => _saveFormData(),
 
   decoration: InputDecoration(
     labelText: 'Qualifications',
@@ -6178,6 +6367,8 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+ 
 
   decoration: InputDecoration(
     labelText: 'Condition',
@@ -6260,6 +6451,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -6418,6 +6610,7 @@ Container(
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -6530,6 +6723,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -6625,6 +6819,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -6699,7 +6894,8 @@ Container(
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -6813,6 +7009,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -6906,6 +7103,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
      onTap: () async {
     // Check if title is selected
@@ -7059,6 +7257,7 @@ Container(
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['model'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
      onTap: () async {
     // Check if brand is selected
@@ -7210,6 +7409,7 @@ SizedBox(height: 10),
     keyboardType: TextInputType.number,
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Year',
      labelStyle: TextStyle(
@@ -7286,6 +7486,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -7361,6 +7563,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['ownerType'],
+ onChanged: (value) => _saveFormData(),
     onTap: () async {
     final selectedOwnerType = await showDialog<String>(
       context: context,
@@ -7484,6 +7687,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
  
   decoration: InputDecoration(
@@ -7636,6 +7840,7 @@ Widget _buildCommercialVehiclesSparesForm(){
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -7748,6 +7953,7 @@ Widget _buildCommercialVehiclesSparesForm(){
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -7843,6 +8049,7 @@ Widget _buildCommercialVehiclesSparesForm(){
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -7917,7 +8124,8 @@ Widget _buildCommercialVehiclesSparesForm(){
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -8031,6 +8239,7 @@ Widget _buildCommercialVehiclesSparesForm(){
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -8123,6 +8332,7 @@ Widget _buildCommercialVehiclesSparesForm(){
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['fuelType'],
+ onChanged: (value) => _saveFormData(),
    onTap: () async {
     final selectedFuelType = await showDialog<String>(
       context: context,
@@ -8256,6 +8466,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
      onTap: () async {
     // Check if title is selected
@@ -8409,6 +8620,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['model'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
      onTap: () async {
     // Check if brand is selected
@@ -8564,6 +8776,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['warranty'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Enter Warranty',
      labelStyle: TextStyle(
@@ -8652,6 +8865,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['transmission'],
+ onChanged: (value) => _saveFormData(),
    onTap: () async {
     final selectedTransmission = await showDialog<String>(
       context: context,
@@ -8797,6 +9011,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['color'],
+ onChanged: (value) => _saveFormData(),
     onTap: () {
     showDialog(
       context: context,
@@ -8981,6 +9196,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -9063,6 +9280,7 @@ SizedBox(height: 10),
   readOnly: _isFormReadOnly,
   keyboardType: TextInputType.number,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
 
   decoration: InputDecoration(
     labelText: 'Year',
@@ -9148,6 +9366,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -9303,6 +9522,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -9415,6 +9635,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -9510,6 +9731,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -9584,7 +9806,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -9699,6 +9922,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['fashion_category'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Fashion Category',
@@ -9776,6 +10000,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -9852,6 +10077,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Brand',
@@ -9931,6 +10157,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['product'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Product',
@@ -10007,6 +10234,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['size'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Fashion Size',
@@ -10085,6 +10313,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -10163,6 +10392,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -10238,6 +10469,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
  
   decoration: InputDecoration(
@@ -10425,6 +10657,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -10537,6 +10770,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -10632,6 +10866,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -10706,7 +10941,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -10744,6 +10980,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Price',
      labelStyle: TextStyle(
@@ -10897,6 +11134,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -10976,6 +11214,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['product'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Product',
@@ -11061,6 +11300,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['hobby_category'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.text,
   decoration: InputDecoration(
     labelText: 'Hobby Category',
@@ -11145,6 +11385,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+ 
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -11221,6 +11463,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
  
   decoration: InputDecoration(
@@ -11409,6 +11652,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -11521,6 +11765,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -11616,6 +11861,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -11690,7 +11936,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+// onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -11804,6 +12051,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -11897,6 +12145,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   //    onTap: () async {
   //   // Check if title is selected
@@ -12052,6 +12301,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['electronics_category'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Electronics Category',
      labelStyle: TextStyle(
@@ -12136,6 +12386,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -12213,6 +12465,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['product'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Product',
      labelStyle: TextStyle(
@@ -12289,6 +12542,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['warranty'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Warranty',
      labelStyle: TextStyle(
@@ -12366,6 +12620,7 @@ SizedBox(height: 10),
   readOnly: _isFormReadOnly,
   keyboardType: TextInputType.number,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Year',
      labelStyle: TextStyle(
@@ -12443,6 +12698,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -12597,6 +12853,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -12709,6 +12966,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -12804,6 +13062,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -12878,7 +13137,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -12992,6 +13252,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -13086,6 +13347,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -13162,6 +13425,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number, 
   decoration: InputDecoration(
     labelText: ' Year',
@@ -13239,6 +13503,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
 
   decoration: InputDecoration(
@@ -13397,7 +13662,8 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
-    // onChanged: (value) => _saveFormData(),
+ onChanged: (value) => _saveFormData(),
+  
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
     labelText: 'State',
@@ -13509,6 +13775,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
+
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -13604,6 +13872,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -13678,7 +13947,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -13792,6 +14062,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
+    
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -13884,6 +14156,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['fuelType'],
+ onChanged: (value) => _saveFormData(),
+     
    onTap: () async {
     final selectedFuelType = await showDialog<String>(
       context: context,
@@ -14017,7 +14291,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['brand'],
-    // onChanged: (value) => _saveFormData(),
+ onChanged: (value) => _saveFormData(),
+    
      onTap: () async {
     // Check if title is selected
     final selectedTitle = controllers['category']?.text ?? '';
@@ -14170,6 +14445,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['model'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
      onTap: () async {
     // Check if brand is selected
@@ -14328,6 +14604,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly:true,
   controller: controllers['ownerType'],
+ onChanged: (value) => _saveFormData(),
      onTap: () async {
     final selectedOwnerType = await showDialog<String>(
       context: context,
@@ -14452,6 +14729,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -14533,6 +14812,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -14668,6 +14948,7 @@ SizedBox(height: 10),
     }
   },
   controller: controllers['transmission'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Transmission Type',
      labelStyle: TextStyle(
@@ -14754,6 +15035,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
+
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -14911,6 +15194,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -15023,6 +15307,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -15118,6 +15403,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -15192,7 +15478,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -15306,6 +15593,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -15403,6 +15691,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['product'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Product',
      labelStyle: TextStyle(
@@ -15479,6 +15768,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['material'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Material',
      labelStyle: TextStyle(
@@ -15562,6 +15852,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -15639,6 +15931,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -15716,6 +16009,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',
@@ -15883,6 +16177,7 @@ SizedBox(height: 10),
     const SizedBox(height: 10),
  TextFormField(
   controller: controllers['state'],
+ onChanged: (value) => _saveFormData(),
     // onChanged: (value) => _saveFormData(),
   readOnly: true, // Keeps it read-only for selection dialog
   decoration: InputDecoration(
@@ -15995,6 +16290,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['city'],
+ onChanged: (value) => _saveFormData(),
  onTap: () async {
     // Debug print to check state value
     log('Current State Value: ${controllers['state']?.text}');
@@ -16090,6 +16386,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['location'],
+ onChanged: (value) => _saveFormData(),
   onTap: () async {
     // Debug print to check city value
     print('Current City Value: ${controllers['city']?.text}');
@@ -16164,7 +16461,8 @@ SizedBox(height: 10),
  
        
 //         TextFormField(
-//   controller: controllers['state'], // Using t
+//   controller: controllers['state'],
+ //onChanged: (value) => _saveFormData(), // Using t
 //   readOnly: true, // Make it read-only since we're using popup
 //   decoration: InputDecoration(
 //     labelText: 'State',
@@ -16278,6 +16576,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['price'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Price',
@@ -16371,6 +16670,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['vaccinationType'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Vaccination Type',
      labelStyle: TextStyle(
@@ -16450,6 +16750,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['pet_category'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Pet Category',
      labelStyle: TextStyle(
@@ -16534,6 +16835,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['breed'],
+ onChanged: (value) => _saveFormData(),
   decoration: InputDecoration(
     labelText: 'Breed',
      labelStyle: TextStyle(
@@ -16610,6 +16912,8 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['condition'],
+ onChanged: (value) => _saveFormData(),
+
   decoration: InputDecoration(
     labelText: 'Condition',
      labelStyle: TextStyle(
@@ -16691,6 +16995,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['year'],
+ onChanged: (value) => _saveFormData(),
   keyboardType: TextInputType.number,
   decoration: InputDecoration(
     labelText: 'Year',
@@ -16776,6 +17081,7 @@ SizedBox(height: 10),
   TextFormField(
   readOnly: _isFormReadOnly,
   controller: controllers['description'],
+ onChanged: (value) => _saveFormData(),
   maxLines: 3,
   decoration: InputDecoration(
     labelText: 'Description',

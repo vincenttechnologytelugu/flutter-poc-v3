@@ -50,6 +50,21 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
     }
   }
 
+
+  String formatPrice(dynamic price) {
+  if (price == null) return 'N/A';
+  
+  // Convert string to number if needed
+  num numericPrice;
+  if (price is String) {
+    numericPrice = double.tryParse(price) ?? 0;
+  } else {
+    numericPrice = price as num;
+  }
+
+  return NumberFormat('#,##0', 'en_IN').format(numericPrice);
+}
+
   @override
   void initState() {
     super.initState();
@@ -656,43 +671,55 @@ class _MyAddsState extends State<MyAdds> with TickerProviderStateMixin {
                                             : Colors.grey,
                                       ),
                                     ),
-                                    // title: Text(ad['title'] ?? ''),
-                                    // subtitle: Text(
-                                    //   '₹${ad['price'] ?? ''}',
+                                   
+                                    subtitle:
+                                    //  Text(
+                                    //   ad['category']
+                                    //               ?.toString()
+                                    //               .toLowerCase() ==
+                                    //           'jobs'
+                                    //       ? 'Salary: ${formatSalary(ad['salary']) ?? 'N/A'}'
+                                    //       : ad['price'] != null &&
+                                    //               ad['price'] != 0
+                                    //           ? '₹${NumberFormat('#,##0', 'en_IN').format(ad['price'])}'
+                                    //           : ad['category']
+                                    //                       ?.toString()
+                                    //                       .toLowerCase() ==
+                                    //                   'jobs'
+                                    //               ? 'Salary: Negotiable'
+                                    //               : 'Price: N/A',
                                     //   style: TextStyle(
-                                    //     color: ad['action_flags']['mark_as_sold']
+                                    //     color: ad['action_flags']
+                                    //                 ?['mark_as_sold'] ==
+                                    //             true
                                     //         ? Colors.black
                                     //         : Colors.grey,
+                                    //     fontSize: 15,
+                                    //     fontWeight: FontWeight.bold,
+                                    //     letterSpacing: 1.2,
+                                    //     fontStyle: FontStyle.normal,
                                     //   ),
+                                    //   overflow: TextOverflow.ellipsis,
                                     // ),
-                                    subtitle: Text(
-                                      ad['category']
-                                                  ?.toString()
-                                                  .toLowerCase() ==
-                                              'jobs'
-                                          ? 'Salary: ${formatSalary(ad['salary']) ?? 'N/A'}'
-                                          : ad['price'] != null &&
-                                                  ad['price'] != 0
-                                              ? '₹${NumberFormat('#,##0', 'en_IN').format(ad['price'])}'
-                                              : ad['category']
-                                                          ?.toString()
-                                                          .toLowerCase() ==
-                                                      'jobs'
-                                                  ? 'Salary: Negotiable'
-                                                  : 'Price: N/A',
-                                      style: TextStyle(
-                                        color: ad['action_flags']
-                                                    ?['mark_as_sold'] ==
-                                                true
-                                            ? Colors.black
-                                            : Colors.grey,
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.bold,
-                                        letterSpacing: 1.2,
-                                        fontStyle: FontStyle.normal,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                    Text(
+  ad['category']?.toString().toLowerCase() == 'jobs'
+    ? 'Salary: ${formatSalary(ad['salary']) ?? 'N/A'}'
+    : ad['price'] != null
+      ? '₹${formatPrice(ad['price'])}'
+      : ad['category']?.toString().toLowerCase() == 'jobs'
+        ? 'Salary: Negotiable'
+        : 'Price: N/A',
+  style: TextStyle(
+    color: ad['action_flags']?['mark_as_sold'] == true
+      ? Colors.black
+      : Colors.grey,
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+    letterSpacing: 1.2,
+    fontStyle: FontStyle.normal,
+  ),
+  overflow: TextOverflow.ellipsis,
+),
 
                                     trailing: Row(
                                       mainAxisSize: MainAxisSize.min,

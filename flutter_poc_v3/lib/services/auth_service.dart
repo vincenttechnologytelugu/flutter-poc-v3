@@ -30,6 +30,7 @@ class AuthService {
     await prefs.setString('first_name', userData['firstName'] ?? '');
     await prefs.setString('last_name', userData['lastName'] ?? '');
     await prefs.setString('email', userData['email'] ?? '');
+     await prefs.setString('userId', userData['_id'] ?? ''); // Add this line
       // Save active subscription rules
   if (userData['active_subscription_rules'] != null) {
     await prefs.setString('active_subscription_rules', json.encode(userData['active_subscription_rules']));
@@ -53,6 +54,10 @@ class AuthService {
 
         // Save user details in SharedPreferences
         await prefs.setString('user_data', jsonEncode(responseData));
+          await prefs.setString('userId', responseData['_id'] ?? ''); // Add this line
+        // In your login success handler
+
+
         return true;
       }
       return false;

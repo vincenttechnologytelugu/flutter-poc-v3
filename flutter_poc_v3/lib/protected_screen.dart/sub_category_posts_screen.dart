@@ -342,7 +342,41 @@ Future<void> fetchPosts() async {
             price: convertedPrice,
              salary: convertedSalary, // Add salary here
             location: item['location']?.toString() ?? '',
+            state: item['state']?.toString() ?? '',
             city: item['city']?.toString() ?? '',
+            electronics_category: item['electronics_category']?.toString() ?? '',
+            product: item['product']?.toString() ?? '',
+            operatingSystem: item['operatingSystem']?.toString() ?? '',
+            camera: item['camera']?.toString() ?? '',
+            screenSize: item['screenSize']?.toString() ?? '',
+            color: item['color']?.toString() ?? '',
+            battery: item['battery']?.toString() ?? '',
+            floorNumber: item['floorNumber']?.toString() ?? '',
+            totalFloors: item['totalFloors']?.toString() ?? '',
+            type: item['type']?.toString() ?? '',
+            ownerType: item['ownerType']?.toString() ?? '',
+            company: item['company']?.toString() ?? '',
+            industry: item['industry']?.toString() ?? '',
+            position: item['position']?.toString() ?? '',
+            experienceLevel: item['experienceLevel']?.toString() ?? '',
+            jobType: item['jobType']?.toString() ?? '',
+            qualifications: item['qualifications']?.toString() ?? '',
+            contact_info: item['contact_info']?.toString() ?? '',
+            pet_category: item['pet_category']?.toString() ?? '',
+            vaccinationType: item['vaccinationType']?.toString() ?? '',
+            dimensions: item['dimensions'] != null 
+                ? int.tryParse(item['dimensions'].toString()) ?? 0 
+                : 0,
+            hobby_category: item['hobby_category']?.toString() ?? '',
+            fashion_category: item['fashion_category']?.toString() ?? '',
+            warranty: item['warranty']?.toString() ?? '',
+            bedrooms: item['bedrooms']?.toString() ?? '',
+            bathrooms: item['bathrooms']?.toString() ?? '',
+            area: item['area']?.toString() ?? '',
+            furnishing: item['furnishing']?.toString() ?? '',
+
+            size: item['size']?.toString() ?? '',
+            breed: item['breed']?.toString() ?? '',
             category: item['category']?.toString() ?? '',
             thumb: item['thumb']?.toString() ?? '',
             brand: item['brand']?.toString() ?? '',
@@ -1205,8 +1239,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       child: Transform.scale(
                                         scale: 1 - value * 0.5,
                                         child: Container(
-                                          width: 10,
-                                          height: 10,
+                                          width: 5,
+                                          height: 5,
                                           decoration: BoxDecoration(
                                             color: const Color.fromARGB(
                                                     255, 246, 3, 226)
@@ -1216,7 +1250,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                               BoxShadow(
                                                 color: Colors.white
                                                     .withOpacity(0.4),
-                                                blurRadius: 10,
+                                                blurRadius: 1,
                                                 spreadRadius: 2,
                                               ),
                                             ],

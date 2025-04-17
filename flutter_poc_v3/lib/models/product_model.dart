@@ -19,7 +19,7 @@ class ProductModel {
   final ActionFlags? actionFlags;
   final String? id;
   final String? title;
-  final double? price;
+  final dynamic price;
   final String? model;
   final int? year;
   final String? location;

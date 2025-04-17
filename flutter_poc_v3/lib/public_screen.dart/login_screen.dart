@@ -617,6 +617,7 @@ class _LoginScreenState extends State<LoginScreen> {
   // In your login success handler
   void onLoginSuccess(Map<String, dynamic> userData) async {
     final prefs = await SharedPreferences.getInstance();
+    
 
     if (userData['active_subscription_rules'] != null) {
       await prefs.setString('active_subscription_rules',

@@ -20,8 +20,11 @@ class UserChatScreen extends StatefulWidget {
   final String title;
   final double price;
    final bool isFromChatScreen; // Add this parameter
-
+   final String buyerId;    // Add this
+  final String sellerId;   // Add this
   final List<dynamic>? initialMessages;
+
+
   const UserChatScreen({
     super.key,
     required this.conversationId,
@@ -29,6 +32,8 @@ class UserChatScreen extends StatefulWidget {
     required this.title,
     required this.price,
     required this.product,
+       required this.buyerId,    // Add this
+    required this.sellerId,   // Add this
     this.initialMessages,
      this.isFromChatScreen = false, // Default to false
   });
@@ -44,6 +49,17 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
   bool isLoading = true;
   String? userName;
+
+  String? formatSalary(dynamic salary) {
+  if (salary == null) return null;
+  try {
+    num numericSalary = salary is String ? double.parse(salary) : salary;
+    return NumberFormat('#,##0', 'en_IN').format(numericSalary);
+  } catch (e) {
+    return null;
+  }
+}
+
 
   @override
   void initState() {
@@ -357,14 +373,36 @@ mainAxisAlignment: MainAxisAlignment.center,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
+                  // Text(
+                  //   '₹${widget.product.price?.toString() ?? '0.0'}',
+                  //   style: const TextStyle(
+                  //     fontSize: 13,
+                  //     color: Colors.green,
+                  //     fontWeight: FontWeight.w500,
+                  //   ),
+                  // ),
                   Text(
-                    '₹${widget.product.price?.toString() ?? '0.0'}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Colors.green,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+  widget.product.category?.toLowerCase() == 'jobs'
+      ? 'Salary: ${formatSalary(widget.product.salary) ?? 'N/A'}'
+      :  widget.product.price != null &&  widget.product.price.toString() != "0"
+          ? '₹${NumberFormat('#,##0', 'en_IN').format(
+               widget.product.price is String 
+                  ? num.tryParse( widget.product.price) ?? 0 
+                  :  widget.product.price
+            )}'
+          :  widget.product.category?.toLowerCase() == 'jobs'
+              ? 'Salary: Negotiable'
+              : 'Price: N/A',
+  style: const TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.bold,
+    color: Color.fromARGB(255, 7, 13, 6),
+    letterSpacing: 1.2,
+    fontStyle: FontStyle.normal,
+  ),
+  overflow: TextOverflow.ellipsis,
+)
+
                 ],
               ),
             ),
@@ -545,8 +583,15 @@ mainAxisAlignment: MainAxisAlignment.center,
 
 
                       return _MessageBubble(message: message,
+
                        previousMessage: previousMessage,
-                      
+                       buyerId: widget.buyerId,
+                       sellerId: widget.sellerId,
+                
+
+
+                        
+                       
                       );
                     },
                   ),
@@ -634,13 +679,187 @@ mainAxisAlignment: MainAxisAlignment.center,
 
 
 
+// class _MessageBubble extends StatefulWidget {
+//   final Message message;
+//   final Message? previousMessage; // Add this to compare timestamps
+  
+
+//   const _MessageBubble({
+//     required this.message,
+//     this.previousMessage,
+//   });
+
+//   @override
+//   State<_MessageBubble> createState() => _MessageBubbleState();
+// }
+
+// class _MessageBubbleState extends State<_MessageBubble> {
+
+  
+
+// String getMessageTime() {
+//   final messageDate = widget.message.createdAt.toLocal();
+//   final now = DateTime.now();
+//   final difference = now.difference(messageDate);
+  
+//   final timeFormat = DateFormat('h:mm a'); // 12-hour format with AM/PM
+
+//   if (difference.inMinutes < 1) {
+//     return 'Just now';
+//   } else if (difference.inMinutes < 60) {
+//     return '${difference.inMinutes}m ago';
+//   } else if (difference.inHours < 24) {
+//     return '${difference.inHours}h ago';
+//   } else if (difference.inDays == 1) {
+//     return 'Yesterday at ${timeFormat.format(messageDate)}';
+//   } else if (difference.inDays < 7) {
+//     final dayName = DateFormat('EEEE').format(messageDate); // Full day name
+//     return '$dayName at ${timeFormat.format(messageDate)}';
+//   } else if (difference.inDays < 365) {
+//     return DateFormat('MMM d').format(messageDate); // Month and day
+//   } else {
+//     return DateFormat('MMM d, y').format(messageDate); // Month, day and year
+//   }
+// }
+
+
+//   bool shouldShowDate() {
+//     if (widget.previousMessage == null) return true;
+    
+//     final previousDate = widget.previousMessage!.createdAt;
+//     final currentDate = widget.message.createdAt;
+    
+//     return !DateUtils.isSameDay(previousDate, currentDate);
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     // Explicitly check if the message is from current user
+//     final isSentMessage = widget.message.isFromCurrentUser;
+
+//     return Column(
+//       children: [
+//         if (shouldShowDate())
+//           Padding(
+//             padding: const EdgeInsets.symmetric(vertical: 16),
+//             child: Center(
+//               child: Container(
+//                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+//                 decoration: BoxDecoration(
+//                   color: Colors.grey[200],
+//                   borderRadius: BorderRadius.circular(12),
+//                 ),
+//                 child: Text(
+//                   getMessageTime(),
+//                   style: TextStyle(
+//                     fontSize: 12,
+//                     color: Colors.grey[600],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//           ),
+//         Align(
+//           // Force alignment based on message type
+//           alignment: isSentMessage ? Alignment.centerRight : Alignment.centerLeft,
+//           child: Container(
+//             constraints: BoxConstraints(
+//               maxWidth: MediaQuery.of(context).size.width * 0.75,
+//             ),
+//             margin: const EdgeInsets.symmetric(vertical: 4),
+//             child: Column(
+//               crossAxisAlignment: isSentMessage 
+//                   ? CrossAxisAlignment.end 
+//                   : CrossAxisAlignment.start,
+//               children: [
+//                 // Only show sender name for received messages
+//                 if (!isSentMessage && 
+//                     (widget.message.firstName != null || 
+//                      widget.message.lastName != null))
+//                   Padding(
+//                     padding: const EdgeInsets.only(left: 12, bottom: 4),
+//                     child: Text(
+//                       '${widget.message.firstName ?? ''} ${widget.message.lastName ?? ''}'
+//                           .trim(),
+//                       style: TextStyle(
+//                         fontSize: 12,
+//                         color: Colors.grey[600],
+//                         fontWeight: FontWeight.w500,
+//                       ),
+//                     ),
+//                   ),
+//                 Container(
+//                   padding: const EdgeInsets.symmetric(
+//                     horizontal: 16,
+//                     vertical: 10,
+//                   ),
+//                   decoration: BoxDecoration(
+//                     // Different colors for sent and received messages
+//                     color: isSentMessage
+//                         ? const Color(0xFF2B7FFF) // Blue for sent messages
+//                         : const Color.fromARGB(255, 189, 211, 24),       // Grey for received messages
+//                     borderRadius: BorderRadius.only(
+//                       topLeft: const Radius.circular(16),
+//                       topRight: const Radius.circular(16),
+//                       bottomLeft: Radius.circular(isSentMessage ? 16 : 4),
+//                       bottomRight: Radius.circular(isSentMessage ? 4 : 16),
+//                     ),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.black.withOpacity(0.05),
+//                         blurRadius: 4,
+//                         offset: const Offset(0, 2),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Column(
+//                     crossAxisAlignment: isSentMessage 
+//                         ? CrossAxisAlignment.end 
+//                         : CrossAxisAlignment.start,
+//                     children: [
+//                       Text(
+//                         widget.message.content,
+//                         style: TextStyle(
+//                           color: isSentMessage ? Colors.white : const Color.fromARGB(221, 249, 248, 248),
+//                           fontSize: 18,
+//                         ),
+//                       ),
+//                       const SizedBox(height: 2),
+//                       Text(
+//                         DateFormat('hh:mm a').format(
+//                           widget.message.createdAt.toLocal()
+//                         ),
+//                         style: TextStyle(
+//                           fontSize: 13,
+//                           color: isSentMessage
+//                               ? Colors.white.withOpacity(0.7)
+//                               : const Color.fromARGB(255, 13, 2, 2),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
+
+
+
 class _MessageBubble extends StatefulWidget {
   final Message message;
-  final Message? previousMessage; // Add this to compare timestamps
+  final Message? previousMessage;
+  final String buyerId;    // Add this
+  final String sellerId;   // Add this
 
   const _MessageBubble({
     required this.message,
     this.previousMessage,
+    required this.buyerId,    // Add this
+    required this.sellerId,   // Add this
   });
 
   @override
@@ -649,9 +868,7 @@ class _MessageBubble extends StatefulWidget {
 
 class _MessageBubbleState extends State<_MessageBubble> {
 
-  
-
-String getMessageTime() {
+  String getMessageTime() {
   final messageDate = widget.message.createdAt.toLocal();
   final now = DateTime.now();
   final difference = now.difference(messageDate);
@@ -687,8 +904,8 @@ String getMessageTime() {
   }
   @override
   Widget build(BuildContext context) {
-    // Explicitly check if the message is from current user
-    final isSentMessage = widget.message.isFromCurrentUser;
+    // Determine message alignment based on senderId
+    final isSenderMessage = widget.message.senderId == widget.sellerId;
 
     return Column(
       children: [
@@ -713,20 +930,20 @@ String getMessageTime() {
             ),
           ),
         Align(
-          // Force alignment based on message type
-          alignment: isSentMessage ? Alignment.centerRight : Alignment.centerLeft,
+          // Align based on sender type
+          alignment: isSenderMessage ? Alignment.centerRight : Alignment.centerLeft,
           child: Container(
             constraints: BoxConstraints(
               maxWidth: MediaQuery.of(context).size.width * 0.75,
             ),
             margin: const EdgeInsets.symmetric(vertical: 4),
             child: Column(
-              crossAxisAlignment: isSentMessage 
+              crossAxisAlignment: isSenderMessage 
                   ? CrossAxisAlignment.end 
                   : CrossAxisAlignment.start,
               children: [
-                // Only show sender name for received messages
-                if (!isSentMessage && 
+                // Show sender name for received messages
+                if (!isSenderMessage && 
                     (widget.message.firstName != null || 
                      widget.message.lastName != null))
                   Padding(
@@ -747,15 +964,14 @@ String getMessageTime() {
                     vertical: 10,
                   ),
                   decoration: BoxDecoration(
-                    // Different colors for sent and received messages
-                    color: isSentMessage
-                        ? const Color(0xFF2B7FFF) // Blue for sent messages
-                        : const Color.fromARGB(255, 189, 211, 24),       // Grey for received messages
+                    color: isSenderMessage
+                        ? const Color(0xFF2B7FFF) // Seller message color
+                        : const Color.fromARGB(255, 189, 211, 24), // Buyer message color
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(16),
                       topRight: const Radius.circular(16),
-                      bottomLeft: Radius.circular(isSentMessage ? 16 : 4),
-                      bottomRight: Radius.circular(isSentMessage ? 4 : 16),
+                      bottomLeft: Radius.circular(isSenderMessage ? 16 : 4),
+                      bottomRight: Radius.circular(isSenderMessage ? 4 : 16),
                     ),
                     boxShadow: [
                       BoxShadow(
@@ -766,14 +982,14 @@ String getMessageTime() {
                     ],
                   ),
                   child: Column(
-                    crossAxisAlignment: isSentMessage 
+                    crossAxisAlignment: isSenderMessage 
                         ? CrossAxisAlignment.end 
                         : CrossAxisAlignment.start,
                     children: [
                       Text(
                         widget.message.content,
                         style: TextStyle(
-                          color: isSentMessage ? Colors.white : const Color.fromARGB(221, 249, 248, 248),
+                          color: isSenderMessage ? Colors.white : const Color.fromARGB(221, 249, 248, 248),
                           fontSize: 18,
                         ),
                       ),
@@ -784,7 +1000,7 @@ String getMessageTime() {
                         ),
                         style: TextStyle(
                           fontSize: 13,
-                          color: isSentMessage
+                          color: isSenderMessage
                               ? Colors.white.withOpacity(0.7)
                               : const Color.fromARGB(255, 13, 2, 2),
                         ),
@@ -800,6 +1016,7 @@ String getMessageTime() {
     );
   }
 }
+
 
 
 

@@ -38,6 +38,7 @@ final ScrollController _scrollController = ScrollController();
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
+         final userId = prefs.getString('userId'); // Add this to get current user ID
 
 
     if (token == null) {
@@ -91,12 +92,16 @@ final ScrollController _scrollController = ScrollController();
         String? conversationId;
         String? title;
         String? thumb;
+         String buyerId;
+      String sellerId;
 
         if (existingConversation != null) {
           // Use existing conversation
           conversationId = existingConversation['_id'];
           title = existingConversation['title'];
           thumb = existingConversation['thumb'];
+           buyerId = existingConversation['buyerId'];
+        sellerId = existingConversation['sellerId'];
         } else {
           // Initiate new chat
           final initiateResponse = await http.post(
@@ -116,6 +121,8 @@ final ScrollController _scrollController = ScrollController();
             conversationId = data['conversationId'];
             title = data['title'];
             thumb = data['thumb'];
+             buyerId = userId!; // Current user is buyer
+          sellerId = widget.productModel.posted_by.toString(); // Seller ID from product
           } else {
             throw Exception('Failed to initiate chat');
           }
@@ -148,8 +155,12 @@ final ScrollController _scrollController = ScrollController();
                   thumb: thumb ?? widget.productModel.thumb ?? '',
                   title: title ?? widget.productModel.title ?? '',
                   price: widget.productModel.price ?? 0.0,
+                 buyerId: buyerId,    // Add this
+                sellerId: sellerId,  // Add this
+                  
                   initialMessages: messagesList,
                   product: widget.productModel,
+
                    isFromChatScreen: false, // Specify that it's from product details
                 ),
               ),

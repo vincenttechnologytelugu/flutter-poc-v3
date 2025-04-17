@@ -2,6 +2,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_poc_v3/models/product_model.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/dashboard/custom_bottom_nav_bar.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/home_screen.dart';
 import 'package:flutter_poc_v3/protected_screen.dart/user_chat_screen.dart';
@@ -26,6 +27,40 @@ class _ChatScreenState extends State<ChatScreen>
   List<Conversation> conversations = [];
 
   bool isLoading = true;
+
+  String? formatSalary(dynamic salary) {
+  if (salary == null) return null;
+  
+  try {
+    num numericSalary = salary is String ? double.parse(salary) : salary;
+    return NumberFormat('#,##0', 'en_IN').format(numericSalary);
+  } catch (e) {
+    return null;
+  }
+}
+
+String formatPriceDisplay(ProductModel productModel) {
+  try {
+    if (productModel.category?.toLowerCase() == 'jobs') {
+      if (productModel.salary != null) {
+        return 'Salary: ₹${formatSalary(productModel.salary) ?? 'Negotiable'}';
+      }
+      return 'Salary: Negotiable';
+    }
+
+    if (productModel.price != null && productModel.price != 0) {
+      num price = productModel.price is String 
+          ? double.parse(productModel.price.toString()) 
+          : productModel.price;
+      return 'Price: ₹${NumberFormat('#,##0', 'en_IN').format(price)}';
+    }
+
+    return 'Price: N/A';
+  } catch (e) {
+    return 'Price: N/A';
+  }
+}
+
 
   @override
   void initState() {
@@ -219,6 +254,19 @@ class _ConversationTile extends StatefulWidget {
 }
 
 class _ConversationTileState extends State<_ConversationTile> {
+
+String? formatSalary(dynamic salary) {
+  if (salary == null) return null;
+  try {
+    num numericSalary = salary is String ? double.parse(salary) : salary;
+    return NumberFormat('#,##0', 'en_IN').format(numericSalary);
+  } catch (e) {
+    return null;
+  }
+}
+
+
+
   Widget buildThumbImage(String? thumbUrl, {double size = 40}) {
     return thumbUrl != null && thumbUrl.isNotEmpty
         ? Image.network(
@@ -332,20 +380,40 @@ class _ConversationTileState extends State<_ConversationTile> {
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 4),
-            Text(
-              widget.conversation.product.price != null
-                  ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.price)}'
-                  : 'N/A',
-              style: const TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w900,
-                color: Color.fromARGB(255, 13, 1, 1),
-                letterSpacing: 1.2,
-                fontFamily: 'Poppins',
-                fontStyle: FontStyle.normal,
-              ),
-              overflow: TextOverflow.ellipsis,
-            )
+            // Text(
+            //   widget.conversation.product.price != null
+            //       ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.price)}'
+            //       : 'N/A',
+            //   style: const TextStyle(
+            //     fontSize: 15,
+            //     fontWeight: FontWeight.w900,  
+            //     color: Color.fromARGB(255, 13, 1, 1),
+            //     letterSpacing: 1.2,
+            //     fontFamily: 'Poppins',
+            //     fontStyle: FontStyle.normal,
+            //   ),
+            //   overflow: TextOverflow.ellipsis,
+            // )
+Text(
+  widget.conversation.product.category?.toLowerCase() == 'jobs'
+    ? widget.conversation.product.salary != null && widget.conversation.product.salary != 0
+        ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.salary)}'
+        : 'Salary: Negotiable'
+    : widget.conversation.product.price != null && widget.conversation.product.price != 0
+        ? '₹${NumberFormat('#,##0', 'en_IN').format(widget.conversation.product.price)}'
+        : 'Price: N/A',
+  style: const TextStyle(
+    fontSize: 15,
+    fontWeight: FontWeight.w900,  
+    color: Color.fromARGB(255, 13, 1, 1),
+    letterSpacing: 1.2,
+    fontFamily: 'Poppins',
+    fontStyle: FontStyle.normal,
+  ),
+  overflow: TextOverflow.ellipsis,
+)
+
+
           ],
         ),
         trailing: Row(
@@ -541,6 +609,10 @@ class _ConversationTileState extends State<_ConversationTile> {
                       thumb: fullThumbUrl, // Pass the full URL
                       title: widget.conversation.product.title ?? '',
                       price: widget.conversation.product.price ?? 0.0,
+
+                      sellerId: widget.conversation.sellerId ?? '',
+                      buyerId: widget.conversation.buyerId ?? '',
+                      
                        isFromChatScreen: true, // Specify that it's from chat screen
                     ),
                   ),
